@@ -1,10 +1,39 @@
+;;; leanote.el --- Major mode for using leanote.  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2016 Aborn Jiang
+
+;; Author: Aborn Jiang <aborn.jiang@gmail.com>
+;; Version: 0.1
+;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3"))
+;; Keywords: leanote, note, markdown
+;; Homepage: https://github.com/aborn/leanote-mode
+;; URL: https://github.com/aborn/leanote-mode
+
+;; This file is NOT part of GNU Emacs.
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; emacs use leanote
+
 ;;; Code:
 
-;; for leanote-mode
 (require 'cl-lib)
 (require 'json)
 (require 'request)
-(require 'aborn-log)   ;; only for test
+(require 'let-alist)
 
 ;;;;  Variables
 (defvar leanote-user nil)
@@ -18,30 +47,31 @@
 (defcustom leanote-api-root
   "https://leanote.com/api"
   "api root"
-  :group 'leanote-mode
+  :group 'leanote
   :type 'string)
 
 (defcustom leanote-request-timeout 10
   "Timeout control for http request, in seconds."
-  :group 'leanote-mode
+  :group 'leanote
   :type 'number)
 
 (defcustom leanote-local-path
   "~/leanote/note"
-  :group 'leanote-mode
+  "local leanote path"
+  :group 'leanote
   :type 'string)
 
-(defgroup leanote-mode nil
+(defgroup leanote nil
   "leanote mini group"
   :prefix "leanote-"
   :group 'external)
 
-(define-minor-mode leanote-mode
-  "leanote mini-mode"
+(define-minor-mode leanote
+  "leanot mini mode"
   :init-value nil
   :lighter " leanote"
   :keymap '(([C-c m] . leanote-init))
-  :group 'leanote-mode)
+  :group 'leanote)
 
 (defun leanote-init ()
   "init it"
@@ -49,6 +79,7 @@
   (message "leanote start."))
 
 (defun leanote-parser ()
+  "parser"
   (json-read-from-string (decode-coding-string (buffer-string) 'utf-8)))
 
 (defun leanote-get-note-books ()
