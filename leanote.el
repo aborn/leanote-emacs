@@ -43,9 +43,9 @@
 (defvar leanote-token nil)
 (defvar leanote-api-login "/auth/login")
 (defvar leanote-api-getnotebooks "/notebook/getNotebooks")
+(defvar leanote-debug-data nil)
 
-(defcustom leanote-api-root
-  "https://leanote.com/api"
+(defcustom leanote-api-root "https://leanote.com/api"
   "api root"
   :group 'leanote
   :type 'string)
@@ -55,8 +55,7 @@
   :group 'leanote
   :type 'number)
 
-(defcustom leanote-local-path
-  "~/leanote/note"
+(defcustom leanote-local-path "~/leanote/note"
   "local leanote path"
   :group 'leanote
   :type 'string)
@@ -96,6 +95,7 @@
                              (message "get-note-book failed, cause: %s"
                                       (assoc-default 'Msg data)))  ;; NOTLOGIN
                          (progn
+                           (setq leanote-debug-data data)
                            (message "finished. notebook number=%d" (length data)))))))
   )
 
@@ -106,7 +106,6 @@
     (setq user (read-string "Email: " nil nil leanote-user-email)))
   (when (null password)
     (setq password (read-passwd "Password: " nil leanote-user-password)))
-  (message "email:%s, password%s" user password)
   (request (concat leanote-api-root leanote-api-login)
            :params `(("email" . ,user)
                      ("pwd" . ,password))
@@ -121,6 +120,7 @@
                            (setq leanote-user (assoc-default 'Username data))
                            (setq leanote-user-email (assoc-default 'Email data))
                            (setq leanote-user-id (assoc-default 'UserId data))
+                           (setq leanote-user-password password) ;; update password
                            (message "login success!")))))))
 
 (provide 'leanote)
