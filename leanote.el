@@ -55,7 +55,7 @@
   "get note books"
   (interactive)
   (request (concat leanote-api-root leanote-api-getnotebooks)
-           :params '(("token" . leanote-token))
+           :params `(("token" . ,leanote-token))
            :sync t
            :parser 'leanote-parser
            :success (cl-function
@@ -77,8 +77,8 @@
     (setq password (read-passwd "Password: " nil leanote-user-password)))
   (message "email:%s, password%s" user password)
   (request (concat leanote-api-root leanote-api-login)
-           :params '(("email" . user)
-                     ("pwd" . password))
+           :params `(("email" . ,user)
+                     ("pwd" . ,password))
            :sync t
            :parser 'leanote-parser
            :success (cl-function
@@ -90,8 +90,6 @@
                            (setq leanote-user (assoc-default 'Username data))
                            (setq leanote-user-email (assoc-default 'Email data))
                            (setq leanote-user-id (assoc-default 'UserId data))
-                           (message "login success!")))))
-           )
-  )
+                           (message "login success!")))))))
 
 (provide 'leanote)
