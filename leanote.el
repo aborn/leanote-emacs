@@ -55,7 +55,7 @@
   :group 'leanote
   :type 'number)
 
-(defcustom leanote-local-path "~/leanote/note"
+(defcustom leanote-local-root-path "~/leanote/note"
   "local leanote path"
   :group 'leanote
   :type 'string)
@@ -96,8 +96,25 @@
                                       (assoc-default 'Msg data)))  ;; NOTLOGIN
                          (progn
                            (setq leanote-debug-data data)
+                           (leanote-mkdir-notebooks-directory-structure data)
                            (message "finished. notebook number=%d" (length data)))))))
   )
+
+(defun leanote-mkdir-notebooks-directory-structure (note-books-data)
+  "make note-books hierarchy"
+  (unless (file-exists-p leanote-local-root-path)
+    (message "make root dir %s" leanote-local-root-path)
+    (make-directory leanote-local-root-path t))
+  (cl-loop for elt in (append note-books-data nil)
+           collect
+           (let* ((title (assoc-default 'Title elt))
+                  (has-parent (not (string= "" (assoc-default 'ParentNotebookId elt))))
+                  (current-note-book (expand-file-name title leanote-local-root-path)))
+             (message "title=%s" title)
+             (when (and (not has-parent) (not (file-exists-p current-note-book)))
+               (make-directory current-note-book)
+               ))
+           ))
 
 (defun leanote-login (&optional user password)
   "login in leanote"
