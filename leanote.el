@@ -96,19 +96,19 @@
 (defun leanote-get-note-content (noteid)
   "get note content, return type.Note"
   (interactive)
-  (leanote-common-api-action "noteId" noteid leanote-api-getnotecontent))
+  (leanote-common-api-action leanote-api-getnotecontent "noteId" noteid))
 
 (defun leanote-get-notes (notebookid)
   "get notebook notes list"
   (interactive)
-  (leanote-common-api-action "notebookId" notebookid leanote-api-getnotes))
+  (leanote-common-api-action leanote-api-getnotes "notebookId" notebookid))
 
 (defun leanote-get-note-and-content (noteid)
   "get note and content, return  type.Note"
   (interactive)
-  (leanote-common-api-action "noteId" noteid leanote-api-getnoteandcontent))
+  (leanote-common-api-action leanote-api-getnoteandcontent "noteId" noteid))
 
-(defun leanote-common-api-action (param-key param-value api)
+(defun leanote-common-api-action (api &optional param-key &optional param-value)
   "common api only one parameter"
   (let ((result nil))
     (request (concat leanote-api-root api)
@@ -128,21 +128,11 @@
 (defun leanote-get-note-books ()
   "get note books"
   (interactive)
-  (request (concat leanote-api-root leanote-api-getnotebooks)
-           :params `(("token" . ,leanote-token))
-           :sync t
-           :parser 'leanote-parser
-           :success (cl-function
-                     (lambda (&key data &allow-other-keys)
-                       (if (not (arrayp data))
-                           (progn
-                             (message "get-note-book failed, cause: %s"
-                                      (assoc-default 'Msg data)))  ;; NOTLOGIN
-                         (progn
-                           (setq leanote-current-note-book data)
-                           (leanote-mkdir-notebooks-directory-structure data)
-                           (message "finished. notebook number=%d" (length data)))))))
-  )
+  (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
+    (when note-books
+      (setq leanote-current-note-book note-books)
+      (message "finished. total:%d" (length note-books))
+      note-books)))
 
 (defun leanote-mkdir-notebooks-directory-structure (note-books-data)
   "make note-books hierarchy"
