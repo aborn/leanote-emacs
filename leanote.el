@@ -36,15 +36,26 @@
 (require 'let-alist)
 
 ;;;;  Variables
+
+;; for debug
+(defvar leanote-debug-data nil)
+
+;; user info
 (defvar leanote-user nil)
 (defvar leanote-user-password nil)
 (defvar leanote-user-email nil)
 (defvar leanote-user-id nil)
 (defvar leanote-token nil)
+
+;; local cache 
+(defvar leanote-current-note-book nil)
+
+;; api
 (defvar leanote-api-login "/auth/login")
 (defvar leanote-api-getnotebooks "/notebook/getNotebooks")
-(defvar leanote-debug-data nil)
-(defvar leanote-current-note-book nil)
+(defvar leanote-api-getnotecontent "/note/getNoteContent")
+(defvar leanote-api-getnoteandcontent "/note/getNoteAndContent")
+(defvar leanote-api-getnotes "/note/getNotes")
 
 (defcustom leanote-api-root "https://leanote.com/api"
   "api root"
@@ -81,6 +92,39 @@
 (defun leanote-parser ()
   "parser"
   (json-read-from-string (decode-coding-string (buffer-string) 'utf-8)))
+
+(defun leanote-get-note-content (noteid)
+  "get note content, return type.Note"
+  (interactive)
+  (leanote-common-api-action "noteId" noteid leanote-api-getnotecontent))
+
+(defun leanote-get-notes (notebookid)
+  "get notebook notes list"
+  (interactive)
+  (leanote-common-api-action "notebookId" notebookid leanote-api-getnotes))
+
+(defun leanote-get-note-and-content (noteid)
+  "get note and content, return  type.Note"
+  (interactive)
+  (leanote-common-api-action "noteId" noteid leanote-api-getnoteandcontent))
+
+(defun leanote-common-api-action (param-key param-value api)
+  "common api only one parameter"
+  (interactive)
+  (let ((result nil))
+    (request (concat leanote-api-root api)
+             :params `(("token" . ,leanote-token) (,param-key . ,param-value))
+             :sync t
+             :parser 'leanote-parser
+             :success (cl-function
+                       (lambda (&key data &allow-other-keys)
+                         (setq leanote-debug-data data)
+                         (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
+                           (setq result data))
+                         ))
+             )
+    result)
+  )
 
 (defun leanote-get-note-books ()
   "get note books"
