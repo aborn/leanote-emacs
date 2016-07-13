@@ -119,12 +119,13 @@
              :success (cl-function
                        (lambda (&key data &allow-other-keys)
                          (setq leanote-debug-data data)
-                         (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
-                           (setq result data))
-                         ))
+                         (if (arrayp data)
+                             (setq result data)
+                           (progn (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
+                                    (setq result data))
+                                  ))))
              )
-    result)
-  )
+    result))
 
 (defun leanote-get-note-books ()
   "get note books"
