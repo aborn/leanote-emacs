@@ -110,7 +110,6 @@
 
 (defun leanote-common-api-action (param-key param-value api)
   "common api only one parameter"
-  (interactive)
   (let ((result nil))
     (request (concat leanote-api-root api)
              :params `(("token" . ,leanote-token) (,param-key . ,param-value))
@@ -123,8 +122,7 @@
                              (setq result data)
                            (progn (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
                                     (setq result data))
-                                  ))))
-             )
+                                  )))))
     result))
 
 (defun leanote-get-note-books ()
