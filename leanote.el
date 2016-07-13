@@ -44,6 +44,7 @@
 (defvar leanote-api-login "/auth/login")
 (defvar leanote-api-getnotebooks "/notebook/getNotebooks")
 (defvar leanote-debug-data nil)
+(defvar leanote-current-note-book nil)
 
 (defcustom leanote-api-root "https://leanote.com/api"
   "api root"
@@ -95,7 +96,7 @@
                              (message "get-note-book failed, cause: %s"
                                       (assoc-default 'Msg data)))  ;; NOTLOGIN
                          (progn
-                           (setq leanote-debug-data data)
+                           (setq leanote-current-note-book data)
                            (leanote-mkdir-notebooks-directory-structure data)
                            (message "finished. notebook number=%d" (length data)))))))
   )
