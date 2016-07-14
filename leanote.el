@@ -87,6 +87,10 @@
 (defun leanote-init ()
   "init it"
   (interactive)
+  (unless (not leanote-token)
+    (leanote-login))
+  (leanote-get-note-books)
+  (leanote-mkdir-notebooks-directory-structure leanote-current-note-book)
   (message "leanote start."))
 
 (defun leanote-parser ()
@@ -117,7 +121,7 @@
              :parser 'leanote-parser
              :success (cl-function
                        (lambda (&key data &allow-other-keys)
-                         (setq leanote-debug-data data)
+                         (setq leanote-debug-data data)  ;; TODO
                          (if (arrayp data)
                              (setq result data)
                            (progn (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
