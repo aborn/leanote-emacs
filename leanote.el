@@ -110,12 +110,12 @@
              collect
              (let* ((noteid (assoc-default 'NoteId note))
                     (title (assoc-default 'Title note))
+                    (is-markdown-content (assoc-default 'IsMarkdown note))
                     (notecontent-obj (leanote-get-note-content noteid))
-                    (is-markdown-content (eq t (assoc-default 'IsMarkdown notecontent-obj)))
                     (notecontent (assoc-default 'Content notecontent-obj)))
                (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
-               (when is-markdown-content
-                 
+               (when (eq t is-markdown-content)
+                 (message "ok, is markdown!")
                  )
                )
              )
