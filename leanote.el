@@ -106,6 +106,7 @@
 (defun leanote-create-notes-files (notebookname notes)
   "create note files"
   (let* ((notebookroot (expand-file-name notebookname leanote-local-root-path)))
+    (message "notebookroot=%s" notebookroot)
     (cl-loop for note in (append notes nil)
              collect
              (let* ((noteid (assoc-default 'NoteId note))
@@ -113,7 +114,7 @@
                     (is-markdown-content (assoc-default 'IsMarkdown note))
                     (notecontent-obj (leanote-get-note-content noteid))
                     (notecontent (assoc-default 'Content notecontent-obj)))
-               (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
+               ;; (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
                (when (eq t is-markdown-content)
                  (message "ok, is markdown!")
                  )
