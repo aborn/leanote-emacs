@@ -87,11 +87,40 @@
 (defun leanote-init ()
   "init it"
   (interactive)
-  (unless (not leanote-token)
+  (unless leanote-token
+    (message "please login first.")
     (leanote-login))
   (leanote-get-note-books)
   (leanote-mkdir-notebooks-directory-structure leanote-current-note-book)
+  (cl-loop for elt in (append leanote-current-note-book nil)
+           collect
+           (let* ((title (assoc-default 'Title elt))
+                  (notebookid (assoc-default 'NotebookId elt))
+                  (notes (leanote-get-notes notebookid)))
+             (message "title:%s, nootbookid:%s, has %d notes." title notebookid (length notes))
+             (leanote-create-notes-files title notes)
+             )
+           )
   (message "leanote start."))
+
+(defun leanote-create-notes-files (notebookname notes)
+  "create note files"
+  (let* ((notebookroot (expand-file-name notebookname leanote-local-root-path)))
+    (cl-loop for note in (append notes nil)
+             collect
+             (let* ((noteid (assoc-default 'NoteId note))
+                    (title (assoc-default 'Title note))
+                    (notecontent-obj (leanote-get-note-content noteid))
+                    (is-markdown-content (eq t (assoc-default 'IsMarkdown notecontent-obj)))
+                    (notecontent (assoc-default 'Content notecontent-obj)))
+               (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
+               (when is-markdown-content
+                 
+                 )
+               )
+             )
+    )
+  )
 
 (defun leanote-parser ()
   "parser"
