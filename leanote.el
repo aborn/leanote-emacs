@@ -1,4 +1,4 @@
-;;; leanote.el --- Major mode for using leanote.  -*- lexical-binding: t; -*-
+;;; leanote.el --- Minor mode for leanote in markdown file.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Aborn Jiang
 
