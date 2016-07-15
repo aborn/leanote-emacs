@@ -48,6 +48,7 @@
 (defvar leanote-token nil)
 
 ;; local cache 
+(defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
 
 ;; api
@@ -92,8 +93,8 @@
     (message "please login first.")
     (leanote-login))
   (leanote-get-note-books)
-  (leanote-mkdir-notebooks-directory-structure leanote-current-note-book)
-  (cl-loop for elt in (append leanote-current-note-book nil)
+  (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
+  (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((title (assoc-default 'Title elt))
                   (notebookid (assoc-default 'NotebookId elt))
@@ -171,7 +172,7 @@
   (interactive)
   (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
     (when note-books
-      (setq leanote-current-note-book note-books)
+      (setq leanote-current-all-note-books note-books)
       (message "Got %d notebooks." (length note-books))
       note-books)))
 
