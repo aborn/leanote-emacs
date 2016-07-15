@@ -84,9 +84,10 @@
   :keymap '(([C-c m] . leanote-init))
   :group 'leanote)
 
-(defun leanote-init ()
+(defun leanote-sync ()
   "init it"
   (interactive)
+  (message "--------start to sync leanote data:%s-------" (leanote--get-current-time-stamp))
   (unless leanote-token
     (message "please login first.")
     (leanote-login))
@@ -97,14 +98,17 @@
            (let* ((title (assoc-default 'Title elt))
                   (notebookid (assoc-default 'NotebookId elt))
                   (notes (leanote-get-notes notebookid)))
-             (message "title:%s, nootbookid:%s, has %d notes." title notebookid (length notes))
-             (leanote-create-notes-files title notes)
-             )
-           )
-  (message "leanote start."))
+             (message "notebook-name:%s, nootbook-id:%s, has %d notes."
+                      title notebookid (length notes))
+             (leanote-create-notes-files title notes)))
+  (message "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
+
+(defun leanote--get-current-time-stamp ()
+  "get current time stamp"
+  (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
 
 (defun leanote-create-notes-files (notebookname notes)
-  "create note files"
+  "create&update all notes content in notebookname"
   (let* ((notebookroot (expand-file-name notebookname leanote-local-root-path)))
     (message "notebookroot=%s" notebookroot)
     (cl-loop for note in (append notes nil)
@@ -116,12 +120,15 @@
                     (notecontent (assoc-default 'Content notecontent-obj)))
                ;; (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
                (when (eq t is-markdown-content)
-                 (message "ok, is markdown!")
-                 )
-               )
-             )
-    )
-  )
+                 (save-current-buffer
+                   (let* ((filename (concat title ".md"))
+                          (file-full-name (expand-file-name filename notebookroot)))
+                     (if (file-exists-p file-full-name)
+                         (message "file %s already exists." file-full-name)
+                       (progn (find-file file-full-name)
+                              (insert notecontent)
+                              (save-buffer)
+                              (message "ok, finished!"))))))))))
 
 (defun leanote-parser ()
   "parser"
@@ -165,7 +172,7 @@
   (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
     (when note-books
       (setq leanote-current-note-book note-books)
-      (message "finished. total:%d" (length note-books))
+      (message "Got %d notebooks." (length note-books))
       note-books)))
 
 (defun leanote-mkdir-notebooks-directory-structure (note-books-data)
