@@ -128,7 +128,7 @@
                        (progn (find-file file-full-name)
                               (insert notecontent)
                               (save-buffer)
-                              (message "ok, finished!"))))))))))
+                              (message "ok, file %s finished!" file-full-name))))))))))
 
 (defun leanote-parser ()
   "parser"
