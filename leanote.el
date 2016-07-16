@@ -145,6 +145,7 @@
                     (notecontent (assoc-default 'Content notecontent-obj)))
                ;; (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
                (when (eq t is-markdown-content)
+                 (puthash noteid note leanote--cache-noteid-info)
                  (save-current-buffer
                    (let* ((filename (concat title ".md"))
                           (file-full-name (expand-file-name filename notebookroot)))
@@ -183,28 +184,31 @@
 (defun leanote-push-current-file-to-remote ()
   "push current content to remote server."
   (interactive)
-  (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name)))
-         (result-data nil))
+  (let* ((note-info (leanote-get-note-info-base-note-full-name
+                     (buffer-file-name)))
+         (result-data nil)
+         (note-id (assoc-default 'NoteId note-info)))
+    (unless note-id
+      (error "cannot find current note info in local cache."))
+    (setq note-info (gethash note-id leanote--cache-noteid-info))
     (unless note-info
       (error "cannot find current note info in local cache."))
-    (setq leanote-debug-data note-info)
-    (if (eq leanote-debug-data note-info)
-        (message "the same object."))
-    ;;(add-to-list 'leanote-debug-data '(Usn . 42))
-    ;; (message "hreee")
-    ;; (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
-    ;; (setq leanote-debug-data result-data)
-    ;; (when (and (listp result-data)
-    ;;            (equal :json-false (assoc-default 'Ok result-data)))
-    ;;   (error "push to remote error, msg:%s." (assoc-default 'Msg result-data)))
-    ;; (message "push to remote success.")
+    (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
+    (setq leanote-debug-data result-data)
+    (if (and (listp result-data)
+             (equal :json-false (assoc-default 'Ok result-data)))
+        (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
+      (progn
+        (message "push to remote success.")
+        (puthash note-id result-data leanote--cache-noteid-info))
+      )
     )
   )
 
 (defun leanote-ajax-update-note (note-info note-content)
   "update note"
   (let* ((result nil)
-         (usn (assoc-default 'Usn leanote-debug-data))
+         (usn (assoc-default 'Usn note-info))
          (new-usn (+ 1 usn))
          (new-usn-str (number-to-string usn))
          (note-id (assoc-default 'NoteId note-info))
