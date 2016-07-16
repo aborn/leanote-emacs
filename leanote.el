@@ -167,7 +167,7 @@
     (unless (string-suffix-p ".md" full-file-name)
       (error "file %s is not markdown file." full-file-name))
     (unless notebook-notes
-      (error "sorry, cannot find any notes in notebook-id %" notebook-id))
+      (error "sorry, cannot find any notes for notebook-id %" notebook-id))
     (message "note-title:%s" note-title)
     (cl-loop for elt in (append notebook-notes nil)
              collect
@@ -179,7 +179,7 @@
     note-info))
 
 (defun leanote-push-current-file-to-remote ()
-  "push current file to remote server"
+  "push current content to remote server"
   (interactive)
   (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name))))
     (unless note-info
