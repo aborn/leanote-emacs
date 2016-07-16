@@ -98,10 +98,9 @@
   (interactive)
   (message "--------start to sync leanote data:%s-------" (leanote--get-current-time-stamp))
   (unless leanote-token
-    (message "please login first.")
     (leanote-login))
   (leanote-get-note-books)
-  ;; keep all node info first
+  ;; keep all notebook node info and store to hash table first
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((notebookid (assoc-default 'NotebookId elt)))
@@ -115,16 +114,18 @@
              (puthash notebookid notes leanote--notebook-notes-cache)
              (message "notebook-name:%s, nootbook-id:%s, has %d notes."
                       title notebookid (length notes))
-             (leanote-create-notes-files title notes)))
+             (leanote-create-notes-files title notes notebookid)))
   (message "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
 
 (defun leanote--get-current-time-stamp ()
   "get current time stamp"
   (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
 
-(defun leanote-create-notes-files (notebookname notes)
+(defun leanote-create-notes-files (notebookname notes notebookid)
   "create&update all notes content in notebookname"
-  (let* ((notebookroot (expand-file-name notebookname leanote-local-root-path)))
+  (let* ((notebookroot (expand-file-name
+                        (leanote-get-notebook-parent-path notebookid)
+                        leanote-local-root-path)))
     (message "notebookroot=%s" notebookroot)
     (cl-loop for note in (append notes nil)
              collect
