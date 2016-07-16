@@ -151,7 +151,7 @@
 (defun leanote-push-current-file-to-remote ()
   "push current file to remote server"
   (interactive)
-  (let* (full-file-name (buffer-file-name))
+  (let* ((full-file-name (buffer-file-name)))
     (message "buffer file name %s" full-file-name)
     )
   )
