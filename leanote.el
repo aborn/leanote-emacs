@@ -87,10 +87,12 @@
   :group 'external)
 
 (define-minor-mode leanote
-  "leanot mini mode"
+  "leanote mini mode"
   :init-value nil
-  :lighter " leanote"
-  :keymap '(([C-c m] . leanote-init))
+  :lighter " leanote "
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
+            map)
   :group 'leanote)
 
 (defun leanote-sync ()
@@ -145,6 +147,14 @@
                               (insert notecontent)
                               (save-buffer)
                               (message "ok, file %s finished!" file-full-name))))))))))
+
+(defun leanote-push-current-file-to-remote ()
+  "push current file to remote server"
+  (interactive)
+  (let* (full-file-name (buffer-file-name))
+    (message "buffer file name %s" full-file-name)
+    )
+  )
 
 (defun leanote-parser ()
   "parser"
@@ -225,8 +235,8 @@
              (when has-parent
                (message "title=%s has parent" title)
                (setq current-notebook-path (expand-file-name
-                                        (leanote-get-notebook-parent-path notebook-id)
-                                        leanote-local-root-path)))
+                                            (leanote-get-notebook-parent-path notebook-id)
+                                            leanote-local-root-path)))
              (unless (file-exists-p current-notebook-path)
                (message "notebook:%s, path:%s" title current-notebook-path)
                (make-directory current-notebook-path t)
@@ -258,3 +268,4 @@
                            (message "login success!")))))))
 
 (provide 'leanote)
+;;; leanote.el ends here
