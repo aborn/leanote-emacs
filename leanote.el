@@ -54,6 +54,8 @@
 (defvar leanote--cache-notebookid-notes (make-hash-table :test 'equal))
 ;; notebook-id -> notebook-info map
 (defvar leanote--cache-notebookid-info (make-hash-table :test 'equal))
+;; note-id -> notebook-info map
+(defvar leanote--cache-noteid-info (make-hash-table :test 'equal))
 ;; local-path -> notebook-id
 (defvar leanote--cache-notebook-path-id (make-hash-table :test 'equal))
 
@@ -105,7 +107,7 @@
   (message "--------start to sync leanote data:%s-------" (leanote--get-current-time-stamp))
   (unless leanote-token
     (leanote-login))
-  (leanote-get-note-books)
+  (leanote-ajax-get-note-books)
   ;; keep all notebook node info and store to hash table first
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
@@ -116,7 +118,7 @@
            collect
            (let* ((title (assoc-default 'Title elt))
                   (notebookid (assoc-default 'NotebookId elt))
-                  (notes (leanote-get-notes notebookid)))
+                  (notes (leanote-ajax-get-notes notebookid)))
              (puthash notebookid notes leanote--cache-notebookid-notes)
              (message "notebook-name:%s, nootbook-id:%s, has %d notes."
                       title notebookid (length notes))
@@ -139,7 +141,7 @@
              (let* ((noteid (assoc-default 'NoteId note))
                     (title (assoc-default 'Title note))
                     (is-markdown-content (assoc-default 'IsMarkdown note))
-                    (notecontent-obj (leanote-get-note-content noteid))
+                    (notecontent-obj (leanote-ajax-get-note-content noteid))
                     (notecontent (assoc-default 'Content notecontent-obj)))
                ;; (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
                (when (eq t is-markdown-content)
@@ -182,13 +184,20 @@
   "push current content to remote server."
   (interactive)
   (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name)))
-         (result-data (leanote-ajax-update-note note-info (buffer-string))))
+         (result-data nil))
     (unless note-info
       (error "cannot find current note info in local cache."))
     (setq leanote-debug-data note-info)
-    (when (and (listp result-data)
-               (equal :json-false (assoc-default 'Ok result-data)))
-      (error "push to remote error, msg:%s." (assoc-default 'Msg result-data)))
+    (if (eq leanote-debug-data note-info)
+        (message "the same object."))
+    ;;(add-to-list 'leanote-debug-data '(Usn . 42))
+    ;; (message "hreee")
+    ;; (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
+    ;; (setq leanote-debug-data result-data)
+    ;; (when (and (listp result-data)
+    ;;            (equal :json-false (assoc-default 'Ok result-data)))
+    ;;   (error "push to remote error, msg:%s." (assoc-default 'Msg result-data)))
+    ;; (message "push to remote success.")
     )
   )
 
@@ -220,13 +229,22 @@
   "parser"
   (json-read-from-string (decode-coding-string (buffer-string) 'utf-8)))
 
-(defun leanote-get-note-content (noteid)
+(defun leanote-ajax-get-note-books ()
+  "get note books"
+  (interactive)
+  (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
+    (when note-books
+      (setq leanote-current-all-note-books note-books)
+      (message "Got %d notebooks." (length note-books))
+      note-books)))
+
+(defun leanote-ajax-get-note-content (noteid)
   "get note content, return type.Note"
   (interactive)
   (leanote-common-api-action leanote-api-getnotecontent "noteId" noteid))
 
-(defun leanote-get-notes (notebookid)
-  "get notebook notes list"
+(defun leanote-ajax-get-notes (notebookid)
+  "get all notes-info in notebook"
   (interactive)
   (leanote-common-api-action leanote-api-getnotes "notebookId" notebookid))
 
@@ -251,15 +269,6 @@
                                     (setq result data))
                                   )))))
     result))
-
-(defun leanote-get-note-books ()
-  "get note books"
-  (interactive)
-  (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
-    (when note-books
-      (setq leanote-current-all-note-books note-books)
-      (message "Got %d notebooks." (length note-books))
-      note-books)))
 
 ;; (leanote-get-notebook-parent-path "5789af43c3b1f40b51000009")
 ;; "其他笔记/其他语言学习"
