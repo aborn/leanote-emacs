@@ -179,13 +179,16 @@
     note-info))
 
 (defun leanote-push-current-file-to-remote ()
-  "push current content to remote server"
+  "push current content to remote server."
   (interactive)
-  (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name))))
+  (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name)))
+         (result-data (leanote-ajax-update-note note-info (buffer-string))))
     (unless note-info
       (error "cannot find current note info in local cache."))
     (setq leanote-debug-data note-info)
-    (leanote-ajax-update-note note-info (buffer-string))
+    (when (and (listp result-data)
+               (equal :json-false (assoc-default 'Ok result-data)))
+      (error "push to remote error, msg:%s." (assoc-default 'Msg result-data)))
     )
   )
 
@@ -210,10 +213,6 @@
              :parser 'leanote-parser
              :success (cl-function
                        (lambda (&key data &allow-other-keys)
-                         (setq leanote-debug-data data)  ;; TODO
-                         (when (and (listp data)
-                                    (equal :json-false (assoc-default 'Ok data)))
-                           (error "push to remote error, msg:%s" (assoc-default 'Msg data)))
                          (setq result data))))
     result))
 
