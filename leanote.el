@@ -155,6 +155,8 @@
 
 (defun leanote-get-note-info-base-note-full-name (full-file-name)
   "get note info base note full name"
+  (unless (string-suffix-p ".md" full-file-name)
+    (error "file %s is not markdown file." full-file-name))
   (let* ((note-info nil)   ;; fefault return
          (notebook-id (gethash
                        (substring default-directory 0 (- (length default-directory) 1))
@@ -163,19 +165,17 @@
                                            (string-remove-prefix
                                             default-directory
                                             full-file-name)))
-         (notebook-notes (gethash notebook-id leanote--cache-notebookid-notes)))
-    (unless (string-suffix-p ".md" full-file-name)
-      (error "file %s is not markdown file." full-file-name))
-    (unless notebook-notes
-      (error "sorry, cannot find any notes for notebook-id %" notebook-id))
-    (message "note-title:%s" note-title)
+         (notebook-notes nil))
+    (unless notebook-id
+      (error "sorry, cannot find any notes for notebook-id %s. %s"
+             notebook-id
+             "make sure this file is leanote file and you have login."))
+    (setq notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
     (cl-loop for elt in (append notebook-notes nil)
              collect
              (when (equal note-title (assoc-default 'Title elt))
                (setq note-info elt))
              )
-    (message "current directory:%s" default-directory)
-    (message "buffer file name %s" full-file-name)
     note-info))
 
 (defun leanote-push-current-file-to-remote ()
