@@ -50,6 +50,13 @@
 ;; local cache 
 (defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
+(defvar leanote--notebook-info-cache (make-hash-table :test 'equal))
+
+;; persistent
+(defvar leanote-persistent-directory
+  (let ((dir (concat user-emacs-directory ".cache/")))
+    (make-directory dir t)
+    dir))
 
 ;; api
 (defvar leanote-api-login "/auth/login")
@@ -99,6 +106,7 @@
            (let* ((title (assoc-default 'Title elt))
                   (notebookid (assoc-default 'NotebookId elt))
                   (notes (leanote-get-notes notebookid)))
+             (puthash notebookid notes leanote--notebook-info-cache)
              (message "notebook-name:%s, nootbook-id:%s, has %d notes."
                       title notebookid (length notes))
              (leanote-create-notes-files title notes)))
@@ -188,7 +196,7 @@
                   (current-note-book (expand-file-name title leanote-local-root-path)))
              (message "title=%s" title)
              (when (and (not has-parent) (not (file-exists-p current-note-book)))
-               (make-directory current-note-book)
+               (make-directory current-note-book t)
                ))
            ))
 
