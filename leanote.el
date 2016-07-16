@@ -185,18 +185,19 @@
     (unless note-info
       (error "cannot find current note info in local cache."))
     (setq leanote-debug-data note-info)
-    ;;(leanote-update-note note-info (buffer-string))
+    (leanote-ajax-update-note note-info (buffer-string))
     )
   )
 
-(defun leanote-update-note (note-info note-content)
+(defun leanote-ajax-update-note (note-info note-content)
   "update note"
   (let* ((result nil)
-        (new-usn (+ 1 (assoc-default 'Usn leanote-debug-data)))
-        (new-usn-str (number-to-string new-usn))
-        (note-id (assoc-default 'NoteId note-info))
-        (notebook-id (assoc-default 'NotebookId note-info))
-        (note-title (assoc-default 'Title note-info)))
+         (usn (assoc-default 'Usn leanote-debug-data))
+         (new-usn (+ 1 usn))
+         (new-usn-str (number-to-string usn))
+         (note-id (assoc-default 'NoteId note-info))
+         (notebook-id (assoc-default 'NotebookId note-info))
+         (note-title (assoc-default 'Title note-info)))
     (request (concat leanote-api-root "/note/updateNote")
              :params `(("token" . ,leanote-token)
                        ("NoteId" . ,note-id)
@@ -210,11 +211,10 @@
              :success (cl-function
                        (lambda (&key data &allow-other-keys)
                          (setq leanote-debug-data data)  ;; TODO
-                         (if (arrayp data)
-                             (setq result data)
-                           (progn (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
-                                    (setq result data))
-                                  )))))
+                         (when (and (listp data)
+                                    (equal :json-false (assoc-default 'Ok data)))
+                           (error "push to remote error, msg:%s" (assoc-default 'Msg data)))
+                         (setq result data))))
     result))
 
 (defun leanote-parser ()
