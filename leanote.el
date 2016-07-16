@@ -50,6 +50,7 @@
 ;; local cache 
 (defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
+(defvar leanote--notebook-notes-cache (make-hash-table :test 'equal))
 (defvar leanote--notebook-info-cache (make-hash-table :test 'equal))
 
 ;; persistent
@@ -100,13 +101,18 @@
     (message "please login first.")
     (leanote-login))
   (leanote-get-note-books)
+  ;; keep all node info first
+  (cl-loop for elt in (append leanote-current-all-note-books nil)
+           collect
+           (let* ((notebookid (assoc-default 'NotebookId elt)))
+             (puthash notebookid elt leanote--notebook-info-cache)))
   (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((title (assoc-default 'Title elt))
                   (notebookid (assoc-default 'NotebookId elt))
                   (notes (leanote-get-notes notebookid)))
-             (puthash notebookid notes leanote--notebook-info-cache)
+             (puthash notebookid notes leanote--notebook-notes-cache)
              (message "notebook-name:%s, nootbook-id:%s, has %d notes."
                       title notebookid (length notes))
              (leanote-create-notes-files title notes)))
@@ -184,19 +190,24 @@
       (message "Got %d notebooks." (length note-books))
       note-books)))
 
-(defun leanote-mkdir-notebooks-directory-structure (note-books-data)
+(defun leanote-mkdir-notebooks-directory-structure (&optional all-notebooks)
   "make note-books hierarchy"
+  (interactive)
   (unless (file-exists-p leanote-local-root-path)
     (message "make root dir %s" leanote-local-root-path)
     (make-directory leanote-local-root-path t))
-  (cl-loop for elt in (append note-books-data nil)
+  (when (null all-notebooks)
+    (message "all-notebooks not provided.")
+    (setq all-notebooks leanote-current-all-note-books))
+  (cl-loop for elt in (append all-notebooks nil)
            collect
            (let* ((title (assoc-default 'Title elt))
                   (has-parent (not (string= "" (assoc-default 'ParentNotebookId elt))))
                   (current-note-book (expand-file-name title leanote-local-root-path)))
              (message "title=%s" title)
              (when (and (not has-parent) (not (file-exists-p current-note-book)))
-               (make-directory current-note-book t)
+               (message ":%s" current-note-book)
+               ;;(make-directory current-note-book t)
                ))
            ))
 
