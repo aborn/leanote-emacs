@@ -190,6 +190,19 @@
       (message "Got %d notebooks." (length note-books))
       note-books)))
 
+;; (leanote-get-notebook-parent-path "5789af43c3b1f40b51000009")
+;; "其他笔记/其他语言学习"
+(defun leanote-get-notebook-parent-path (parentid)
+  "get notebook parent path"
+  (let* ((cparent (gethash parentid leanote--notebook-info-cache))
+         (cparent-title (assoc-default 'Title cparent))
+         (cparent-parent-id (assoc-default 'ParentNotebookId cparent))
+         (cparent-no-parent (string= "" cparent-parent-id)))
+    (if cparent-no-parent
+        cparent-title
+      (concat (leanote-get-notebook-parent-path cparent-parent-id) "/" cparent-title))
+    ))
+
 (defun leanote-mkdir-notebooks-directory-structure (&optional all-notebooks)
   "make note-books hierarchy"
   (interactive)
@@ -198,16 +211,24 @@
     (make-directory leanote-local-root-path t))
   (when (null all-notebooks)
     (message "all-notebooks not provided.")
+
     (setq all-notebooks leanote-current-all-note-books))
   (cl-loop for elt in (append all-notebooks nil)
            collect
            (let* ((title (assoc-default 'Title elt))
-                  (has-parent (not (string= "" (assoc-default 'ParentNotebookId elt))))
-                  (current-note-book (expand-file-name title leanote-local-root-path)))
+                  (notebook-id (assoc-default 'NotebookId elt))
+                  (parent-id (assoc-default 'ParentNotebookId elt))
+                  (has-parent (not (string= "" parent-id)))
+                  (current-notebook-path (expand-file-name title leanote-local-root-path)))
              (message "title=%s" title)
-             (when (and (not has-parent) (not (file-exists-p current-note-book)))
-               (message ":%s" current-note-book)
-               ;;(make-directory current-note-book t)
+             (when has-parent
+               (message "title=%s has parent" title)
+               (setq current-notebook-path (expand-file-name
+                                        (leanote-get-notebook-parent-path notebook-id)
+                                        leanote-local-root-path)))
+             (unless (file-exists-p current-notebook-path)
+               (message "notebook:%s, path:%s" title current-notebook-path)
+               (make-directory current-notebook-path t)
                ))
            ))
 
