@@ -189,7 +189,7 @@
          (result-data nil)
          (note-id (assoc-default 'NoteId note-info)))
     (unless note-id
-      (error "cannot find current note info in local cache."))
+      (error "cannot find this note corresponding note-id."))
     (setq note-info (gethash note-id leanote--cache-noteid-info))
     (unless note-info
       (error "cannot find current note info in local cache."))
