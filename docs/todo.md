@@ -3,3 +3,4 @@
 * create
 * delete
 * swiper search
+* rename
