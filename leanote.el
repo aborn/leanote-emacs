@@ -50,8 +50,12 @@
 ;; local cache 
 (defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
-(defvar leanote--notebook-notes-cache (make-hash-table :test 'equal))
-(defvar leanote--notebook-info-cache (make-hash-table :test 'equal))
+;; notebook-id -> notes-list(without content) map
+(defvar leanote--cache-notebookid-notes (make-hash-table :test 'equal))
+;; notebook-id -> notebook-info map
+(defvar leanote--cache-notebookid-info (make-hash-table :test 'equal))
+;; local-path -> notebook-id
+(defvar leanote--cache-notebook-path-id (make-hash-table :test 'equal))
 
 ;; persistent
 (defvar leanote-persistent-directory
@@ -106,14 +110,14 @@
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((notebookid (assoc-default 'NotebookId elt)))
-             (puthash notebookid elt leanote--notebook-info-cache)))
+             (puthash notebookid elt leanote--cache-notebookid-info)))
   (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((title (assoc-default 'Title elt))
                   (notebookid (assoc-default 'NotebookId elt))
                   (notes (leanote-get-notes notebookid)))
-             (puthash notebookid notes leanote--notebook-notes-cache)
+             (puthash notebookid notes leanote--cache-notebookid-notes)
              (message "notebook-name:%s, nootbook-id:%s, has %d notes."
                       title notebookid (length notes))
              (leanote-create-notes-files title notes notebookid)))
@@ -128,6 +132,7 @@
   (let* ((notebookroot (expand-file-name
                         (leanote-get-notebook-parent-path notebookid)
                         leanote-local-root-path)))
+    (puthash notebookroot notebookid leanote--cache-notebook-path-id)
     (message "notebookroot=%s" notebookroot)
     (cl-loop for note in (append notes nil)
              collect
@@ -148,11 +153,38 @@
                               (save-buffer)
                               (message "ok, file %s finished!" file-full-name))))))))))
 
+(defun leanote-get-note-info-base-note-full-name (full-file-name)
+  "get note info base note full name"
+  (let* ((note-info nil)   ;; fefault return
+         (notebook-id (gethash
+                       (substring default-directory 0 (- (length default-directory) 1))
+                       leanote--cache-notebook-path-id))
+         (note-title (string-remove-suffix ".md"
+                                           (string-remove-prefix
+                                            default-directory
+                                            full-file-name)))
+         (notebook-notes (gethash notebook-id leanote--cache-notebookid-notes)))
+    (unless (string-suffix-p ".md" full-file-name)
+      (error "file %s is not markdown file." full-file-name))
+    (unless notebook-notes
+      (error "sorry, cannot find any notes in notebook-id %" notebook-id))
+    (message "note-title:%s" note-title)
+    (cl-loop for elt in (append notebook-notes nil)
+             collect
+             (when (equal note-title (assoc-default 'Title elt))
+               (setq note-info elt))
+             )
+    (message "current directory:%s" default-directory)
+    (message "buffer file name %s" full-file-name)
+    note-info))
+
 (defun leanote-push-current-file-to-remote ()
   "push current file to remote server"
   (interactive)
-  (let* ((full-file-name (buffer-file-name)))
-    (message "buffer file name %s" full-file-name)
+  (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name))))
+    (unless note-info
+      (error "cannot find current note info in local cache."))
+    (setq leanote-debug-data note-info)
     )
   )
 
@@ -205,7 +237,7 @@
 ;; "其他笔记/其他语言学习"
 (defun leanote-get-notebook-parent-path (parentid)
   "get notebook parent path"
-  (let* ((cparent (gethash parentid leanote--notebook-info-cache))
+  (let* ((cparent (gethash parentid leanote--cache-notebookid-info))
          (cparent-title (assoc-default 'Title cparent))
          (cparent-parent-id (assoc-default 'ParentNotebookId cparent))
          (cparent-no-parent (string= "" cparent-parent-id)))
