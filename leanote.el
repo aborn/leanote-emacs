@@ -127,8 +127,8 @@
       (setq is-modified (assoc-default 'IsModified note-info))
       (setq noteid (assoc-default 'NoteId note-info))
       (when (and noteid (not is-modified))
-        (add-to-list note-info '(IsModified . t))
-        (puthash noteid leanote--cache-noteid-info)
+        (add-to-list 'note-info '(IsModified . t))
+        (puthash noteid note-info leanote--cache-noteid-info)
         (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
         (message "change file status when save. %s" full-file-name)
         )
@@ -145,7 +145,7 @@
         (result nil))
     (setq result (pcache-get repo key))
     (unless (hash-table-p result)
-      (setq (make-hash-table :test 'equal)))
+      (setq result (make-hash-table :test 'equal)))
     result))
 
 (defun leanote-sync ()
@@ -165,7 +165,6 @@
            (let* ((notebookid (assoc-default 'NotebookId elt)))
              (puthash notebookid elt leanote--cache-notebookid-info)))
   (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
-  (message "midddddd") ;; TODO
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((title (assoc-default 'Title elt))
@@ -200,31 +199,32 @@
                     (notecontent-obj (leanote-ajax-get-note-content noteid))
                     (notecontent (assoc-default 'Content notecontent-obj))
                     (note-local-cache (gethash noteid leanote--cache-noteid-info)))
-               (message "heee") ;; TODO
                (when (eq t is-markdown-content)
                  (save-current-buffer
                    (let* ((filename (concat title ".md"))
                           (file-full-name (expand-file-name filename notebookroot)))
                      (if (file-exists-p file-full-name)
-                         (message "file exists %s" file-full-name)
+                         (progn
+                           (message "file %s exists in local." file-full-name)
+                           (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
+                             (if is-modified
+                                 (message "local file %s has modified, sync error for this file."
+                                          file-full-name)
+                               (progn
+                                 (find-file file-full-name)
+                                 (erase-buffer)
+                                 (insert notecontent)
+                                 (save-buffer)
+                                 (puthash noteid note leanote--cache-noteid-info)
+                                 (message "ok, file %s updated!" file-full-name)
+                                 ))))
                        (progn
-                         (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
-                           (if is-modified
-                               (message "local file %s has modified, sync error for this file."
-                                        file-full-name)
-                             (progn
-                               (find-file file-full-name)
-                               (erase-buffer)
-                               (insert notecontent)
-                               (save-buffer)
-                               (puthash noteid note leanote--cache-noteid-info)
-                               (message "ok, file %s updated!" file-full-name)
-                               ))))
-                       (progn (find-file file-full-name)
-                              (insert notecontent)
-                              (save-buffer)
-                              (puthash noteid note leanote--cache-noteid-info)
-                              (message "ok, file %s finished!" file-full-name))))))))))
+                         (message "file %s not exists in local." file-full-name)
+                         (find-file file-full-name)
+                         (insert notecontent)
+                         (save-buffer)
+                         (puthash noteid note leanote--cache-noteid-info)
+                         (message "ok, file %s finished!" file-full-name))))))))))
 
 (defun leanote-get-note-info-base-note-full-name (full-file-name)
   "get note info base note full name"
