@@ -15,6 +15,6 @@ Add following code to your init(.emacs or init.el anyway) file.
 ```
 
 ## Hotkey
-* C-c u leanote-push-current-file-to-remote
-
+* **C-c u** update or add new note content to remote server
+* **C-c D** delete current note
 

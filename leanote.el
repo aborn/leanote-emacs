@@ -98,6 +98,7 @@
   :lighter " leanote "
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
+            (define-key map (kbd "C-c D") 'leanote-delete-current-note)
             map)
   :group 'leanote)
 
@@ -186,8 +187,57 @@
       (add-to-list 'note-info '(Usn . 0)))
     note-info))
 
+(defun leanote-delete-current-note ()
+  "delete current note"
+  (interactive)
+  (let* ((result-data nil)
+         (note-info (leanote-get-note-info-base-note-full-name
+                     (buffer-file-name)))
+         (note-id (assoc-default 'NoteId note-info))
+         (note-title (assoc-default 'Title note-info))
+         (usn (assoc-default 'Usn note-info)))
+    (unless note-id
+      (error "cannot found current note for id %s" note-id))
+    (when (yes-or-no-p (format "Do you really want to delete %s?" note-title))
+      (setq result-data (leanote-ajax-delete-note note-id usn))
+      ;; (setq leanote-debug-data result-data)   ;; TODO
+      (if (and (listp result-data)
+               (equal :json-false (assoc-default 'Ok result-data)))
+          (error "delete note error, msg:%s." (assoc-default 'Msg result-data))
+        (progn
+          (unless result-data
+            (error "error in delete note. reason: server error!"))
+          (message "delete remote note %s success." note-title)
+          (remhash note-id leanote--cache-noteid-info)
+          (let ((name (buffer-file-name)))
+            (delete name recentf-list)       ;; TODO is needed ?
+            (kill-buffer)
+            (message "local file %s was deleted." name)
+            ))
+        ))))
+
+(defun leanote-ajax-delete-note (note-id usn)
+  "delete note"
+  (let* ((result nil)
+         (usn-str (number-to-string (+ 1 usn))))
+    (request (concat leanote-api-root "/note/deleteTrash")
+             :params `(("token" . ,leanote-token)
+                       ("noteId" . ,note-id)
+                       ("usn" . ,usn-str))
+             :sync t
+             :type "POST"
+             :parser 'leanote-parser
+             :success (cl-function
+                       (lambda (&key data &allow-other-keys)
+                         (setq result data)))
+             :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                                   (message "Got error: %S" error-thrown)
+                                   (error "Got error: %S" error-thrown)))
+             )
+    result))
+
 (defun leanote-push-current-file-to-remote ()
-  "push current content to remote server."
+  "push current content or add new note to remote server."
   (interactive)
   (let* ((note-info (leanote-get-note-info-base-note-full-name
                      (buffer-file-name)))
@@ -209,6 +259,8 @@
                    (equal :json-false (assoc-default 'Ok result-data)))
               (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
             (progn
+              (unless result-data
+                (error "error in push(update note) to server. reason: server error!"))
               (message "push(update note) to remote success.")
               (puthash note-id result-data leanote--cache-noteid-info))
             ))
@@ -224,6 +276,8 @@
                    (equal :json-false (assoc-default 'Ok result-data)))
               (error "push(add new note) to remote error, msg:%s." (assoc-default 'Msg result-data))
             (progn
+              (unless result-data
+                (error "error in push(add new note) to server. reason: server error!"))
               (message "push(add new note) to remote success.")
               (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
                      (notebook-notes-new (vconcat notebook-notes (vector result-data))))
@@ -263,7 +317,11 @@
              :parser 'leanote-parser
              :success (cl-function
                        (lambda (&key data &allow-other-keys)
-                         (setq result data))))
+                         (setq result data)))
+             :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                                   (message "Got error: %S" error-thrown)
+                                   (error "Got error: %S" error-thrown)))
+             )
     result))
 
 (defun leanote-parser ()
