@@ -18,3 +18,5 @@ Add following code to your init(.emacs or init.el anyway) file.
 * **C-c u** update or add new note content to remote server
 * **C-c D** delete current note
 
+## Leanote log
+All logs are recorded in \*Leanote-Log* buffer.
