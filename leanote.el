@@ -34,6 +34,7 @@
 (require 'json)
 (require 'request)
 (require 'let-alist)
+(require 'pcache)    ;; for persistent
 
 ;;;;  Variables
 
@@ -60,10 +61,7 @@
 (defvar leanote--cache-notebook-path-id (make-hash-table :test 'equal))
 
 ;; persistent
-(defvar leanote-persistent-directory
-  (let ((dir (concat user-emacs-directory ".cache/")))
-    (make-directory dir t)
-    dir))
+(defconst leanote-persistent-repo "*leanote*")
 
 ;; api
 (defvar leanote-api-login "/auth/login")
@@ -100,7 +98,25 @@
             (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
             (define-key map (kbd "C-c D") 'leanote-delete-current-note)
             map)
-  :group 'leanote)
+  :group 'leanote
+  (leanote-init))
+
+(defun leanote-init ()
+  "do some init work when leanote minor-mode turn on"
+  (message "init")
+  (let ((repo (pcache-repository leanote-persistent-repo)))
+    (setq leanote--cache-noteid-info
+          (leanote-persistent-get 'leanote--cache-noteid-info))))
+
+(defun leanote-persistent-put (key has-table)
+  "put "
+  (let ((repo (pcache-repository leanote-persistent-repo)))
+    (pcache-put repo key has-table)))
+
+(defun leanote-persistent-get (key)
+  "get "
+  (let ((repo (pcache-repository leanote-persistent-repo)))
+    (pcache-get repo key)))
 
 (defun leanote-sync ()
   "init it"
@@ -124,6 +140,7 @@
              (message "notebook-name:%s, nootbook-id:%s, has %d notes."
                       title notebookid (length notes))
              (leanote-create-notes-files title notes notebookid)))
+  (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
   (message "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
 
 (defun leanote--get-current-time-stamp ()
