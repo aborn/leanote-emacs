@@ -122,16 +122,18 @@
   (let* ((full-file-name (buffer-file-name))
          (note-info nil)
          (is-modified nil)
-         (noteid nil))
+         (noteid nil)
+         (note-info-remote (leanote-get-note-info-base-note-full-name full-file-name)))
     (when (string-suffix-p ".md" full-file-name)
-      (setq note-info (leanote-get-note-info-base-note-full-name full-file-name))
+      (setq note-info (gethash (assoc-default 'NoteId note-info-remote)
+                               leanote--cache-noteid-info))
       (setq is-modified (assoc-default 'IsModified note-info))
       (setq noteid (assoc-default 'NoteId note-info))
       (when (and noteid (not is-modified))
         (add-to-list 'note-info '(IsModified . t))
         (puthash noteid note-info leanote--cache-noteid-info)
         (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
-        (leanote-log "change file status when save. %s" full-file-name)
+        (leanote-log (format "change file status when save. %s" full-file-name))
         )
       )))
 
@@ -152,10 +154,11 @@
 (defun leanote-sync ()
   "init it"
   (interactive)
-  (leanote-log "--------start to sync leanote data:%s-------" (leanote--get-current-time-stamp))
+  (leanote-log (format "--------start to sync leanote data:%s-------" (leanote--get-current-time-stamp)))
   (unless leanote-token
     (leanote-login))
   (unless leanote-token     ;; make sure login success.
+    (leanote-log "login failed!")
     (error "login failed!"))
   (leanote-ajax-get-note-books)
   (unless (> (hash-table-count leanote--cache-noteid-info) 0)
@@ -174,8 +177,8 @@
                   (notebookid (assoc-default 'NotebookId elt))
                   (notes (leanote-ajax-get-notes notebookid)))
              (puthash notebookid notes leanote--cache-notebookid-notes)
-             (leanote-log "notebook-name:%s, nootbook-id:%s, has %d notes."
-                      title notebookid (length notes))
+             (leanote-log (format "notebook-name:%s, nootbook-id:%s, has %d notes."
+                                  title notebookid (length notes)))
              (leanote-create-notes-files title notes notebookid)))
   (let ((local-cache (leanote-persistent-get 'leanote--cache-noteid-info)))
     (when (equal 0 (hash-table-count local-cache))
@@ -184,7 +187,7 @@
   (leanote-persistent-put 'leanote--cache-notebook-path-id leanote--cache-notebook-path-id)
   (leanote-persistent-put 'leanote--cache-notebookid-info leanote--cache-notebookid-info)
   (leanote-persistent-put 'leanote--cache-notebookid-notes leanote--cache-notebookid-notes)
-  (leanote-log "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
+  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp))))
 
 (defun leanote--get-current-time-stamp ()
   "get current time stamp"
@@ -215,7 +218,7 @@
                            (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
                              (if is-modified
                                  (leanote-log "local file %s has modified, sync error for this file."
-                                          file-full-name)
+                                              file-full-name)
                                (progn
                                  (find-file file-full-name)
                                  (erase-buffer)
@@ -253,8 +256,7 @@
     (cl-loop for elt in (append notebook-notes nil)
              collect
              (when (equal note-title (assoc-default 'Title elt))
-               (setq note-info elt))
-             )
+               (setq note-info elt)))   ;; keep remote value
     (unless note-info
       (setq note-info '())
       (add-to-list 'note-info `(NotebookId . ,notebook-id))
@@ -337,6 +339,7 @@
               (unless result-data
                 (error "error in push(update note) to server. reason: server error!"))
               (leanote-log "push(update note) to remote success.")
+              (message "push(update note) to remote success.")
               (puthash note-id result-data leanote--cache-noteid-info))
             ))
       (progn       ;; add new note
@@ -354,6 +357,7 @@
               (unless result-data
                 (error "error in push(add new note) to server. reason: server error!"))
               (leanote-log "push(add new note) to remote success.")
+              (message "push(add new note) to remote success.")
               (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
                      (notebook-notes-new (vconcat notebook-notes (vector result-data))))
                 (setq note-id (assoc-default 'NoteId result-data))
@@ -409,7 +413,7 @@
   (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
     (when note-books
       (setq leanote-current-all-note-books note-books)
-      (leanote-log "Got %d notebooks." (length note-books))
+      (leanote-log (format "Got %d notebooks." (length note-books)))
       note-books)))
 
 (defun leanote-ajax-get-note-content (noteid)
