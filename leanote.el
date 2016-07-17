@@ -99,7 +99,8 @@
             (define-key map (kbd "C-c D") 'leanote-delete-current-note)
             map)
   :group 'leanote
-  (leanote-init))
+  (leanote-init)
+  (message "leanote minor mode initial!"))
 
 (defun leanote-init ()
   "do some init work when leanote minor-mode turn on"
@@ -125,6 +126,10 @@
   (unless leanote-token
     (leanote-login))
   (leanote-ajax-get-note-books)
+  (unless (> (hash-table-count leanote--cache-noteid-info) 0)
+    (setq leanote--cache-noteid-info   ;; restore from disk
+          (message "restore leanote--cache-noteid-info from disk.")
+          (leanote-persistent-get 'leanote--cache-noteid-info)))
   ;; keep all notebook node info and store to hash table first
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
@@ -160,18 +165,31 @@
                     (title (assoc-default 'Title note))
                     (is-markdown-content (assoc-default 'IsMarkdown note))
                     (notecontent-obj (leanote-ajax-get-note-content noteid))
-                    (notecontent (assoc-default 'Content notecontent-obj)))
+                    (notecontent (assoc-default 'Content notecontent-obj))
+                    (note-local-cache (gethash noteid leanote--cache-noteid-info)))
                ;; (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
                (when (eq t is-markdown-content)
-                 (puthash noteid note leanote--cache-noteid-info)
                  (save-current-buffer
                    (let* ((filename (concat title ".md"))
                           (file-full-name (expand-file-name filename notebookroot)))
                      (if (file-exists-p file-full-name)
-                         (message "file %s already exists." file-full-name)
+                         (progn
+                           (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
+                             (if is-modified
+                                 (message "local file %s has modified, sync error for this file."
+                                          file-full-name)
+                               (progn
+                                 (find-file file-full-name)
+                                 (erase-buffer)
+                                 (insert notecontent)
+                                 (save-buffer)
+                                 (puthash noteid note leanote--cache-noteid-info)
+                                 (message "ok, file %s updated!" file-full-name)
+                                 ))))
                        (progn (find-file file-full-name)
                               (insert notecontent)
                               (save-buffer)
+                              (puthash noteid note leanote--cache-noteid-info)
                               (message "ok, file %s finished!" file-full-name))))))))))
 
 (defun leanote-get-note-info-base-note-full-name (full-file-name)
