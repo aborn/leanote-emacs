@@ -104,10 +104,35 @@
 
 (defun leanote-init ()
   "do some init work when leanote minor-mode turn on"
-  (message "init")
   (let ((repo (pcache-repository leanote-persistent-repo)))
     (setq leanote--cache-noteid-info
-          (leanote-persistent-get 'leanote--cache-noteid-info))))
+          (leanote-persistent-get 'leanote--cache-noteid-info))
+    (setq leanote--cache-notebook-path-id
+          (leanote-persistent-get 'leanote--cache-notebook-path-id))
+    (setq leanote--cache-notebookid-info
+          (leanote-persistent-get 'leanote--cache-notebookid-info))
+    (setq leanote--cache-notebookid-notes
+          (leanote-persistent-get 'leanote--cache-notebookid-notes)))
+  (add-hook 'after-save-hook 'leanote-after-save-action)
+  (message "finished leanote-init."))
+
+(defun leanote-after-save-action ()
+  "do some action after save markdown file"
+  (let* ((full-file-name (buffer-file-name))
+         (note-info nil)
+         (is-modified nil)
+         (noteid nil))
+    (when (string-suffix-p ".md" full-file-name)
+      (setq note-info (leanote-get-note-info-base-note-full-name full-file-name))
+      (setq is-modified (assoc-default 'IsModified note-info))
+      (setq noteid (assoc-default 'NoteId note-info))
+      (when (and noteid (not is-modified))
+        (add-to-list note-info '(IsModified . t))
+        (puthash noteid leanote--cache-noteid-info)
+        (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
+        (message "change file status when save. %s" full-file-name)
+        )
+      )))
 
 (defun leanote-persistent-put (key has-table)
   "put "
@@ -116,8 +141,12 @@
 
 (defun leanote-persistent-get (key)
   "get "
-  (let ((repo (pcache-repository leanote-persistent-repo)))
-    (pcache-get repo key)))
+  (let ((repo (pcache-repository leanote-persistent-repo))
+        (result nil))
+    (setq result (pcache-get repo key))
+    (unless (hash-table-p result)
+      (setq (make-hash-table :test 'equal)))
+    result))
 
 (defun leanote-sync ()
   "init it"
@@ -128,14 +157,15 @@
   (leanote-ajax-get-note-books)
   (unless (> (hash-table-count leanote--cache-noteid-info) 0)
     (setq leanote--cache-noteid-info   ;; restore from disk
-          (message "restore leanote--cache-noteid-info from disk.")
-          (leanote-persistent-get 'leanote--cache-noteid-info)))
+          (leanote-persistent-get 'leanote--cache-noteid-info))
+    (message "restore leanote--cache-noteid-info from disk."))
   ;; keep all notebook node info and store to hash table first
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((notebookid (assoc-default 'NotebookId elt)))
              (puthash notebookid elt leanote--cache-notebookid-info)))
   (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
+  (message "midddddd") ;; TODO
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((title (assoc-default 'Title elt))
@@ -146,6 +176,9 @@
                       title notebookid (length notes))
              (leanote-create-notes-files title notes notebookid)))
   (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
+  (leanote-persistent-put 'leanote--cache-notebook-path-id leanote--cache-notebook-path-id)
+  (leanote-persistent-put 'leanote--cache-notebookid-info leanote--cache-notebookid-info)
+  (leanote-persistent-put 'leanote--cache-notebookid-notes leanote--cache-notebookid-notes)
   (message "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
 
 (defun leanote--get-current-time-stamp ()
@@ -167,25 +200,26 @@
                     (notecontent-obj (leanote-ajax-get-note-content noteid))
                     (notecontent (assoc-default 'Content notecontent-obj))
                     (note-local-cache (gethash noteid leanote--cache-noteid-info)))
-               ;; (message "ismarkdown:%s, title:%s, content:%s" is-markdown-content title notecontent)
+               (message "heee") ;; TODO
                (when (eq t is-markdown-content)
                  (save-current-buffer
                    (let* ((filename (concat title ".md"))
                           (file-full-name (expand-file-name filename notebookroot)))
                      (if (file-exists-p file-full-name)
-                         (progn
-                           (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
-                             (if is-modified
-                                 (message "local file %s has modified, sync error for this file."
-                                          file-full-name)
-                               (progn
-                                 (find-file file-full-name)
-                                 (erase-buffer)
-                                 (insert notecontent)
-                                 (save-buffer)
-                                 (puthash noteid note leanote--cache-noteid-info)
-                                 (message "ok, file %s updated!" file-full-name)
-                                 ))))
+                         (message "file exists %s" file-full-name)
+                       (progn
+                         (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
+                           (if is-modified
+                               (message "local file %s has modified, sync error for this file."
+                                        file-full-name)
+                             (progn
+                               (find-file file-full-name)
+                               (erase-buffer)
+                               (insert notecontent)
+                               (save-buffer)
+                               (puthash noteid note leanote--cache-noteid-info)
+                               (message "ok, file %s updated!" file-full-name)
+                               ))))
                        (progn (find-file file-full-name)
                               (insert notecontent)
                               (save-buffer)
