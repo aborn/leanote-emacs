@@ -179,6 +179,11 @@
              (when (equal note-title (assoc-default 'Title elt))
                (setq note-info elt))
              )
+    (unless note-info
+      (setq note-info '())
+      (add-to-list 'note-info `(NotebookId . ,notebook-id))
+      (add-to-list 'note-info `(Title . ,note-title))
+      (add-to-list 'note-info '(Usn . 0)))
     note-info))
 
 (defun leanote-push-current-file-to-remote ()
@@ -187,26 +192,59 @@
   (let* ((note-info (leanote-get-note-info-base-note-full-name
                      (buffer-file-name)))
          (result-data nil)
+         (notebook-id (gethash
+                       (substring default-directory 0 (- (length default-directory) 1))
+                       leanote--cache-notebook-path-id))
+         (notebook-info (gethash notebook-id leanote--cache-notebookid-info))
+         (notebook-title (assoc-default 'Title notebook-info))
          (note-id (assoc-default 'NoteId note-info)))
-    (unless note-id
-      (error "cannot find this note corresponding note-id."))
-    (setq note-info (gethash note-id leanote--cache-noteid-info))
-    (unless note-info
-      (error "cannot find current note info in local cache."))
-    (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
-    (setq leanote-debug-data result-data)
-    (if (and (listp result-data)
-             (equal :json-false (assoc-default 'Ok result-data)))
-        (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
-      (progn
-        (message "push to remote success.")
-        (puthash note-id result-data leanote--cache-noteid-info))
+    (if note-id
+        (progn     ;; modify exists note
+          (setq note-info (gethash note-id leanote--cache-noteid-info))
+          (unless note-info
+            (error "cannot find current note info for id %s in local cache." note-id))
+          (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
+          ;; (setq leanote-debug-data result-data)
+          (if (and (listp result-data)
+                   (equal :json-false (assoc-default 'Ok result-data)))
+              (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
+            (progn
+              (message "push(update note) to remote success.")
+              (puthash note-id result-data leanote--cache-noteid-info))
+            ))
+      (progn       ;; add new note
+        (unless notebook-id
+          (error "cannot find any notebook for this file."))
+        (when (yes-or-no-p (format "The note was not found in notebook `%s'. Do you want to add it?"
+                                   notebook-title))
+          (add-to-list 'note-info '(NoteId . "0"))
+          ;;(setq leanote-debug-data (gethash notebook-id leanote--cache-notebookid-notes))
+          (setq result-data (leanote-ajax-update-note note-info (buffer-string) "/note/addNote"))
+          (if (and (listp result-data)
+                   (equal :json-false (assoc-default 'Ok result-data)))
+              (error "push(add new note) to remote error, msg:%s." (assoc-default 'Msg result-data))
+            (progn
+              (message "push(add new note) to remote success.")
+              (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
+                     (notebook-notes-new (vconcat notebook-notes (vector result-data)))
+                     )
+                (setq note-id (assoc-default 'NoteId result-data))
+                (unless note-id
+                  (error "error in local data operate!"))
+                (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
+                (puthash note-id result-data leanote--cache-noteid-info)))
+            )
+          )
+        )
       )
     )
   )
 
-(defun leanote-ajax-update-note (note-info note-content)
+(defun leanote-ajax-update-note (note-info note-content &optional api)
   "update note"
+  (when (null api)
+    (setq api "/note/updateNote"))
+  (message "leanote-ajax-update-note api=%s" api)
   (let* ((result nil)
          (usn (assoc-default 'Usn note-info))
          (new-usn (+ 1 usn))
@@ -214,12 +252,14 @@
          (note-id (assoc-default 'NoteId note-info))
          (notebook-id (assoc-default 'NotebookId note-info))
          (note-title (assoc-default 'Title note-info)))
-    (request (concat leanote-api-root "/note/updateNote")
+    (request (concat leanote-api-root api)
              :params `(("token" . ,leanote-token)
                        ("NoteId" . ,note-id)
                        ("Usn" . ,new-usn-str)
                        ("NotebookId" . ,notebook-id)
                        ("Title" . ,note-title)
+                       ("IsMarkdown" . "true")
+                       ("Abstract" . ,note-content)
                        ("Content" . ,note-content))
              :sync t
              :type "POST"
