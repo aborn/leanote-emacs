@@ -226,16 +226,13 @@
             (progn
               (message "push(add new note) to remote success.")
               (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
-                     (notebook-notes-new (vconcat notebook-notes (vector result-data)))
-                     )
+                     (notebook-notes-new (vconcat notebook-notes (vector result-data))))
                 (setq note-id (assoc-default 'NoteId result-data))
                 (unless note-id
                   (error "error in local data operate!"))
                 (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
                 (puthash note-id result-data leanote--cache-noteid-info)))
-            )
-          )
-        )
+            )))
       )
     )
   )
