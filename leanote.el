@@ -154,6 +154,8 @@
   (message "--------start to sync leanote data:%s-------" (leanote--get-current-time-stamp))
   (unless leanote-token
     (leanote-login))
+  (unless leanote-token     ;; make sure login success.
+    (error "login failed!"))
   (leanote-ajax-get-note-books)
   (unless (> (hash-table-count leanote--cache-noteid-info) 0)
     (setq leanote--cache-noteid-info   ;; restore from disk
@@ -174,7 +176,10 @@
              (message "notebook-name:%s, nootbook-id:%s, has %d notes."
                       title notebookid (length notes))
              (leanote-create-notes-files title notes notebookid)))
-  (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
+  (let ((local-cache (leanote-persistent-get 'leanote--cache-noteid-info)))
+    (when (equal 0 (hash-table-count local-cache))
+      (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
+      (message "notice: init leanote-persistent-put for leanote--cache-noteid-info")))
   (leanote-persistent-put 'leanote--cache-notebook-path-id leanote--cache-notebook-path-id)
   (leanote-persistent-put 'leanote--cache-notebookid-info leanote--cache-notebookid-info)
   (leanote-persistent-put 'leanote--cache-notebookid-notes leanote--cache-notebookid-notes)
