@@ -390,7 +390,7 @@
   "update note"
   (when (null api)
     (setq api "/note/updateNote"))
-  (leanote-log "leanote-ajax-update-note api=%s" api)
+  (leanote-log (format "leanote-ajax-update-note api=%s" api))
   (let* ((result nil)
          (usn (assoc-default 'Usn note-info))
          (new-usn (+ 1 usn))
@@ -414,7 +414,8 @@
                        (lambda (&key data &allow-other-keys)
                          (setq result data)))
              :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                                   (leanote-log "Got error: %S" error-thrown)
+                                   (message "Got error: %S" error-thrown)
+                                   (leanote-log "Got error")
                                    (error "Got error: %S" error-thrown)))
              )
     result))
