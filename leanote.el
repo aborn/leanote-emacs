@@ -207,7 +207,7 @@
                         (leanote-get-notebook-parent-path notebookid)
                         leanote-local-root-path)))
     (puthash notebookroot notebookid leanote--cache-notebook-path-id)
-    (leanote-log "notebookroot=%s" notebookroot)
+    (leanote-log (format "notebookroot=%s" notebookroot))
     (cl-loop for note in (append notes nil)
              collect
              (let* ((noteid (assoc-default 'NoteId note))
@@ -229,6 +229,7 @@
                                               file-full-name)
                                (progn
                                  (find-file file-full-name)
+                                 (setq buffer-read-only nil)
                                  (erase-buffer)
                                  (insert notecontent)
                                  (save-buffer)
@@ -238,6 +239,7 @@
                        (progn
                          (leanote-log (format "file %s not exists in local." file-full-name))
                          (find-file file-full-name)
+                         (setq buffer-read-only nil)
                          (insert notecontent)
                          (save-buffer)
                          (puthash noteid note leanote--cache-noteid-info)
