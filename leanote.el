@@ -123,18 +123,26 @@
          (note-info nil)
          (is-modified nil)
          (noteid nil)
-         (note-info-remote (leanote-get-note-info-base-note-full-name full-file-name)))
+         (note-info-remote nil)
+         (note-book-id nil))
     (when (string-suffix-p ".md" full-file-name)
-      (setq note-info (gethash (assoc-default 'NoteId note-info-remote)
-                               leanote--cache-noteid-info))
-      (setq is-modified (assoc-default 'IsModified note-info))
-      (setq noteid (assoc-default 'NoteId note-info))
-      (when (and noteid (not is-modified))
-        (add-to-list 'note-info '(IsModified . t))
-        (puthash noteid note-info leanote--cache-noteid-info)
-        (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
-        (leanote-log (format "change file status when save. %s" full-file-name))
-        )
+      (setq note-book-id (gethash
+                          (substring default-directory 0 (- (length default-directory) 1))
+                          leanote--cache-notebook-path-id))
+      (unless note-book-id
+        (leanote-log "no releated notebook"))
+      (when note-book-id
+        (setq note-info-remote (leanote-get-note-info-base-note-full-name full-file-name))
+        (setq note-info (gethash (assoc-default 'NoteId note-info-remote)
+                                 leanote--cache-noteid-info))
+        (setq is-modified (assoc-default 'IsModified note-info))
+        (setq noteid (assoc-default 'NoteId note-info))
+        (when (and noteid (not is-modified))
+          (add-to-list 'note-info '(IsModified . t))
+          (puthash noteid note-info leanote--cache-noteid-info)
+          (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
+          (leanote-log (format "change file status when save. %s" full-file-name))
+          ))
       )))
 
 (defun leanote-persistent-put (key has-table)
@@ -228,12 +236,13 @@
                                  (leanote-log "ok, file %s updated!" file-full-name)
                                  ))))
                        (progn
-                         (leanote-log "file %s not exists in local." file-full-name)
+                         (leanote-log (format "file %s not exists in local." file-full-name))
                          (find-file file-full-name)
                          (insert notecontent)
                          (save-buffer)
                          (puthash noteid note leanote--cache-noteid-info)
-                         (leanote-log "ok, file %s finished!" file-full-name))))))))))
+                         (leanote-log (format "ok, file %s finished!" file-full-name))
+                         )))))))))
 
 (defun leanote-get-note-info-base-note-full-name (full-file-name)
   "get note info base note full name"
@@ -452,14 +461,16 @@
 ;; "其他笔记/其他语言学习"
 (defun leanote-get-notebook-parent-path (parentid)
   "get notebook parent path"
-  (let* ((cparent (gethash parentid leanote--cache-notebookid-info))
-         (cparent-title (assoc-default 'Title cparent))
-         (cparent-parent-id (assoc-default 'ParentNotebookId cparent))
-         (cparent-no-parent (string= "" cparent-parent-id)))
-    (if cparent-no-parent
-        cparent-title
-      (concat (leanote-get-notebook-parent-path cparent-parent-id) "/" cparent-title))
-    ))
+  (if (not parentid)
+      ""
+    (progn (let* ((cparent (gethash parentid leanote--cache-notebookid-info))
+                  (cparent-title (assoc-default 'Title cparent))
+                  (cparent-parent-id (assoc-default 'ParentNotebookId cparent))
+                  (cparent-no-parent (string= "" cparent-parent-id)))
+             (if cparent-no-parent
+                 cparent-title
+               (concat (leanote-get-notebook-parent-path cparent-parent-id) "/" cparent-title))
+             ))))
 
 (defun leanote-mkdir-notebooks-directory-structure (&optional all-notebooks)
   "make note-books hierarchy"
@@ -469,7 +480,6 @@
     (make-directory leanote-local-root-path t))
   (when (null all-notebooks)
     (leanote-log "all-notebooks not provided.")
-
     (setq all-notebooks leanote-current-all-note-books))
   (cl-loop for elt in (append all-notebooks nil)
            collect
