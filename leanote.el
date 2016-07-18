@@ -106,14 +106,18 @@
 (defun leanote-init ()
   "do some init work when leanote minor-mode turn on"
   (let ((repo (pcache-repository leanote-persistent-repo)))
-    (setq leanote--cache-noteid-info
-          (leanote-persistent-get 'leanote--cache-noteid-info))
-    (setq leanote--cache-notebook-path-id
-          (leanote-persistent-get 'leanote--cache-notebook-path-id))
-    (setq leanote--cache-notebookid-info
-          (leanote-persistent-get 'leanote--cache-notebookid-info))
-    (setq leanote--cache-notebookid-notes
-          (leanote-persistent-get 'leanote--cache-notebookid-notes)))
+    (when (= 0 (hash-table-count leanote--cache-noteid-info))
+     (setq leanote--cache-noteid-info
+          (leanote-persistent-get 'leanote--cache-noteid-info)))
+    (when (= 0 (hash-table-count leanote--cache-notebook-path-id))
+      (setq leanote--cache-notebook-path-id
+            (leanote-persistent-get 'leanote--cache-notebook-path-id)))
+    (when (= 0 (hash-table-count leanote--cache-notebookid-info))
+      (setq leanote--cache-notebookid-info
+            (leanote-persistent-get 'leanote--cache-notebookid-info)))
+    (when (= 0 (hash-table-count leanote--cache-notebookid-notes))
+     (setq leanote--cache-notebookid-notes
+          (leanote-persistent-get 'leanote--cache-notebookid-notes))))
   (add-hook 'after-save-hook 'leanote-after-save-action)
   (leanote-log "finished leanote-init."))
 
@@ -137,7 +141,7 @@
                                  leanote--cache-noteid-info))
         (setq is-modified (assoc-default 'IsModified note-info))
         (setq noteid (assoc-default 'NoteId note-info))
-        (when (and noteid (not is-modified))
+        (when (and note-info (not is-modified))
           (add-to-list 'note-info '(IsModified . t))
           (puthash noteid note-info leanote--cache-noteid-info)
           (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
@@ -177,6 +181,7 @@
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((notebookid (assoc-default 'NotebookId elt)))
+             (message "notebookid:%s  title:%s" notebookid (assoc-default 'Title elt))
              (puthash notebookid elt leanote--cache-notebookid-info)))
   (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
   (cl-loop for elt in (append leanote-current-all-note-books nil)
@@ -195,7 +200,8 @@
   (leanote-persistent-put 'leanote--cache-notebook-path-id leanote--cache-notebook-path-id)
   (leanote-persistent-put 'leanote--cache-notebookid-info leanote--cache-notebookid-info)
   (leanote-persistent-put 'leanote--cache-notebookid-notes leanote--cache-notebookid-notes)
-  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp))))
+  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
+  )
 
 (defun leanote--get-current-time-stamp ()
   "get current time stamp"
@@ -239,7 +245,6 @@
                        (progn
                          (leanote-log (format "file %s not exists in local." file-full-name))
                          (find-file file-full-name)
-                         (setq buffer-read-only nil)
                          (insert notecontent)
                          (save-buffer)
                          (puthash noteid note leanote--cache-noteid-info)
@@ -490,14 +495,14 @@
                   (parent-id (assoc-default 'ParentNotebookId elt))
                   (has-parent (not (string= "" parent-id)))
                   (current-notebook-path (expand-file-name title leanote-local-root-path)))
-             (leanote-log "title=%s" title)
+             (leanote-log (format "title=%s" title))
              (when has-parent
-               (leanote-log "title=%s has parent" title)
+               (leanote-log (format "title=%s has parent" title))
                (setq current-notebook-path (expand-file-name
                                             (leanote-get-notebook-parent-path notebook-id)
                                             leanote-local-root-path)))
              (unless (file-exists-p current-notebook-path)
-               (leanote-log "notebook:%s, path:%s" title current-notebook-path)
+               (leanote-log (format "notebook:%s, path:%s" title current-notebook-path))
                (make-directory current-notebook-path t)
                ))
            ))
@@ -532,6 +537,7 @@
          (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
     (with-current-buffer buf
       (insert (concat local-current-time (string-join args " ")))
+      (message (concat local-current-time (string-join args " ")))
       (insert "\n")
       )))
 
