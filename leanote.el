@@ -228,11 +228,11 @@
                           (file-full-name (expand-file-name filename notebookroot)))
                      (if (file-exists-p file-full-name)
                          (progn
-                           (leanote-log "file %s exists in local." file-full-name)
+                           (leanote-log (format "file %s exists in local." file-full-name))
                            (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
                              (if is-modified
-                                 (leanote-log "local file %s has modified, sync error for this file."
-                                              file-full-name)
+                                 (leanote-log (format "local file %s has modified, sync error for this file."
+                                              file-full-name))
                                (progn
                                  (find-file file-full-name)
                                  (setq buffer-read-only nil)
@@ -240,7 +240,7 @@
                                  (insert notecontent)
                                  (save-buffer)
                                  (puthash noteid note leanote--cache-noteid-info)
-                                 (leanote-log "ok, file %s updated!" file-full-name)
+                                 (leanote-log (format "ok, file %s updated!" file-full-name))
                                  ))))
                        (progn
                          (leanote-log (format "file %s not exists in local." file-full-name))
@@ -300,12 +300,12 @@
         (progn
           (unless result-data
             (error "error in delete note. reason: server error!"))
-          (leanote-log "delete remote note %s success." note-title)
+          (leanote-log (format "delete remote note %s success." note-title))
           (remhash note-id leanote--cache-noteid-info)
           (let ((name (buffer-file-name)))
             (delete name recentf-list)       ;; TODO is needed ?
             (kill-buffer)
-            (leanote-log "local file %s was deleted." name)
+            (leanote-log (format "local file %s was deleted." name))
             ))
         ))))
 
@@ -324,7 +324,8 @@
                        (lambda (&key data &allow-other-keys)
                          (setq result data)))
              :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                                   (leanote-log "Got error: %S" error-thrown)
+                                   (message "Got error: %S" error-thrown)
+                                   (leanote-log "Got error in leanote-ajax-delete-note")
                                    (error "Got error: %S" error-thrown)))
              )
     result))
@@ -484,7 +485,7 @@
   "make note-books hierarchy"
   (interactive)
   (unless (file-exists-p leanote-local-root-path)
-    (leanote-log "make root dir %s" leanote-local-root-path)
+    (leanote-log (format "make root dir %s" leanote-local-root-path))
     (make-directory leanote-local-root-path t))
   (when (null all-notebooks)
     (leanote-log "all-notebooks not provided.")
@@ -523,7 +524,7 @@
            :success (cl-function
                      (lambda (&key data &allow-other-keys)
                        (if (equal :json-false (assoc-default 'Ok data))
-                           (leanote-log "%s" (assoc-default 'Msg data))
+                           (leanote-log (format "%s" (assoc-default 'Msg data)))
                          (progn
                            (setq leanote-token (assoc-default 'Token data))
                            (setq leanote-user (assoc-default 'Username data))
