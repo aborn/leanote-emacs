@@ -107,8 +107,8 @@
   "do some init work when leanote minor-mode turn on"
   (let ((repo (pcache-repository leanote-persistent-repo)))
     (when (= 0 (hash-table-count leanote--cache-noteid-info))
-     (setq leanote--cache-noteid-info
-          (leanote-persistent-get 'leanote--cache-noteid-info)))
+      (setq leanote--cache-noteid-info
+            (leanote-persistent-get 'leanote--cache-noteid-info)))
     (when (= 0 (hash-table-count leanote--cache-notebook-path-id))
       (setq leanote--cache-notebook-path-id
             (leanote-persistent-get 'leanote--cache-notebook-path-id)))
@@ -116,8 +116,8 @@
       (setq leanote--cache-notebookid-info
             (leanote-persistent-get 'leanote--cache-notebookid-info)))
     (when (= 0 (hash-table-count leanote--cache-notebookid-notes))
-     (setq leanote--cache-notebookid-notes
-          (leanote-persistent-get 'leanote--cache-notebookid-notes))))
+      (setq leanote--cache-notebookid-notes
+            (leanote-persistent-get 'leanote--cache-notebookid-notes))))
   (add-hook 'after-save-hook 'leanote-after-save-action)
   (leanote-log "finished leanote-init."))
 
@@ -164,9 +164,10 @@
     result))
 
 (defun leanote-sync ()
-  "init it"
+  "sync notebooks and notes with remote"
   (interactive)
-  (leanote-log (format "--------start to sync leanote data:%s-------" (leanote--get-current-time-stamp)))
+  (leanote-log (format "--------start to sync leanote data:%s-------"
+                       (leanote--get-current-time-stamp)))
   (unless leanote-token
     (leanote-login))
   (unless leanote-token     ;; make sure login success.
@@ -200,8 +201,7 @@
   (leanote-persistent-put 'leanote--cache-notebook-path-id leanote--cache-notebook-path-id)
   (leanote-persistent-put 'leanote--cache-notebookid-info leanote--cache-notebookid-info)
   (leanote-persistent-put 'leanote--cache-notebookid-notes leanote--cache-notebookid-notes)
-  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
-  )
+  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp))))
 
 (defun leanote--get-current-time-stamp ()
   "get current time stamp"
@@ -232,7 +232,7 @@
                            (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
                              (if is-modified
                                  (leanote-log (format "local file %s has modified, sync error for this file."
-                                              file-full-name))
+                                                      file-full-name))
                                (progn
                                  (find-file file-full-name)
                                  (setq buffer-read-only nil)
@@ -542,6 +542,20 @@
       (message (concat local-current-time (string-join args " ")))
       (insert "\n")
       )))
+
+(defun leanote-log2buf (level &rest args)
+  "log message in buffer `leanote-log-buffer-name'"
+  (let* ((buf (get-buffer-create leanote-log-buffer-name))
+         (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
+    (with-current-buffer buf
+      (insert (format "[%s] " level))
+      (insert (concat local-current-time (string-join args " ")))
+      (insert "\n")
+      )))
+
+(defun leanote-log4j (type &rest args)
+  "log4j: log message with level."
+  )
 
 (provide 'leanote)
 ;;; leanote.el ends here
