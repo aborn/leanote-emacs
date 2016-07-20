@@ -86,6 +86,12 @@
   :group 'leanote
   :type 'string)
 
+(defcustom leanote-log-level "info"
+  "which kind of log should be printed,
+   can be `info', `warning', `debug', `error'"
+  :group 'leanote
+  :type 'string)
+
 (defgroup leanote nil
   "leanote mini group"
   :prefix "leanote-"
@@ -533,15 +539,13 @@
                            (setq leanote-user-password password) ;; update password
                            (leanote-log "login success!")))))))
 
-(defun leanote-log (&rest args)
-  "log message to `leanote-log-buffer-name'"
+(defun leanote-log2msg (&rest args)
+  "log message to *Message* buffer."
   (let* ((buf (get-buffer-create leanote-log-buffer-name))
          (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
     (with-current-buffer buf
-      (insert (concat local-current-time (string-join args " ")))
       (message (concat local-current-time (string-join args " ")))
-      (insert "\n")
-      )))
+      (insert "\n"))))
 
 (defun leanote-log2buf (level &rest args)
   "log message in buffer `leanote-log-buffer-name'"
@@ -550,12 +554,30 @@
     (with-current-buffer buf
       (insert (format "[%s] " level))
       (insert (concat local-current-time (string-join args " ")))
-      (insert "\n")
-      )))
+      (insert "\n"))))
 
-(defun leanote-log4j (type &rest args)
-  "log4j: log message with level."
-  )
+(defun leanote-log4j (level &rest args)
+  "log4j: log message with corresponding level."
+  (cond ((equal "info" level)
+         (leanote-log2buf "info" args))
+        ((equal "debug" level)
+         (leanote-log2msg args))
+        ((equal "warning" level)
+         (progn
+           (leanote-log2msg args)
+           (leanote-log2buf "warning" args)
+           ))
+        ((equal "error" level)
+         (progn
+           (leanote-log2msg args)
+           (leanote-log2buf "error" args)
+           ))
+        (t (leanote-log2buf "info" args))))
+
+(defun leanote-log (level &rest args)
+  "log it!"
+  (when (equal level leanote-log-level)
+    (leanote-log4j level args)))
 
 (provide 'leanote)
 ;;; leanote.el ends here
