@@ -542,7 +542,7 @@
 (defun leanote-log2msg (&rest args)
   "log message to *Message* buffer."
   (let* ((buf (get-buffer-create leanote-log-buffer-name))
-         (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
+         (local-current-time (format-time-string "[leanote][%Y-%m-%d %H:%M:%S] " (current-time))))
     (with-current-buffer buf
       (message (concat local-current-time (string-join args " ")))
       (insert "\n"))))
@@ -577,7 +577,7 @@
 (defun leanote-log (level &rest args)
   "log it!"
   (when (equal level leanote-log-level)
-    (leanote-log4j level args)))
+    (leanote-log4j level (string-join args " "))))
 
 (provide 'leanote)
 ;;; leanote.el ends here
