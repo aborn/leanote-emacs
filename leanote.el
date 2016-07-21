@@ -348,6 +348,7 @@
          (notebook-info (gethash notebook-id leanote--cache-notebookid-info))
          (notebook-title (assoc-default 'Title notebook-info))
          (note-id (assoc-default 'NoteId note-info)))
+    ;; TODO save it before update.
     (if note-id
         (progn     ;; modify exists note
           (setq note-info (gethash note-id leanote--cache-noteid-info))
