@@ -570,7 +570,7 @@
            (when (or (equal "warning" level) (equal "error" level))
              (leanote-log2buf level msg))
            ))
-        ((equal "error" level)
+        ((equal "error" leanote-log-level)
          (progn
            (when (or (equal "error" level))
              (leanote-log2buf level msg))
