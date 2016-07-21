@@ -556,23 +556,25 @@
       (insert (concat local-current-time (string-join args " ")))
       (insert "\n"))))
 
-(defun leanote-log4j (level &rest args)
+(defun leanote-log4j (level msg)
   "log4j: log message with corresponding level."
+  (when (listp msg)
+    (message "list"))
   (cond ((equal "info" level)
-         (leanote-log2buf "info" args))
+         (leanote-log2buf "info" msg))
         ((equal "debug" level)
-         (leanote-log2msg args))
+         (leanote-log2msg msg))
         ((equal "warning" level)
          (progn
-           (leanote-log2msg args)
-           (leanote-log2buf "warning" args)
+           (leanote-log2msg msg)
+           (leanote-log2buf "warning" msg)
            ))
         ((equal "error" level)
          (progn
-           (leanote-log2msg args)
-           (leanote-log2buf "error" args)
+           (leanote-log2msg msg)
+           (leanote-log2buf "error" msg)
            ))
-        (t (leanote-log2buf "info" args))))
+        (t (leanote-log2buf "info" msg))))
 
 (defun leanote-log (level &rest args)
   "log it!"
