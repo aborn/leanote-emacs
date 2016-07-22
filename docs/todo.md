@@ -1,12 +1,16 @@
 # todo
 
 ## basic
+
+### v0.1
 * update   DONE
 * create   DONE
 * delete   DONE
+* message to specific buffer  DONE
+
+### v0.2
 * swiper search
 * rename
-* message to specific buffer  DONE
 * when buffer exists bug?
 * status-bar show
 
