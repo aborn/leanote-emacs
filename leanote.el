@@ -1,10 +1,10 @@
-;;; leanote.el --- Minor mode for leanote in markdown file.  -*- lexical-binding: t; -*-
+;;; leanote.el --- A minor mode for writing leanote in markdown file.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Aborn Jiang
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3"))
+;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-mode
 ;; URL: https://github.com/aborn/leanote-mode
@@ -26,7 +26,17 @@
 
 ;;; Commentary:
 
-;; emacs use leanote
+;; The leanote package is a minor mode for writing note in markdown file.
+;; Before use this package, please spend a few minutes to learn leanote, which
+;; is an open-source platform https://github.com/leanote/leanote. The leanote
+;; office provide note server, android & ios apps.
+;;
+;; The emacs leanote package provides follwoing features:
+;; M-x leanote-login    login remote server.
+;; M-x leanote-sync     sync remote notes to local.
+;; C-c u                update/create note to remote server.
+;; C-c D                delete note
+;;
 
 ;;; Code:
 
