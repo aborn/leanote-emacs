@@ -383,7 +383,7 @@
              (let ((note-id-in-notebook (assoc-default 'NoteId elt)))
                (when (equal note-id-in-notebook note-id)
                  (setq index count)
-                 (leanote-log "matched: noteid=%s" note-id))
+                 (leanote-log (format "matched: noteid=%s, index=%d" note-id index)))
                (setq count (+ count 1))))
     index))
 
@@ -473,23 +473,23 @@
          (notebook-info (gethash notebook-id leanote--cache-notebookid-info))
          (notebook-title (assoc-default 'Title notebook-info))
          (notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
-         (note-id (assoc-default 'NoteId note-info)))
-    ;; TODO save it before update.
+         (note-id (assoc-default 'NoteId note-info))
+         (note-title (assoc-default 'Title note-info)))
+    (save-buffer)  ;; save it before update.
     (if note-id
-        (progn     ;; modify exists note
+        (progn     ;; modify exists note.
           (setq note-info (gethash note-id leanote--cache-noteid-info)) ;; force update
           (unless note-info
             (error "cannot find current note info for id %s in local cache." note-id))
           (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
-          ;; (setq leanote-debug-data result-data)
           (if (and (listp result-data)
                    (equal :json-false (assoc-default 'Ok result-data)))
               (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
             (progn
               (unless result-data
                 (error "error in push(update note) to server. reason: server error!"))
-              (leanote-log "push(update note) to remote success.")
-              (message "push(update note) to remote success.")
+              (leanote-log (format "file %s update to remote success." note-title))
+              (message (format "file %s update to remote success." note-title))
               (leanote-notebook-replace notebook-notes result-data note-id)
               (puthash note-id result-data leanote--cache-noteid-info))
             ))
@@ -503,12 +503,12 @@
           (setq result-data (leanote-ajax-update-note note-info (buffer-string) "/note/addNote"))
           (if (and (listp result-data)
                    (equal :json-false (assoc-default 'Ok result-data)))
-              (error "push(add new note) to remote error, msg:%s." (assoc-default 'Msg result-data))
+              (error "add new note to remote error, msg:%s." (assoc-default 'Msg result-data))
             (progn
               (unless result-data
-                (error "error in push(add new note) to server. reason: server error!"))
-              (leanote-log "push(add new note) to remote success.")
-              (message "push(add new note) to remote success.")
+                (error "add new note to server error. reason: server error!"))
+              (leanote-log (format "add new file %s to remote success." note-title))
+              (message (format "add new file %s to remote success." note-title))
               (let* ((notebook-notes-new (vconcat notebook-notes (vector result-data))))
                 (setq note-id (assoc-default 'NoteId result-data))
                 (unless note-id
@@ -695,6 +695,7 @@
   (let* ((buf (get-buffer-create leanote-log-buffer-name))
          (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
     (with-current-buffer buf
+      ;;(end-of-buffer)
       (insert (format "[%s] " level))
       (insert (concat local-current-time (string-join args " ")))
       (insert "\n"))))
