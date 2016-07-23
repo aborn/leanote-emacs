@@ -321,7 +321,7 @@
             (leanote-log "error" "error in delete note. reason: server error!")
             (error "error in delete note. reason: server error!"))
           (leanote-log (format "delete remote note %s success." note-title))
-          (remhash note-id leanote--cache-noteid-info)
+          (remhash note-id leanote--cache-noteid-info)   ;; remove from local cache
           (let ((name (buffer-file-name))
                 (notebook-notes-new (leanote-delete-local-notebook-note notebook-id note-id)))
             (when (listp recentf-list)      ;; remove it from recentf-list
@@ -329,7 +329,7 @@
             ;; (kill-buffer)
             (delete-file-and-buffer)
             (setq ab/debug notebook-notes-new)
-            (puthash notebook-id notebook-notes-new)
+            (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
             (leanote-log (format "local file %s was deleted." name))
             ))
         ))))
@@ -340,8 +340,8 @@
          (index (leanote-get-note-index notebook-notes noteid))
          (result notebook-notes))
     (when (>= index 0)
-      (aset notebook-notes index nil)
-      (setq result (delete nil notebook-notes)))  ;; a new array
+      (aset notebook-notes index nil)) ;; a new array
+    (setq result (delete nil notebook-notes))
     result))
 
 (defun leanote-ajax-delete-note (note-id usn)
