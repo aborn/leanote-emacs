@@ -1,12 +1,13 @@
 # todo
 
 ## basic
+list eache version features:
 
 ### v0.1
-* update   DONE
-* create   DONE
-* delete   DONE
-* message to specific buffer  DONE
+* update note    DONE
+* create note    DONE
+* delete note    DONE
+* operating log  DONE
 
 ### v0.2
 * swiper search

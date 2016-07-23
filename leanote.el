@@ -97,7 +97,7 @@
   :type 'string)
 
 (defcustom leanote-log-level "info"
-  "which kind of log should be printed,
+  "which level log should be printed,
    can be `info', `warning', `error'"
   :group 'leanote
   :type 'string)
@@ -134,11 +134,10 @@
     (when (= 0 (hash-table-count leanote--cache-notebookid-notes))
       (setq leanote--cache-notebookid-notes
             (leanote-persistent-get 'leanote--cache-notebookid-notes))))
-  (add-hook 'after-save-hook 'leanote-after-save-action)
-  (leanote-log "info" "finished leanote-init."))
+  (add-hook 'after-save-hook 'leanote-after-save-action))
 
 (defun leanote-after-save-action ()
-  "do some action after save markdown file"
+  "do some action when markdown file are saved."
   (let* ((full-file-name (buffer-file-name))
          (note-info nil)
          (is-modified nil)
@@ -165,13 +164,13 @@
           ))
       )))
 
-(defun leanote-persistent-put (key has-table)
-  "put "
+(defun leanote-persistent-put (key value)
+  "save key value to persistent cache."
   (let ((repo (pcache-repository leanote-persistent-repo)))
-    (pcache-put repo key has-table)))
+    (pcache-put repo key value)))
 
 (defun leanote-persistent-get (key)
-  "get "
+  "get value from persistent cache."
   (let ((repo (pcache-repository leanote-persistent-repo))
         (result nil))
     (setq result (pcache-get repo key))
@@ -180,25 +179,25 @@
     result))
 
 (defun leanote-sync ()
-  "sync notebooks and notes with remote"
+  "sync notebooks and notes from remote server."
   (interactive)
   (leanote-log "info" (format "--------start to sync leanote data:%s-------"
                               (leanote--get-current-time-stamp)))
   (unless leanote-token
     (leanote-login))
-  (unless leanote-token     ;; make sure login success.
+  (unless leanote-token                ;; make sure user login.
     (leanote-log "error" "login failed!")
     (error "login failed!"))
   (leanote-ajax-get-note-books)
   (unless (> (hash-table-count leanote--cache-noteid-info) 0)
-    (setq leanote--cache-noteid-info   ;; restore from disk
+    (setq leanote--cache-noteid-info   ;; restore noteid info from persistent cache.
           (leanote-persistent-get 'leanote--cache-noteid-info))
-    (leanote-log "info" "restore leanote--cache-noteid-info from disk."))
+    (leanote-log "info" "restore leanote--cache-noteid-info."))
   ;; keep all notebook node info and store to hash table first
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((notebookid (assoc-default 'NotebookId elt)))
-             (message "notebookid:%s  title:%s" notebookid (assoc-default 'Title elt))
+             (leanote-log "info" (format "notebookid:%s  title:%s" notebookid (assoc-default 'Title elt)))
              (puthash notebookid elt leanote--cache-notebookid-info)))
   (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
   (cl-loop for elt in (append leanote-current-all-note-books nil)
@@ -553,11 +552,9 @@
 (defun leanote-log2msg (level &rest args)
   "only warning or error message to *Message* buffer."
   (when (or (equal "warning" level) (equal "error" level))
-    (let* ((buf (get-buffer-create leanote-log-buffer-name))
-           (local-current-time (format-time-string "[leanote][%Y-%m-%d %H:%M:%S] " (current-time))))
-      (with-current-buffer buf
-        (message (concat local-current-time (string-join args " ")))
-        (insert "\n")))))
+    (let* ((local-current-time (format-time-string "[leanote][%Y-%m-%d %H:%M:%S] " (current-time))))
+      (message (concat local-current-time (string-join args " ")))
+      )))
 
 (defun leanote-log2buf (level &rest args)
   "log message in buffer `leanote-log-buffer-name'"
@@ -570,11 +567,10 @@
 
 (defun leanote-log4j (level msg)
   "log4j: log message with corresponding level."
-  (when (listp msg)
-    (message "list"))
   (leanote-log2msg level msg)
   (cond ((equal "info" leanote-log-level)
-         (leanote-log2buf level msg))
+         (progn
+           (leanote-log2buf level msg)))
         ((equal "warning" leanote-log-level)
          (progn
            (when (or (equal "warning" level) (equal "error" level))
@@ -584,13 +580,18 @@
          (progn
            (when (or (equal "error" level))
              (leanote-log2buf level msg))
-           ))
-        ))
+           ))))
 
-(defun leanote-log (level &rest args)
-  "log it!"
-  (when (equal level leanote-log-level)
-    (leanote-log4j level (string-join args " "))))
+(defun leanote-log (&rest args)
+  "log message!"
+  (let* ((size (length args))
+         (level (if (= 1 size)
+                    "info"
+                  (car args)))
+         (content (if (= 1 size)
+                      args
+                    (cdr args))))
+    (leanote-log4j level (string-join content " "))))
 
 (provide 'leanote)
 ;;; leanote.el ends here
