@@ -35,7 +35,8 @@
 ;; M-x leanote-login    login remote server.
 ;; M-x leanote-sync     sync remote notes to local.
 ;; C-c u                update/create note to remote server.
-;; C-c D                delete note
+;; C-c d                delete note
+;; C-c r                rename note
 ;;
 
 ;;; Code:
@@ -58,9 +59,10 @@
 (defvar leanote-user-id nil)
 (defvar leanote-token nil)
 
-;; local cache 
 (defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
+
+;;; local cache 
 ;; notebook-id -> notes-list(without content) map
 (defvar leanote--cache-notebookid-notes (make-hash-table :test 'equal))
 ;; notebook-id -> notebook-info map
@@ -69,9 +71,10 @@
 (defvar leanote--cache-noteid-info (make-hash-table :test 'equal))
 ;; local-path -> notebook-id map
 (defvar leanote--cache-notebook-path-id (make-hash-table :test 'equal))
-
 ;; pcache persistent repo name
 (defconst leanote-persistent-repo "*leanote*")
+
+;; log buffer name
 (defconst leanote-log-buffer-name "*Leanote-Log*")
 
 ;; api
@@ -113,7 +116,8 @@
   :lighter " leanote "
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
-            (define-key map (kbd "C-c D") 'leanote-delete-current-note)
+            (define-key map (kbd "C-c d") 'leanote-delete-current-note)
+            (define-key map (kbd "C-c d") 'leanote-rename)
             map)
   :group 'leanote
   (leanote-init)
@@ -121,19 +125,18 @@
 
 (defun leanote-init ()
   "do some init work when leanote minor-mode turn on"
-  (let ((repo (pcache-repository leanote-persistent-repo)))
-    (when (= 0 (hash-table-count leanote--cache-noteid-info))
-      (setq leanote--cache-noteid-info
-            (leanote-persistent-get 'leanote--cache-noteid-info)))
-    (when (= 0 (hash-table-count leanote--cache-notebook-path-id))
-      (setq leanote--cache-notebook-path-id
-            (leanote-persistent-get 'leanote--cache-notebook-path-id)))
-    (when (= 0 (hash-table-count leanote--cache-notebookid-info))
-      (setq leanote--cache-notebookid-info
-            (leanote-persistent-get 'leanote--cache-notebookid-info)))
-    (when (= 0 (hash-table-count leanote--cache-notebookid-notes))
-      (setq leanote--cache-notebookid-notes
-            (leanote-persistent-get 'leanote--cache-notebookid-notes))))
+  (when (= 0 (hash-table-count leanote--cache-noteid-info))
+    (setq leanote--cache-noteid-info
+          (leanote-persistent-get 'leanote--cache-noteid-info)))
+  (when (= 0 (hash-table-count leanote--cache-notebook-path-id))
+    (setq leanote--cache-notebook-path-id
+          (leanote-persistent-get 'leanote--cache-notebook-path-id)))
+  (when (= 0 (hash-table-count leanote--cache-notebookid-info))
+    (setq leanote--cache-notebookid-info
+          (leanote-persistent-get 'leanote--cache-notebookid-info)))
+  (when (= 0 (hash-table-count leanote--cache-notebookid-notes))
+    (setq leanote--cache-notebookid-notes
+          (leanote-persistent-get 'leanote--cache-notebookid-notes)))
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
 (defun leanote-after-save-action ()
@@ -184,11 +187,7 @@
   (interactive)
   (leanote-log (format "--------start to sync leanote data:%s-------"
                        (leanote--get-current-time-stamp)))
-  (unless leanote-token
-    (leanote-login))
-  (unless leanote-token                ;; make sure user login.
-    (leanote-log "error" "login failed!")
-    (error "login failed!"))
+  (leanote-make-sure-login)
   (leanote-ajax-get-note-books)
   (unless (> (hash-table-count leanote--cache-noteid-info) 0)
     (setq leanote--cache-noteid-info   ;; restore noteid info from persistent cache.
@@ -299,8 +298,7 @@
 (defun leanote-delete-current-note ()
   "delete current note."
   (interactive)
-  (unless leanote-token
-    (leanote-login))
+  (leanote-make-sure-login)
   (let* ((result-data nil)
          (note-info (leanote-get-note-info-base-note-full-name
                      (buffer-file-name)))
@@ -310,7 +308,6 @@
          (usn (assoc-default 'Usn note-info)))
     (unless note-id
       (error "cannot found current note for id %s" note-id))
-    (setq ab/debug note-info)
     (when (yes-or-no-p (format "Do you really want to delete %s?" note-title))
       (setq result-data (leanote-ajax-delete-note note-id usn))
       (if (and (listp result-data)
@@ -328,7 +325,6 @@
               (delete name recentf-list))
             ;; (kill-buffer)
             (delete-file-and-buffer)
-            (setq ab/debug notebook-notes-new)
             (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
             (leanote-log (format "local file %s was deleted." name))
             ))
@@ -421,6 +417,7 @@
 (defun leanote-rename ()
   "rename current note"
   (interactive)
+  (leanote-make-sure-login)
   (let* ((buf-name (buffer-file-name))
          (note-info (leanote-get-note-info-base-note-full-name buf-name))
          (result-data nil)
@@ -466,6 +463,7 @@
 (defun leanote-push-current-file-to-remote ()
   "push current content or add new note to remote server."
   (interactive)
+  (leanote-make-sure-login)
   (let* ((note-info (leanote-get-note-info-base-note-full-name
                      (buffer-file-name)))
          (result-data nil)
@@ -518,9 +516,7 @@
                 (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
                 (puthash note-id result-data leanote--cache-noteid-info)))
             )))
-      )
-    )
-  )
+      )))
 
 (defun leanote-ajax-update-note (note-info &optional note-content api)
   "update note content and abstract."
@@ -647,6 +643,18 @@
                (make-directory current-notebook-path t)
                ))
            ))
+
+(defun leanote-make-sure-login (&optional force)
+  "make sure login first"
+  (when (null force)
+    (if leanote-token
+        (setq force nil)
+      (setq force t)))
+  (when force
+    (leanote-login))
+  (unless leanote-token
+    (leanote-log "error" "login failed!")
+    (error "login failed!")))
 
 ;;;###autoload
 (defun leanote-login (&optional user password)

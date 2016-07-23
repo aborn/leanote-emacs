@@ -20,7 +20,7 @@ Add following code to your init(.emacs or init.el anyway) file.
 
 ## Hotkey
 * **C-c u** update or add new note content to remote server
-* **C-c D** delete current note
+* **C-c d** delete current note
 
 ## Leanote log
 All logs are recorded in \*Leanote-Log* buffer.
@@ -49,7 +49,7 @@ M-x package-install RET leanote-mode RET
 
 ## 快捷键
 * **C-c u** 更新或者添加当前笔记到服务器
-* **C-c D** 删除当前笔记
+* **C-c d** 删除当前笔记
 
 ## 操作日志
 所有的操作日志被记录在\*Leanote-Log* 这个buffer里。
