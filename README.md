@@ -29,7 +29,7 @@ All logs are recorded in \*Leanote-Log* buffer.
 
 # leanote-mode
 leanote-mode是emacs下的一个minor-mode,
-在emacs下采用[leanote](https://leanote.com/)提供的服务写markdown笔记。
+在emacs中采用[leanote](https://leanote.com/)提供的服务写markdown笔记。
 
 ## 安装
 从elpa的源中进行安装（如[melpa](https://melpa.org/) 或者 [popkit elpa](https://elpa.popkit.org/)).）  
