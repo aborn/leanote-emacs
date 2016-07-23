@@ -178,11 +178,12 @@
       (setq result (make-hash-table :test 'equal)))
     result))
 
+;;;###autoload
 (defun leanote-sync ()
   "sync notebooks and notes from remote server."
   (interactive)
   (leanote-log (format "--------start to sync leanote data:%s-------"
-                              (leanote--get-current-time-stamp)))
+                       (leanote--get-current-time-stamp)))
   (unless leanote-token
     (leanote-login))
   (unless leanote-token                ;; make sure user login.
@@ -207,7 +208,7 @@
                   (notes (leanote-ajax-get-notes notebookid)))
              (puthash notebookid notes leanote--cache-notebookid-notes)
              (leanote-log (format "notebook-name:%s, nootbook-id:%s, has %d notes."
-                                         title notebookid (length notes)))
+                                  title notebookid (length notes)))
              (leanote-create-notes-files title notes notebookid)))
   (let ((local-cache (leanote-persistent-get 'leanote--cache-noteid-info)))
     (when (equal 0 (hash-table-count local-cache))
@@ -223,7 +224,7 @@
   (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
 
 (defun leanote-create-notes-files (notebookname notes notebookid)
-  "create&update all notes content in notebookname"
+  "create/update all notes in `notebookname'"
   (let* ((notebookroot (expand-file-name
                         (leanote-get-notebook-parent-path notebookid)
                         leanote-local-root-path)))
@@ -255,7 +256,7 @@
                                  (insert notecontent)
                                  (save-buffer)
                                  (puthash noteid note leanote--cache-noteid-info)
-                                 (leanote-log (format "ok, file %s updated!" file-full-name))
+                                 (leanote-log (format "ok, local file %s updated!" file-full-name))
                                  ))))
                        (progn
                          (leanote-log (format "file %s not exists in local." file-full-name))
@@ -263,7 +264,7 @@
                          (insert notecontent)
                          (save-buffer)
                          (puthash noteid note leanote--cache-noteid-info)
-                         (leanote-log (format "ok, file %s finished!" file-full-name))
+                         (leanote-log (format "ok, local file %s created!" file-full-name))
                          )))))))))
 
 (defun leanote-get-note-info-base-note-full-name (full-file-name)
@@ -296,7 +297,7 @@
     note-info))
 
 (defun leanote-delete-current-note ()
-  "delete current note"
+  "delete current note."
   (interactive)
   (let* ((result-data nil)
          (note-info (leanote-get-note-info-base-note-full-name
@@ -308,7 +309,6 @@
       (error "cannot found current note for id %s" note-id))
     (when (yes-or-no-p (format "Do you really want to delete %s?" note-title))
       (setq result-data (leanote-ajax-delete-note note-id usn))
-      ;; (setq leanote-debug-data result-data)   ;; TODO
       (if (and (listp result-data)
                (equal :json-false (assoc-default 'Ok result-data)))
           (error "delete note error, msg:%s." (assoc-default 'Msg result-data))
@@ -319,7 +319,8 @@
           (leanote-log (format "delete remote note %s success." note-title))
           (remhash note-id leanote--cache-noteid-info)
           (let ((name (buffer-file-name)))
-            (delete name recentf-list)       ;; TODO is needed ?
+            (when (listp recentf-list)      ;; remove it from recentf-list
+              (delete name recentf-list))
             (kill-buffer)
             (leanote-log (format "local file %s was deleted." name))
             ))
@@ -482,8 +483,6 @@
                                   )))))
     result))
 
-;; (leanote-get-notebook-parent-path "5789af43c3b1f40b51000009")
-;; "其他笔记/其他语言学习"
 (defun leanote-get-notebook-parent-path (parentid)
   "get notebook parent path"
   (if (not parentid)
@@ -525,6 +524,7 @@
                ))
            ))
 
+;;;###autoload
 (defun leanote-login (&optional user password)
   "login in leanote"
   (interactive)
@@ -548,6 +548,8 @@
                            (setq leanote-user-id (assoc-default 'UserId data))
                            (setq leanote-user-password password) ;; update password
                            (leanote-log "login success!")))))))
+
+;;; log 
 
 (defun leanote-log2msg (level &rest args)
   "only warning or error message to *Message* buffer."
