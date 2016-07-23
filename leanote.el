@@ -117,7 +117,7 @@
             map)
   :group 'leanote
   (leanote-init)
-  (leanote-log "info" "leanote minor mode initial!"))
+  (leanote-log "leanote minor mode initial!"))
 
 (defun leanote-init ()
   "do some init work when leanote minor-mode turn on"
@@ -149,7 +149,7 @@
                           (substring default-directory 0 (- (length default-directory) 1))
                           leanote--cache-notebook-path-id))
       (unless note-book-id
-        (leanote-log "info" "no releated notebook"))
+        (leanote-log "no releated notebook"))
       (when note-book-id
         (setq note-info-remote (leanote-get-note-info-base-note-full-name full-file-name))
         (setq note-info (gethash (assoc-default 'NoteId note-info-remote)
@@ -160,7 +160,7 @@
           (add-to-list 'note-info '(IsModified . t))
           (puthash noteid note-info leanote--cache-noteid-info)
           (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
-          (leanote-log "info" (format "change file status when save. %s" full-file-name))
+          (leanote-log (format "change file status when save. %s" full-file-name))
           ))
       )))
 
@@ -181,7 +181,7 @@
 (defun leanote-sync ()
   "sync notebooks and notes from remote server."
   (interactive)
-  (leanote-log "info" (format "--------start to sync leanote data:%s-------"
+  (leanote-log (format "--------start to sync leanote data:%s-------"
                               (leanote--get-current-time-stamp)))
   (unless leanote-token
     (leanote-login))
@@ -192,12 +192,12 @@
   (unless (> (hash-table-count leanote--cache-noteid-info) 0)
     (setq leanote--cache-noteid-info   ;; restore noteid info from persistent cache.
           (leanote-persistent-get 'leanote--cache-noteid-info))
-    (leanote-log "info" "restore leanote--cache-noteid-info."))
+    (leanote-log "restore leanote--cache-noteid-info."))
   ;; keep all notebook node info and store to hash table first
   (cl-loop for elt in (append leanote-current-all-note-books nil)
            collect
            (let* ((notebookid (assoc-default 'NotebookId elt)))
-             (leanote-log "info" (format "notebookid:%s  title:%s" notebookid (assoc-default 'Title elt)))
+             (leanote-log (format "notebookid:%s  title:%s" notebookid (assoc-default 'Title elt)))
              (puthash notebookid elt leanote--cache-notebookid-info)))
   (leanote-mkdir-notebooks-directory-structure leanote-current-all-note-books)
   (cl-loop for elt in (append leanote-current-all-note-books nil)
@@ -206,17 +206,17 @@
                   (notebookid (assoc-default 'NotebookId elt))
                   (notes (leanote-ajax-get-notes notebookid)))
              (puthash notebookid notes leanote--cache-notebookid-notes)
-             (leanote-log "info" (format "notebook-name:%s, nootbook-id:%s, has %d notes."
+             (leanote-log (format "notebook-name:%s, nootbook-id:%s, has %d notes."
                                          title notebookid (length notes)))
              (leanote-create-notes-files title notes notebookid)))
   (let ((local-cache (leanote-persistent-get 'leanote--cache-noteid-info)))
     (when (equal 0 (hash-table-count local-cache))
       (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
-      (leanote-log "info" "notice: init leanote-persistent-put for leanote--cache-noteid-info")))
+      (leanote-log "notice: init leanote-persistent-put for leanote--cache-noteid-info")))
   (leanote-persistent-put 'leanote--cache-notebook-path-id leanote--cache-notebook-path-id)
   (leanote-persistent-put 'leanote--cache-notebookid-info leanote--cache-notebookid-info)
   (leanote-persistent-put 'leanote--cache-notebookid-notes leanote--cache-notebookid-notes)
-  (leanote-log "info" (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp))))
+  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp))))
 
 (defun leanote--get-current-time-stamp ()
   "get current time stamp"
@@ -228,7 +228,7 @@
                         (leanote-get-notebook-parent-path notebookid)
                         leanote-local-root-path)))
     (puthash notebookroot notebookid leanote--cache-notebook-path-id)
-    (leanote-log "info" (format "notebookroot=%s" notebookroot))
+    (leanote-log (format "notebookroot=%s" notebookroot))
     (cl-loop for note in (append notes nil)
              collect
              (let* ((noteid (assoc-default 'NoteId note))
@@ -243,7 +243,7 @@
                           (file-full-name (expand-file-name filename notebookroot)))
                      (if (file-exists-p file-full-name)
                          (progn
-                           (leanote-log "info" (format "file %s exists in local." file-full-name))
+                           (leanote-log (format "file %s exists in local." file-full-name))
                            (let* ((is-modified (assoc-default 'IsModified note-local-cache)))
                              (if is-modified
                                  (leanote-log "error" (format "local file %s has modified, sync error for this file."
@@ -255,15 +255,15 @@
                                  (insert notecontent)
                                  (save-buffer)
                                  (puthash noteid note leanote--cache-noteid-info)
-                                 (leanote-log "info" (format "ok, file %s updated!" file-full-name))
+                                 (leanote-log (format "ok, file %s updated!" file-full-name))
                                  ))))
                        (progn
-                         (leanote-log "info" (format "file %s not exists in local." file-full-name))
+                         (leanote-log (format "file %s not exists in local." file-full-name))
                          (find-file file-full-name)
                          (insert notecontent)
                          (save-buffer)
                          (puthash noteid note leanote--cache-noteid-info)
-                         (leanote-log "info" (format "ok, file %s finished!" file-full-name))
+                         (leanote-log (format "ok, file %s finished!" file-full-name))
                          )))))))))
 
 (defun leanote-get-note-info-base-note-full-name (full-file-name)
@@ -316,12 +316,12 @@
           (unless result-data
             (leanote-log "error" "error in delete note. reason: server error!")
             (error "error in delete note. reason: server error!"))
-          (leanote-log "info" (format "delete remote note %s success." note-title))
+          (leanote-log (format "delete remote note %s success." note-title))
           (remhash note-id leanote--cache-noteid-info)
           (let ((name (buffer-file-name)))
             (delete name recentf-list)       ;; TODO is needed ?
             (kill-buffer)
-            (leanote-log "info" (format "local file %s was deleted." name))
+            (leanote-log (format "local file %s was deleted." name))
             ))
         ))))
 
@@ -371,7 +371,7 @@
             (progn
               (unless result-data
                 (error "error in push(update note) to server. reason: server error!"))
-              (leanote-log "info" "push(update note) to remote success.")
+              (leanote-log "push(update note) to remote success.")
               (message "push(update note) to remote success.")
               (puthash note-id result-data leanote--cache-noteid-info))
             ))
@@ -389,7 +389,7 @@
             (progn
               (unless result-data
                 (error "error in push(add new note) to server. reason: server error!"))
-              (leanote-log "info" "push(add new note) to remote success.")
+              (leanote-log "push(add new note) to remote success.")
               (message "push(add new note) to remote success.")
               (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
                      (notebook-notes-new (vconcat notebook-notes (vector result-data))))
@@ -407,7 +407,7 @@
   "update note"
   (when (null api)
     (setq api "/note/updateNote"))
-  (leanote-log "info" (format "leanote-ajax-update-note api=%s" api))
+  (leanote-log (format "leanote-ajax-update-note api=%s" api))
   (let* ((result nil)
          (usn (assoc-default 'Usn note-info))
          (new-usn (+ 1 usn))
@@ -447,7 +447,7 @@
   (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
     (when note-books
       (setq leanote-current-all-note-books note-books)
-      (leanote-log "info" (format "Got %d notebooks." (length note-books)))
+      (leanote-log (format "Got %d notebooks." (length note-books)))
       note-books)))
 
 (defun leanote-ajax-get-note-content (noteid)
@@ -501,7 +501,7 @@
   "make note-books hierarchy"
   (interactive)
   (unless (file-exists-p leanote-local-root-path)
-    (leanote-log "info" (format "make root dir %s" leanote-local-root-path))
+    (leanote-log (format "make root dir %s" leanote-local-root-path))
     (make-directory leanote-local-root-path t))
   (when (null all-notebooks)
     (leanote-log "warning" "all-notebooks not provided.")
@@ -513,14 +513,14 @@
                   (parent-id (assoc-default 'ParentNotebookId elt))
                   (has-parent (not (string= "" parent-id)))
                   (current-notebook-path (expand-file-name title leanote-local-root-path)))
-             (leanote-log "info" (format "title=%s" title))
+             (leanote-log (format "title=%s" title))
              (when has-parent
-               (leanote-log "info" (format "title=%s has parent" title))
+               (leanote-log (format "title=%s has parent" title))
                (setq current-notebook-path (expand-file-name
                                             (leanote-get-notebook-parent-path notebook-id)
                                             leanote-local-root-path)))
              (unless (file-exists-p current-notebook-path)
-               (leanote-log "info" (format "notebook:%s, path:%s" title current-notebook-path))
+               (leanote-log (format "notebook:%s, path:%s" title current-notebook-path))
                (make-directory current-notebook-path t)
                ))
            ))
@@ -547,7 +547,7 @@
                            (setq leanote-user-email (assoc-default 'Email data))
                            (setq leanote-user-id (assoc-default 'UserId data))
                            (setq leanote-user-password password) ;; update password
-                           (leanote-log "info" "login success!")))))))
+                           (leanote-log "login success!")))))))
 
 (defun leanote-log2msg (level &rest args)
   "only warning or error message to *Message* buffer."
