@@ -117,7 +117,7 @@
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
             (define-key map (kbd "C-c d") 'leanote-delete-current-note)
-            (define-key map (kbd "C-c d") 'leanote-rename)
+            (define-key map (kbd "C-c r") 'leanote-rename)
             map)
   :group 'leanote
   (leanote-init)
