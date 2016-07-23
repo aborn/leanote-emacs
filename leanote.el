@@ -299,6 +299,8 @@
 (defun leanote-delete-current-note ()
   "delete current note."
   (interactive)
+  (unless leanote-token
+    (leanote-login))
   (let* ((result-data nil)
          (note-info (leanote-get-note-info-base-note-full-name
                      (buffer-file-name)))
@@ -329,7 +331,7 @@
 
 (defun leanote-ajax-delete-note (note-id usn)
   "delete note"
-  (leanote-log "note-id=%s, usn=%d" note-id usn)
+  (leanote-log (format "note-id=%s, usn=%d" note-id usn))
   (let* ((result nil)
          (usn-str (number-to-string (+ 1 usn))))
     (request (concat leanote-api-root "/note/deleteTrash")
@@ -399,8 +401,8 @@
 (defun leanote-rename ()
   "rename current note"
   (interactive)
-  (let* ((note-info (leanote-get-note-info-base-note-full-name
-                     (buffer-file-name)))
+  (let* ((buf-name (buffer-file-name))
+         (note-info (leanote-get-note-info-base-note-full-name buf-name))
          (result-data nil)
          (notebook-id (gethash
                        (substring default-directory 0 (- (length default-directory) 1))
@@ -435,6 +437,8 @@
             (puthash notebook-id notebook-notes leanote--cache-notebookid-notes)
             (puthash note-id result-data leanote--cache-noteid-info)
             (leanote-rename-file-and-buffer (concat new-name ".md"))
+            (when (listp recentf-list)      ;; remove it from recentf-list
+              (delete buf-name recentf-list))
             (leanote-log "rename note success.")))))
     ))
 
