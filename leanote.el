@@ -346,6 +346,51 @@
              )
     result))
 
+;;;###autoload
+(defun leanote-rename ()
+  "rename current note"
+  (interactive)
+  (let* ((note-info (leanote-get-note-info-base-note-full-name
+                     (buffer-file-name)))
+         (result-data nil)
+         (notebook-id (gethash
+                       (substring default-directory 0 (- (length default-directory) 1))
+                       leanote--cache-notebook-path-id))
+         (notebook-info (gethash notebook-id leanote--cache-notebookid-info))
+         (notebook-title (assoc-default 'Title notebook-info))
+         (note-id (assoc-default 'NoteId note-info))
+         (note-title (assoc-default 'Title note-info))
+         (new-name nil))
+    (when note-id
+      (message "notebook-title:%s, note-title:%s" notebook-title note-title)
+      (setq ab/debug note-info)
+      (setq new-name (read-string "Input new name:" nil nil note-title))
+      (when (string-suffix-p ".md" new-name)
+        (message "markdown")
+        (setq new-name (substring new-name 0 (- (length new-name) 3))))
+      (setq ab/debug notebook-info)
+      (when (equal note-title new-name)
+        (error "not changed!"))
+      ;; (when (yes-or-no-p (format "Change file name %s.md to %s.md?"
+      ;;                            note-title new-name))
+      ;;   (message "new-name:%s %s" new-name note-title)
+      ;;   (add-to-list 'note-info `(Title . ,new-name))
+      ;;   (setq ab/debug note-info)
+      ;;   (setq result-data (leanote-ajax-update-note note-info nil))
+      ;;   (setq ab/debug2 result-data)
+      ;;   (if (and (listp result-data)
+      ;;            (equal :json-false (assoc-default 'Ok result-data)))
+      ;;       (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
+      ;;     (progn
+      ;;       (unless result-data
+      ;;         (error "error in push(update note) to server. reason: server error!"))
+      ;;       (leanote-log "push(rename note) to remote success.")
+      ;;       (puthash note-id result-data leanote--cache-noteid-info))
+      ;;     )
+      ;;   )
+      )
+    ))
+
 (defun leanote-push-current-file-to-remote ()
   "push current content or add new note to remote server."
   (interactive)
@@ -404,8 +449,8 @@
     )
   )
 
-(defun leanote-ajax-update-note (note-info note-content &optional api)
-  "update note"
+(defun leanote-ajax-update-note (note-info &optional note-content api)
+  "update note content and abstract."
   (when (null api)
     (setq api "/note/updateNote"))
   (leanote-log (format "leanote-ajax-update-note api=%s" api))
@@ -415,16 +460,20 @@
          (new-usn-str (number-to-string usn))
          (note-id (assoc-default 'NoteId note-info))
          (notebook-id (assoc-default 'NotebookId note-info))
-         (note-title (assoc-default 'Title note-info)))
+         (note-title (assoc-default 'Title note-info))
+         (request-params nil))
+    (setq request-params `(("token" . ,leanote-token)
+                          ("NoteId" . ,note-id)
+                          ("Usn" . ,new-usn-str)
+                          ("NotebookId" . ,notebook-id)
+                          ("Title" . ,note-title)))
+    (when note-content
+      (add-to-list 'request-params '("IsMarkdown" . "true"))
+      (add-to-list 'request-params `("Abstract" . ,note-content))
+      (add-to-list 'request-params `("Content" . ,note-content)))
+    (setq ab/debug request-params)
     (request (concat leanote-api-root api)
-             :params `(("token" . ,leanote-token)
-                       ("NoteId" . ,note-id)
-                       ("Usn" . ,new-usn-str)
-                       ("NotebookId" . ,notebook-id)
-                       ("Title" . ,note-title)
-                       ("IsMarkdown" . "true")
-                       ("Abstract" . ,note-content)
-                       ("Content" . ,note-content))
+             :params request-params
              :sync t
              :type "POST"
              :parser 'leanote-parser
