@@ -307,6 +307,7 @@
          (usn (assoc-default 'Usn note-info)))
     (unless note-id
       (error "cannot found current note for id %s" note-id))
+    (setq ab/debug note-info)
     (when (yes-or-no-p (format "Do you really want to delete %s?" note-title))
       (setq result-data (leanote-ajax-delete-note note-id usn))
       (if (and (listp result-data)
@@ -328,6 +329,7 @@
 
 (defun leanote-ajax-delete-note (note-id usn)
   "delete note"
+  (leanote-log "note-id=%s, usn=%d" note-id usn)
   (let* ((result nil)
          (usn-str (number-to-string (+ 1 usn))))
     (request (concat leanote-api-root "/note/deleteTrash")
@@ -346,6 +348,53 @@
              )
     result))
 
+(defun leanote-notebook-has-note-p (notebook-notes note-name)
+  "notebook has note with name `note-name'"
+  (let* ((result nil))
+    (when (string-suffix-p ".md" note-name)
+      (setq note-name (substring note-name 0
+                                 (- (length note-name) 3))))
+    (cl-loop for elt in (append notebook-notes nil)
+             collect
+             (let ((title (assoc-default 'Title elt)))
+               (when (equal title note-name)
+                 (setq result t))))
+    result))
+
+(defun leanote-notebook-replace (notebook-notes new-note note-id)
+  "replace `note-name' with `new-note'"
+  (let* ((index -1)
+         (count 0))
+    (cl-loop for elt in (append notebook-notes nil)
+             collect
+             (let ((note-id-in-notebook (assoc-default 'NoteId elt)))
+               (when (equal note-id-in-notebook note-id)
+                 (setq index count)
+                 (leanote-log "matched: noteid=%s" note-id))
+               (setq count (+ count 1))))
+    (when (and (>= index 0)
+               (arrayp notebook-notes))
+      (aset notebook-notes index new-note))))
+
+(defun leanote-rename-file-and-buffer (new-name)
+  "Renames both current buffer and file it's visiting to NEW-NAME."
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not filename)
+        (leanote-log "Buffer '%s' is not visiting a file!" name)
+      (if (get-buffer new-name)
+          (progn
+            (leanote-log "A buffer named '%s' already exists! Use another name!" new-name)
+            (rename-file name new-name 1)
+            (rename-buffer (concat new-name "#" name))
+            (set-visited-file-name new-name)
+            (set-buffer-modified-p nil))
+        (progn
+          (rename-file name new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil))))))
+
 ;;;###autoload
 (defun leanote-rename ()
   "rename current note"
@@ -358,37 +407,35 @@
                        leanote--cache-notebook-path-id))
          (notebook-info (gethash notebook-id leanote--cache-notebookid-info))
          (notebook-title (assoc-default 'Title notebook-info))
+         (notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
          (note-id (assoc-default 'NoteId note-info))
          (note-title (assoc-default 'Title note-info))
          (new-name nil))
     (when note-id
-      (message "notebook-title:%s, note-title:%s" notebook-title note-title)
-      (setq ab/debug note-info)
+      (setq note-info (gethash note-id leanote--cache-noteid-info)) ;; force update
       (setq new-name (read-string "Input new name:" nil nil note-title))
       (when (string-suffix-p ".md" new-name)
-        (message "markdown")
         (setq new-name (substring new-name 0 (- (length new-name) 3))))
-      (setq ab/debug notebook-info)
       (when (equal note-title new-name)
-        (error "not changed!"))
-      ;; (when (yes-or-no-p (format "Change file name %s.md to %s.md?"
-      ;;                            note-title new-name))
-      ;;   (message "new-name:%s %s" new-name note-title)
-      ;;   (add-to-list 'note-info `(Title . ,new-name))
-      ;;   (setq ab/debug note-info)
-      ;;   (setq result-data (leanote-ajax-update-note note-info nil))
-      ;;   (setq ab/debug2 result-data)
-      ;;   (if (and (listp result-data)
-      ;;            (equal :json-false (assoc-default 'Ok result-data)))
-      ;;       (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
-      ;;     (progn
-      ;;       (unless result-data
-      ;;         (error "error in push(update note) to server. reason: server error!"))
-      ;;       (leanote-log "push(rename note) to remote success.")
-      ;;       (puthash note-id result-data leanote--cache-noteid-info))
-      ;;     )
-      ;;   )
-      )
+        (error "Rename error, not changed!"))
+      (when (leanote-notebook-has-note-p notebook-notes new-name)
+        (error (format "Rename error: the notebook %s already exists note %s" notebook-title new-name)))
+      (when (yes-or-no-p (format "Change file name %s.md to %s.md?"
+                                 note-title new-name))
+        (leanote-log "rename note %s with new name %s" note-title new-name)
+        (add-to-list 'note-info `(Title . ,new-name))
+        (setq result-data (leanote-ajax-update-note note-info nil))
+        (if (and (listp result-data)
+                 (equal :json-false (assoc-default 'Ok result-data)))
+            (error "rename note error, msg:%s." (assoc-default 'Msg result-data))
+          (progn
+            (unless result-data
+              (error "error in rename. reason: server error!"))
+            (leanote-notebook-replace notebook-notes result-data note-id)
+            (puthash notebook-id notebook-notes leanote--cache-notebookid-notes)
+            (puthash note-id result-data leanote--cache-noteid-info)
+            (leanote-rename-file-and-buffer (concat new-name ".md"))
+            (leanote-log "rename note success.")))))
     ))
 
 (defun leanote-push-current-file-to-remote ()
@@ -402,11 +449,12 @@
                        leanote--cache-notebook-path-id))
          (notebook-info (gethash notebook-id leanote--cache-notebookid-info))
          (notebook-title (assoc-default 'Title notebook-info))
+         (notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
          (note-id (assoc-default 'NoteId note-info)))
     ;; TODO save it before update.
     (if note-id
         (progn     ;; modify exists note
-          (setq note-info (gethash note-id leanote--cache-noteid-info))
+          (setq note-info (gethash note-id leanote--cache-noteid-info)) ;; force update
           (unless note-info
             (error "cannot find current note info for id %s in local cache." note-id))
           (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
@@ -419,6 +467,7 @@
                 (error "error in push(update note) to server. reason: server error!"))
               (leanote-log "push(update note) to remote success.")
               (message "push(update note) to remote success.")
+              (leanote-notebook-replace notebook-notes result-data note-id)
               (puthash note-id result-data leanote--cache-noteid-info))
             ))
       (progn       ;; add new note
@@ -437,8 +486,7 @@
                 (error "error in push(add new note) to server. reason: server error!"))
               (leanote-log "push(add new note) to remote success.")
               (message "push(add new note) to remote success.")
-              (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
-                     (notebook-notes-new (vconcat notebook-notes (vector result-data))))
+              (let* ((notebook-notes-new (vconcat notebook-notes (vector result-data))))
                 (setq note-id (assoc-default 'NoteId result-data))
                 (unless note-id
                   (error "error in local data operate!"))
@@ -463,15 +511,17 @@
          (note-title (assoc-default 'Title note-info))
          (request-params nil))
     (setq request-params `(("token" . ,leanote-token)
-                          ("NoteId" . ,note-id)
-                          ("Usn" . ,new-usn-str)
-                          ("NotebookId" . ,notebook-id)
-                          ("Title" . ,note-title)))
-    (when note-content
-      (add-to-list 'request-params '("IsMarkdown" . "true"))
-      (add-to-list 'request-params `("Abstract" . ,note-content))
-      (add-to-list 'request-params `("Content" . ,note-content)))
-    (setq ab/debug request-params)
+                           ("NoteId" . ,note-id)
+                           ("Usn" . ,new-usn-str)
+                           ("NotebookId" . ,notebook-id)
+                           ("Title" . ,note-title)))
+    (if note-content
+        (progn
+          (leanote-log "update content")
+          (add-to-list 'request-params '("IsMarkdown" . "true"))
+          (add-to-list 'request-params `("Abstract" . ,note-content))
+          (add-to-list 'request-params `("Content" . ,note-content)))
+      (leanote-log "only update info."))
     (request (concat leanote-api-root api)
              :params request-params
              :sync t
