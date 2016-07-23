@@ -1,4 +1,4 @@
-;;; leanote.el --- A minor mode for writing leanote in markdown file.  -*- lexical-binding: t; -*-
+;;; leanote.el --- A minor mode writing leanote in markdown file.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Aborn Jiang
 
@@ -67,7 +67,7 @@
 (defvar leanote--cache-notebookid-info (make-hash-table :test 'equal))
 ;; note-id -> notebook-info map
 (defvar leanote--cache-noteid-info (make-hash-table :test 'equal))
-;; local-path -> notebook-id
+;; local-path -> notebook-id map
 (defvar leanote--cache-notebook-path-id (make-hash-table :test 'equal))
 
 ;; pcache persistent repo name
