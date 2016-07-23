@@ -3,4 +3,5 @@ This version provides following features:
 * M-x leanote-login    login remote server.
 * M-x leanote-sync     sync remote notes to local.
 * C-c u                update/create note to remote server.
-* C-c D                delete note
+* C-c D                delete note.
+* log all message into \*Leanote-Log* buffer.
