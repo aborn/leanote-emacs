@@ -439,6 +439,7 @@
             (leanote-rename-file-and-buffer (concat new-name ".md"))
             (when (listp recentf-list)      ;; remove it from recentf-list
               (delete buf-name recentf-list))
+            (message "rename note success.")
             (leanote-log "rename note success.")))))
     ))
 
