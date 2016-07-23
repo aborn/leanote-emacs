@@ -305,6 +305,7 @@
          (note-info (leanote-get-note-info-base-note-full-name
                      (buffer-file-name)))
          (note-id (assoc-default 'NoteId note-info))
+         (notebook-id (assoc-default 'NotebookId note-info))
          (note-title (assoc-default 'Title note-info))
          (usn (assoc-default 'Usn note-info)))
     (unless note-id
@@ -321,19 +322,33 @@
             (error "error in delete note. reason: server error!"))
           (leanote-log (format "delete remote note %s success." note-title))
           (remhash note-id leanote--cache-noteid-info)
-          (let ((name (buffer-file-name)))
+          (let ((name (buffer-file-name))
+                (notebook-notes-new (leanote-delete-local-notebook-note notebook-id note-id)))
             (when (listp recentf-list)      ;; remove it from recentf-list
               (delete name recentf-list))
-            (kill-buffer)
+            ;; (kill-buffer)
+            (delete-file-and-buffer)
+            (setq ab/debug notebook-notes-new)
+            (puthash notebook-id notebook-notes-new)
             (leanote-log (format "local file %s was deleted." name))
             ))
         ))))
 
+(defun leanote-delete-local-notebook-note (notebook-id noteid)
+  "delete local cache notebook note"
+  (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
+         (index (leanote-get-note-index notebook-notes noteid))
+         (result notebook-notes))
+    (when (>= index 0)
+      (aset notebook-notes index nil)
+      (setq result (delete nil notebook-notes)))  ;; a new array
+    result))
+
 (defun leanote-ajax-delete-note (note-id usn)
   "delete note"
-  (leanote-log (format "note-id=%s, usn=%d" note-id usn))
+  (leanote-log (format "note-id=%s, usn=%d will be delete." note-id usn))
   (let* ((result nil)
-         (usn-str (number-to-string (+ 1 usn))))
+         (usn-str (number-to-string (+ 0 usn))))
     (request (concat leanote-api-root "/note/deleteTrash")
              :params `(("token" . ,leanote-token)
                        ("noteId" . ,note-id)
@@ -363,8 +378,8 @@
                  (setq result t))))
     result))
 
-(defun leanote-notebook-replace (notebook-notes new-note note-id)
-  "replace `note-name' with `new-note'"
+(defun leanote-get-note-index (notebook-notes note-id)
+  "get the note index in `notebook-notes'"
   (let* ((index -1)
          (count 0))
     (cl-loop for elt in (append notebook-notes nil)
@@ -374,6 +389,11 @@
                  (setq index count)
                  (leanote-log "matched: noteid=%s" note-id))
                (setq count (+ count 1))))
+    index))
+
+(defun leanote-notebook-replace (notebook-notes new-note note-id)
+  "replace `note-name' with `new-note'"
+  (let* ((index (leanote-get-note-index notebook-notes note-id)))
     (when (and (>= index 0)
                (arrayp notebook-notes))
       (aset notebook-notes index new-note))))

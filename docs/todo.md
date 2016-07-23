@@ -17,6 +17,7 @@ list eache version features:
 
 ## bug-report
 * local data lose if emacs crash accidentally. do a timer task for save it!
+* delte note conflict.
 
 ## advanced
 * different color for log.
