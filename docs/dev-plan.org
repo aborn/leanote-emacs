@@ -10,7 +10,7 @@
 
 -----
 
-** leanote develop
+** each version develop plan.
 *** v0.2
 1. plan release time: 2016-08-14
 2. features:
@@ -38,6 +38,7 @@ CLOSED: [2016-07-23 Sun 16:47]
 ***** CLOSED print each operate log
 CLOSED: [2016-07-23 Sun 16:47]
 - CLOSING NOTE [2016-07-23 Sun 16:47]
+
 
 ** bug-report
 *** local data lose if emacs crash accidentally. do a timer task for save it!
