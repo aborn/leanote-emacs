@@ -77,12 +77,37 @@
 ;; log buffer name
 (defconst leanote-log-buffer-name "*Leanote-Log*")
 
+;; leanote group
+(defgroup leanote nil
+  "leanote mini group"
+  :prefix "leanote-"
+  :group 'external)
+
 ;; api
-(defvar leanote-api-login "/auth/login")
-(defvar leanote-api-getnotebooks "/notebook/getNotebooks")
-(defvar leanote-api-getnotecontent "/note/getNoteContent")
-(defvar leanote-api-getnoteandcontent "/note/getNoteAndContent")
-(defvar leanote-api-getnotes "/note/getNotes")
+(defcustom leanote-api-login "/auth/login"
+  "login api"
+  :group 'leanote
+  :type 'string)
+
+(defcustom leanote-api-getnotebooks "/notebook/getNotebooks"
+  "get note books api"
+  :group 'leanote
+  :type 'string)
+
+(defcustom leanote-api-getnotecontent "/note/getNoteContent"
+  "get conte content api"
+  :group 'leanote
+  :type 'string)
+
+(defcustom leanote-api-getnoteandcontent "/note/getNoteAndContent"
+  "get note and content api"
+  :group 'leanote
+  :type 'string)
+
+(defcustom leanote-api-getnotes "/note/getNotes"
+  "get notes api"
+  :group 'leanote
+  :type 'string)
 
 (defcustom leanote-api-root "https://leanote.com/api"
   "api root"
@@ -105,11 +130,7 @@
   :group 'leanote
   :type 'string)
 
-(defgroup leanote nil
-  "leanote mini group"
-  :prefix "leanote-"
-  :group 'external)
-
+;; minor mode
 (define-minor-mode leanote
   "leanote mini mode"
   :init-value nil
