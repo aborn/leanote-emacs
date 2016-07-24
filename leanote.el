@@ -252,7 +252,7 @@
                                  (find-file file-full-name)
                                  (setq buffer-read-only nil)
                                  (erase-buffer)
-                                 (insert notecontent)
+                                 (insert notecontent)  ;; if notecontent is nil ?
                                  (save-buffer)
                                  (puthash noteid note leanote--cache-noteid-info)
                                  (leanote-log (format "ok, local file %s updated!" file-full-name))
@@ -575,6 +575,7 @@
 (defun leanote-ajax-get-note-books ()
   "get note books"
   (interactive)
+  (leanote-log (format "leanote-ajax-get-note-books api: %s" leanote-api-getnotebooks))
   (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
     (if note-books
         (progn (setq leanote-current-all-note-books note-books)
@@ -603,6 +604,8 @@
 
 (defun leanote-common-api-action (api &optional param-key &optional param-value)
   "common api only one parameter"
+  (unless api
+    (error "leanote-common-api-action parameter api is %s!" api))
   (leanote-log (format "do ajax, api=%s" api))
   (let ((result nil))
     (request (concat leanote-api-root api)
