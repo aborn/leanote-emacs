@@ -567,10 +567,14 @@
   "get note books"
   (interactive)
   (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
-    (when note-books
-      (setq leanote-current-all-note-books note-books)
-      (leanote-log (format "Got %d notebooks." (length note-books)))
-      note-books)))
+    (if note-books
+        (progn (setq leanote-current-all-note-books note-books)
+               (leanote-log (format "Got %d notebooks." (length note-books)))
+               note-books))
+    (progn
+      (message "No notebooks got!")
+      (leanote-log "warning" "No notebooks got!"))
+    ))
 
 (defun leanote-ajax-get-note-content (noteid)
   "get note content, return type.Note"
@@ -601,7 +605,12 @@
                              (setq result data)
                            (progn (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
                                     (setq result data))
-                                  )))))
+                                  ))))
+             :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                                   (message "Got error: %S" error-thrown)
+                                   (leanote-log "error" "Got error")
+                                   (error "Got error: %S" error-thrown)))
+             )
     result))
 
 (defun leanote-get-notebook-parent-path (parentid)
