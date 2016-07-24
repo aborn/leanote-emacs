@@ -228,7 +228,7 @@
                         (leanote-get-notebook-parent-path notebookid)
                         leanote-local-root-path)))
     (puthash notebookroot notebookid leanote--cache-notebook-path-id)
-    (leanote-log (format "notebookroot=%s" notebookroot))
+    (leanote-log (format "notebookroot=%s, notebookname=%s" notebookroot notebookname))
     (cl-loop for note in (append notes nil)
              collect
              (let* ((noteid (assoc-default 'NoteId note))
@@ -270,7 +270,7 @@
 (defun leanote-get-note-info-base-note-full-name (ffn)
   "get note info base note full name `ffn' full file name"
   (unless (string-suffix-p ".md" ffn)
-    (error "file %s is not markdown file." ffn))
+    (error (format "file %s is not markdown file." ffn)))
   (let* ((note-info nil)   ;; fefault return
          (notebook-id (gethash
                        (substring default-directory 0 (- (length default-directory) 1))
@@ -281,9 +281,9 @@
                                             ffn)))
          (notebook-notes nil))
     (unless notebook-id
-      (error "sorry, cannot find any notes for notebook-id %s. %s"
-             notebook-id
-             "make sure this file is leanote file and you have login."))
+      (error (format "sorry, cannot find any notes for notebook-id %s. %s"
+                     notebook-id
+                     "make sure this file is leanote file and you have login.")))
     (setq notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
     (cl-loop for elt in (append notebook-notes nil)
              collect
@@ -293,7 +293,7 @@
       (setq note-info '())
       (cl-pushnew `(NotebookId . ,notebook-id) note-info)
       (cl-pushnew `(Title . ,note-title) note-info)
-      (cl-pushnew '(Usn . 0)) note-info)
+      (cl-pushnew '(Usn . 0) note-info))
     note-info))
 
 (defun leanote-delete-current-note ()
@@ -443,7 +443,7 @@
       (when (yes-or-no-p (format "Change file name %s.md to %s.md?"
                                  note-title new-name))
         (leanote-log "rename note %s with new name %s" note-title new-name)
-        (add-to-list 'note-info `(Title . ,new-name))
+        (cl-pushnew `(Title . ,new-name) note-info)
         (setq result-data (leanote-ajax-update-note note-info nil))
         (if (and (listp result-data)
                  (equal :json-false (assoc-default 'Ok result-data)))
@@ -499,7 +499,7 @@
           (error "cannot find any notebook for this file."))
         (when (yes-or-no-p (format "The note was not found in notebook `%s'. Do you want to add it?"
                                    notebook-title))
-          (add-to-list 'note-info '(NoteId . "0"))
+          (cl-pushnew '(NoteId . "0") note-info)
           ;;(setq leanote-debug-data (gethash notebook-id leanote--cache-notebookid-notes))
           (setq result-data (leanote-ajax-update-note note-info (buffer-string) "/note/addNote"))
           (if (and (listp result-data)
@@ -542,7 +542,7 @@
           (leanote-log "update content")
           (cl-pushnew '("IsMarkdown" . "true") request-params)
           (cl-pushnew `("Abstract" . ,note-content) request-params)
-          (cl-pushnew `("Content" . ,note-content)) request-params)
+          (cl-pushnew `("Content" . ,note-content) request-params))
       (leanote-log "only update info."))
     (request (concat leanote-api-root api)
              :params request-params
