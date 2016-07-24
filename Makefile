@@ -6,6 +6,8 @@ ELPA_DIR = \
 
 .PHONY: travis-ci clean
 
+all: compile test
+
 test: 
 	$(CASK) exec buttercup -L .
 
