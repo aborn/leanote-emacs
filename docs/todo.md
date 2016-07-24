@@ -22,3 +22,7 @@ list eache version features:
 ## advanced
 * different color for log.
 * update local data when published.
+
+## others
+* unit test
+
