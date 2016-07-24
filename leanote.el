@@ -461,6 +461,15 @@
             (leanote-log "rename note success.")))))
     ))
 
+(defun leanote-get-current-note-id ()
+  "this function use for debug & dev"
+  (interactive)
+  (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name)))
+         (note-id (assoc-default 'NoteId note-info)))
+    (message "note-id=%s" note-id)
+    note-id
+    ))
+
 (defun leanote-push-current-file-to-remote ()
   "push current content or add new note to remote server."
   (interactive)
@@ -570,10 +579,11 @@
     (if note-books
         (progn (setq leanote-current-all-note-books note-books)
                (leanote-log (format "Got %d notebooks." (length note-books)))
-               note-books))
-    (progn
-      (message "No notebooks got!")
-      (leanote-log "warning" "No notebooks got!"))
+               note-books)
+      (progn
+        (message "No notebooks got!")
+        (leanote-log "warning" "No notebooks got!")
+        (error "No notebooks got!")))
     ))
 
 (defun leanote-ajax-get-note-content (noteid)
@@ -593,6 +603,7 @@
 
 (defun leanote-common-api-action (api &optional param-key &optional param-value)
   "common api only one parameter"
+  (leanote-log (format "do ajax, api=%s" api))
   (let ((result nil))
     (request (concat leanote-api-root api)
              :params `(("token" . ,leanote-token) (,param-key . ,param-value))
@@ -600,12 +611,13 @@
              :parser 'leanote-parser
              :success (cl-function
                        (lambda (&key data &allow-other-keys)
-                         (setq leanote-debug-data data)  ;; TODO
                          (if (arrayp data)
-                             (setq result data)
-                           (progn (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
-                                    (setq result data))
-                                  ))))
+                             (progn
+                               (setq result data))
+                           (progn
+                             (unless (eq (assoc-default 'Ok leanote-debug-data) :json-false)
+                               (setq result data))
+                             ))))
              :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                                    (message "Got error: %S" error-thrown)
                                    (leanote-log "error" "Got error")
