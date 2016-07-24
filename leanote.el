@@ -160,7 +160,7 @@
         (setq is-modified (assoc-default 'IsModified note-info))
         (setq noteid (assoc-default 'NoteId note-info))
         (when (and note-info (not is-modified))
-          (add-to-list 'note-info '(IsModified . t))
+          (cl-pushnew '(IsModified . t) note-info)
           (puthash noteid note-info leanote--cache-noteid-info)
           (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
           (leanote-log (format "change file status when save. %s" full-file-name))
@@ -290,9 +290,9 @@
                (setq note-info elt)))   ;; keep remote value
     (unless note-info
       (setq note-info '())
-      (add-to-list 'note-info `(NotebookId . ,notebook-id))
-      (add-to-list 'note-info `(Title . ,note-title))
-      (add-to-list 'note-info '(Usn . 0)))
+      (cl-pushnew `(NotebookId . ,notebook-id) note-info)
+      (cl-pushnew `(Title . ,note-title) note-info)
+      (cl-pushnew '(Usn . 0)) note-info)
     note-info))
 
 (defun leanote-delete-current-note ()
@@ -539,9 +539,9 @@
     (if note-content
         (progn
           (leanote-log "update content")
-          (add-to-list 'request-params '("IsMarkdown" . "true"))
-          (add-to-list 'request-params `("Abstract" . ,note-content))
-          (add-to-list 'request-params `("Content" . ,note-content)))
+          (cl-pushnew '("IsMarkdown" . "true") request-params)
+          (cl-pushnew `("Abstract" . ,note-content) request-params)
+          (cl-pushnew `("Content" . ,note-content)) request-params)
       (leanote-log "only update info."))
     (request (concat leanote-api-root api)
              :params request-params
