@@ -15,7 +15,7 @@ install:
 	$(CASK) install
 
 compile:
-	$(CASK) exec $(EMACS) -batch -L -Q . -f batch-byte-compile *.el
+	$(CASK) exec $(EMACS) -batch -Q -f batch-byte-compile *.el
 
 travis-ci:
 	$(CASK) exec $(EMACS) -batch -Q -l ci/leanote-mode-init.el
