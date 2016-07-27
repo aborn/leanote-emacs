@@ -346,7 +346,7 @@
             (when (listp recentf-list)      ;; remove it from recentf-list
               (delete name recentf-list))
             ;; (kill-buffer)
-            (delete-file-and-buffer)
+            (delete-file-and-buffer)   ;; TODO not a function
             (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
             (leanote-log (format "local file %s was deleted." name))
             ))
