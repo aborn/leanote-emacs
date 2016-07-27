@@ -1,0 +1,54 @@
+#+TITLE:     leanote develop plan
+#+AUTHOR:    Aborn Jiang
+#+EMAIL:     (concat "aborn.jiang" at-sign "gmail.com")
+#+DATE:      2016-07-24
+#+LANGUAGE:  en
+#+OPTIONS:   H:4 num:nil toc:2
+#+TIME:      2016-07-24 ~ 
+
+#+SETUPFILE: ~/github/org-html-themes/setup/theme-readtheorg.setup
+
+-----
+
+** each version develop plan.
+*** v0.2
+1. plan release time: 2016-08-14
+2. features:
+**** all tasks [25%]
+***** CLOSED rename the note title and sync to remote
+CLOSED: [2016-07-24 Sun 16:52]
+- CLOSING NOTE [2016-07-24 Sun 16:52]
+***** TODO search all note by name.
+***** ONGOING status-bar show.
+***** TODO each markdown note should has an abstract.
+
+*** v0.1
+1. release time: 2016-07-23
+2. features:
+**** all tasks [100%]
+***** CLOSED push local note to remote
+CLOSED: [2016-07-23 Sun 16:47]
+- CLOSING NOTE [2016-07-23 Sun 16:47]
+***** CLOSED create new note
+CLOSED: [2016-07-23 Sun 16:47]
+- CLOSING NOTE [2016-07-23 Sun 16:47]
+***** CLOSED delete local note & remote note
+CLOSED: [2016-07-23 Sun 16:47]
+- CLOSING NOTE [2016-07-23 Sun 16:47]
+***** CLOSED print each operate log
+CLOSED: [2016-07-23 Sun 16:47]
+- CLOSING NOTE [2016-07-23 Sun 16:47]
+
+
+** bug-report
+*** local data lose if emacs crash accidentally. do a timer task for save it!
+*** delte note conflict. 
+*** when buffer exists bug?
+
+** advanced
+*** different color for log.
+*** update local data when published.
+
+** others
+*** unit test
+
