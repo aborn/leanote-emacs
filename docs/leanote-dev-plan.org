@@ -41,6 +41,7 @@ CLOSED: [2016-07-23 Sun 16:47]
 
 
 ** bug-report
+*** TODO fun. delete-file-and-buffer is not fond!! only in buffer-dealing.el
 *** local data lose if emacs crash accidentally. do a timer task for save it!
 *** delte note conflict. 
 *** when buffer exists bug?
