@@ -201,6 +201,7 @@
           (cl-pushnew '(IsModified . t) note-info)
           (puthash noteid note-info leanote--cache-noteid-info)
           (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
+          (force-mode-line-update)
           (leanote-log (format "change file status when save. %s" full-file-name))
           ))
       )))
@@ -527,9 +528,15 @@
 (defun leanote-status ()
   "current leanote status"
   (let* ((note-id (leanote-get-current-note-id))
-         (result ""))
+         (result "")
+         (note-info nil))
     (when note-id
-      (setq result "leanote"))
+      (setq note-info (gethash note-id leanote--cache-noteid-info))
+      (when note-info
+        (let ((is-modified (assoc-default 'IsModified note-info)))
+          (if is-modified
+              (setq result "leanote*")
+            (setq result "leanote")))))
     result))
 
 (defun leanote-push-current-file-to-remote ()
