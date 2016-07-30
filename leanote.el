@@ -306,7 +306,7 @@
 
 
 (defun leanote-get-note-info-base-note-full-name (ffn)
-  "get note info base note full name `ffn' full file name"
+  "get note info base note full file name `ffn'"
   (unless (string-suffix-p ".md" ffn)
     (error (format "file %s is not markdown file." ffn)))
   (let* ((note-info nil)   ;; fefault return
@@ -500,17 +500,37 @@
     ))
 
 (defun leanote-get-current-note-id ()
-  "this function use for debug & dev"
+  "get current buffer leanote note-id"
   (interactive)
-  (let* ((note-info (leanote-get-note-info-base-note-full-name (buffer-file-name)))
-         (note-id (assoc-default 'NoteId note-info)))
-    (message "note-id=%s" note-id)
-    note-id
-    ))
+  (let ((file-name (buffer-file-name)))
+    (when file-name
+      (let* ((is-markdown-file (string-suffix-p ".md" file-name))
+             (note-title (string-remove-suffix ".md"
+                                               (string-remove-prefix
+                                                default-directory
+                                                file-name))))
+        (when is-markdown-file
+          (let* ((notebook-id (gethash
+                               (substring default-directory
+                                          0 (- (length default-directory) 1))
+                               leanote--cache-notebook-path-id))
+                 (notebook-notes nil)
+                 (note-id nil))
+            (when notebook-id
+              (setq notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
+              (cl-loop for elt in (append notebook-notes nil)
+                       collect
+                       (when (equal note-title (assoc-default 'Title elt))
+                         (setq note-id (assoc-default 'NoteId elt))))
+              note-id)))))))
 
 (defun leanote-status ()
   "current leanote status"
-  "leanote")
+  (let* ((note-id (leanote-get-current-note-id))
+         (result ""))
+    (when note-id
+      (setq result "leanote"))
+    result))
 
 (defun leanote-push-current-file-to-remote ()
   "push current content or add new note to remote server."
