@@ -11,18 +11,25 @@
 -----
 
 ** each version develop plan.
+*** v0.3
+1. plan release time: <2016-09-11 Sun>
+2. features
+**** all tasks [%]
+***** TODO deal with minor-mode variable and minor-mode command and map.
 *** v0.2
 1. plan release time: 2016-08-14
 2. features:
-**** ONGOING all tasks [0%]
+**** ONGOING all tasks [40%]
+- State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 00:12]
+- State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 00:11]
 - State "ONGOING"    from              [2016-07-30 Sat 17:23]
-***** CLOSED rename the note title and sync to remote
-CLOSED: [2016-07-24 Sun 16:52]
+***** DONE CLOSED rename the note title and sync to remote
+CLOSED: [2016-07-31 Sun 00:12]
 - CLOSING NOTE [2016-07-24 Sun 16:52]
 ***** TODO search all note by name.
-***** ONGOING status-bar show.  <2016-07-30 Sat>--<2016-07-31 Sun>
+***** DONE status-bar show.  <2016-07-30 Sat>--<2016-07-31 Sun>
+CLOSED: [2016-07-31 Sun 00:11]
 ***** TODO each markdown note should has an abstract.
-***** TODO deal with minor-mode variable and minor-mode command and map.
 
 *** v0.1
 1. release time: 2016-07-23

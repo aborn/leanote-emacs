@@ -155,7 +155,7 @@
   (unless leanote-mode
     (setq leanote-mode t))
   (unless (assq 'leanote-mode minor-mode-alist)
-    (add-to-list 'minor-mode-alist '(leanote-mode " leanote")))
+    (add-to-list 'minor-mode-alist '(leanote-mode " leanote") t))
   (spaceline-define-segment leanote-status
     "show the leanote status"
     (when leanote-mode
