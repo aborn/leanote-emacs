@@ -130,11 +130,16 @@
   :group 'leanote
   :type 'string)
 
+(defcustom leanote-mode nil
+  "toggle leanote-mode."
+  :require 'leanote
+  :type 'boolean
+  :group 'leanote)
+
 ;; minor mode
 (define-minor-mode leanote
   "leanote mini mode"
   :init-value nil
-  :lighter " leanote "
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
             (define-key map (kbd "C-c d") 'leanote-delete-current-note)
@@ -144,8 +149,20 @@
   (leanote-init)
   (leanote-log "leanote minor mode initial!"))
 
+;;;###autoload
 (defun leanote-init ()
   "do some init work when leanote minor-mode turn on"
+  (unless leanote-mode
+    (setq leanote-mode t))
+  (unless (assq 'leanote-mode minor-mode-alist)
+    (add-to-list 'minor-mode-alist '(leanote-mode " leanote")))
+  (spaceline-define-segment leanote-status
+    "show the leanote status"
+    (when leanote-mode
+      (powerline-raw
+       (s-trim (leanote-status)))))
+  (unless (assq '(leanote-status :when active) spaceline-left)
+    (add-to-list 'spaceline-left '(leanote-status :when active) t))
   (when (= 0 (hash-table-count leanote--cache-noteid-info))
     (setq leanote--cache-noteid-info
           (leanote-persistent-get 'leanote--cache-noteid-info)))
@@ -490,6 +507,10 @@
     (message "note-id=%s" note-id)
     note-id
     ))
+
+(defun leanote-status ()
+  "current leanote status"
+  "leanote")
 
 (defun leanote-push-current-file-to-remote ()
   "push current content or add new note to remote server."
