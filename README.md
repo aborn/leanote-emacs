@@ -23,6 +23,12 @@ Add following code to your init(.emacs or init.el anyway) file.
 * **C-c d** delete current note
 * **C-c r** leanote-rename
 
+## mode line status
+A markdown file is leanote, the mode line show it status as following:
+![](images/status.png "mode line status")
+What's more, when a leanote note is modified but without push to remote, the mode line show **leanote\***
+![](images/statusm.png "mode line status modified")
+
 ## Leanote log
 All logs are recorded in \*Leanote-Log* buffer.
 
