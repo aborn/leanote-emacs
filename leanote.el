@@ -4,7 +4,7 @@
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
 ;; Version: 0.2
-;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0"))
+;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0") (ivy "0.8.0"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-mode
 ;; URL: https://github.com/aborn/leanote-mode
@@ -37,7 +37,7 @@
 ;; C-c u                update/create note to remote server.
 ;; C-c d                delete note
 ;; C-c r                rename note
-;;
+;; C-c f                leanote-find-note
 
 ;;; Code:
 
@@ -47,6 +47,7 @@
 (require 'let-alist)
 (require 'pcache)    ;; for persistent
 (require 's)
+(require 'ivy)
 
 ;;;;  Variables
 
@@ -145,6 +146,7 @@
             (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
             (define-key map (kbd "C-c d") 'leanote-delete-current-note)
             (define-key map (kbd "C-c r") 'leanote-rename)
+            (define-key map (kbd "C-c f") 'leanote-find-note)
             map)
   :group 'leanote
   (leanote-init)
@@ -821,6 +823,33 @@
                  (setq result key)))
              leanote--cache-notebook-path-id)
     result))
+
+(defun leanote-find-note ()
+  "find note by title with ivy-mode"
+  (interactive)
+  (let (collection)
+    (setq collection
+          (mapcar (lambda (elt)
+                    ;; re-shape list for the ivy-read
+                    (cons
+                     (assoc-default 'Title elt)
+                     (list (assoc-default 'NotebookId elt)
+                           (assoc-default 'Title elt)
+                           (assoc-default 'NoteId elt))))
+                  (leanote-get-all-notes-from-cache)))
+    (ivy-read "search note by title:"
+              collection
+              :action (lambda (x)
+                        (let* ((path (leanote-get-notebook-path-from-cache (car x)))
+                               (file-name nil))
+                          (if path
+                              (progn
+                                (setq file-name
+                                      (concat (expand-file-name (car (cdr x)) path) ".md"))
+                                (setq ab/debug file-name)
+                                (find-file file-name))
+                            (message "not find notebook."))))
+              )))
 
 ;;; log
 
