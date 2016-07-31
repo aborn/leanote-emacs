@@ -1,5 +1,5 @@
 # leanote-mode
-Writing markdown blog in emacs with elegant way [leanote](https://leanote.com/[leanote])
+Writing markdown note in emacs with elegant way [leanote](https://leanote.com/[leanote])
 and its [open source platform](http://leanote.org/).
 
 ## Install
