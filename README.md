@@ -37,7 +37,7 @@ English version readme ends here. Chinese readme provided as follows.
 --------------------------------------------------------------------------------
 
 # leanote-mode
-leanote-mode是emacs下的一个minor-mode，使得你能在emacs下优雅的作笔记。同时，
+leanote-mode是emacs下的一个**minor-mode**，使得你能在emacs下优雅的记笔记。同时，
 可采用[leanote](https://leanote.com/)提供的服务保存markdown格式的笔记内容。
 
 ## 安装
