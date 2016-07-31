@@ -19,14 +19,14 @@ Add following code to your init(.emacs or init.el anyway) file.
 ```
 
 ## Hotkey
-* **C-c u** update or add new note content to remote server
-* **C-c d** delete current note
-* **C-c r** leanote-rename
+* **C-c u** update or add new note content to remote.
+* **C-c d** delete current leanote.
+* **C-c r** rename current leanote.
 
 ## mode line status
-A markdown file is leanote, the mode line show it status as following:
+The mode line show it status when markdown file is leanote, 
 ![](images/status.png "mode line status")
-What's more, when a leanote note is modified but without push to remote, the mode line show **leanote***
+What's more, when leanote note is modified local (without push to remote), the mode line show **leanote***
 ![](images/statusm.png "mode line status modified")
 
 ## Leanote log
