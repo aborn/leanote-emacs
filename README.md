@@ -23,7 +23,7 @@ Add following code to your init(.emacs or init.el anyway) file.
 * **C-c d** delete current leanote.
 * **C-c r** rename current leanote.
 
-## mode line status
+## Leanote status
 The mode line show it status when markdown file is leanote, 
 ![](images/status.png "mode line status")
 What's more, when leanote note is modified local (without push to remote), the mode line show **leanote***
@@ -61,7 +61,7 @@ M-x package-install RET leanote-mode RET
 * **C-c d** 删除当前笔记
 * **C-c r** 修改当前笔记名
 
-## mode line 状态显示
+## leanote状态显示
 当一个markdown文件为leanote时，其mode line会显示出来，如下：
 ![](images/status.png "mode line status")
 当一个leanote文件只是在本地修改了，没有同步到远端的时，状态显示为**leanote***，如下：
