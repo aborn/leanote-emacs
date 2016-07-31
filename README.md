@@ -1,6 +1,6 @@
 # leanote-mode
-Writing markdown blog in emacs with elegant [leanote](https://leanote.com/[leanote])
-and [its open source platform](http://leanote.org/).
+Writing markdown blog in emacs with elegant way [leanote](https://leanote.com/[leanote])
+and its [open source platform](http://leanote.org/).
 
 ## Install
 Install it from elpa package source (i.e. [melpa](https://melpa.org/) or [popkit elpa](https://elpa.popkit.org/)).  
@@ -32,14 +32,15 @@ What's more, when a leanote note is modified but without push to remote, the mod
 ## Leanote log
 All logs are recorded in \*Leanote-Log* buffer.
 
------------------------------------------------------------------------
+English version readme ends here. Chinese language readme provided as follows.
+--------------------------------------------------------------------------------
 
 # leanote-mode
-leanote-mode是emacs下的一个minor-mode,
-在emacs中采用[leanote](https://leanote.com/)提供的服务写markdown笔记。
+leanote-mode是emacs下的一个minor-mode，使得你能在emacs下优雅的作笔记。同时，
+可采用[leanote](https://leanote.com/)提供的服务保存markdown格式的笔记内容。
 
 ## 安装
-从elpa的源中进行安装（如[melpa](https://melpa.org/) 或者 [popkit elpa](https://elpa.popkit.org/)).）  
+从elpa的源中进行安装（如[melpa](https://melpa.org/) 或者 [popkit elpa](https://elpa.popkit.org/).）  
 ```elisp
 M-x package-install RET leanote-mode RET
 ```
