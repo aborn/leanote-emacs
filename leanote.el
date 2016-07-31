@@ -1,10 +1,10 @@
-;;; leanote.el --- A minor mode writing leanote in markdown file.  -*- lexical-binding: t; -*-
+;;; leanote.el --- A minor mode writing markdown leanote.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Aborn Jiang
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
 ;; Version: 0.2
-;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0"))
+;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-mode
 ;; URL: https://github.com/aborn/leanote-mode
