@@ -13,7 +13,7 @@ Add following code to your init(.emacs or init.el anyway) file.
 ```elisp
 (add-hook 'markdown-mode-hook 'leanote)
 ```
-**Note: ** Config your own server api if you use youself host(vps) as following  
+**Note:** Config your own server api if you use youself host(vps) as following  
 ```elisp
 (setq leanote-api-root "youryomain/api")
 ```

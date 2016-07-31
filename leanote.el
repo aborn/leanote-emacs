@@ -305,7 +305,6 @@
                          (leanote-log (format "ok, local file %s created!" file-full-name))
                          )))))))))
 
-
 (defun leanote-get-note-info-base-note-full-name (ffn)
   "get note info base note full file name `ffn'"
   (unless (string-suffix-p ".md" ffn)
@@ -314,10 +313,7 @@
          (notebook-id (gethash
                        (substring default-directory 0 (- (length default-directory) 1))
                        leanote--cache-notebook-path-id))
-         (note-title (string-remove-suffix ".md"
-                                           (string-remove-prefix
-                                            default-directory
-                                            ffn)))
+         (note-title (file-name-base ffn))
          (notebook-notes nil))
     (unless notebook-id
       (error (format "sorry, cannot find any notes for notebook-id %s. %s"
@@ -506,10 +502,7 @@
   (let ((file-name (buffer-file-name)))
     (when file-name
       (let* ((is-markdown-file (string-suffix-p ".md" file-name))
-             (note-title (string-remove-suffix ".md"
-                                               (string-remove-prefix
-                                                default-directory
-                                                file-name))))
+             (note-title (file-name-base file-name)))
         (when is-markdown-file
           (let* ((notebook-id (gethash
                                (substring default-directory
