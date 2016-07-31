@@ -11,17 +11,18 @@
 -----
 
 ** each version develop plan.
-*** v0.3
-1. plan release time: <2016-09-11 Sun>
+*** v0.2.5
+1. plan release time: <2016-08-28 Sun>
 2. features
 **** TODO all tasks [0%]
 ***** TODO deal with minor-mode variable and minor-mode command and map.
 ***** TODO update user name & password
 ***** TODO get current user info.
 *** v0.2
-1. plan release time: 2016-08-14
+1. plan release time: <2016-08-14 Sun>
 2. features:
-**** ONGOING all tasks [40%]
+**** ONGOING all tasks [50%]
+- State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 09:27]
 - State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 00:12]
 - State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 00:11]
 - State "ONGOING"    from              [2016-07-30 Sat 17:23]
@@ -31,7 +32,7 @@ CLOSED: [2016-07-31 Sun 00:12]
 ***** TODO search all note by name.
 ***** DONE status-bar show.  <2016-07-30 Sat>--<2016-07-31 Sun>
 CLOSED: [2016-07-31 Sun 00:11]
-***** TODO each markdown note should has an abstract.
+***** ONGOING each markdown note should has an abstract.
 
 *** v0.1
 1. release time: 2016-07-23
