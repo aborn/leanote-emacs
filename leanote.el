@@ -361,11 +361,20 @@
             (when (listp recentf-list)      ;; remove it from recentf-list
               (delete name recentf-list))
             ;; (kill-buffer)
-            (delete-file-and-buffer)   ;; TODO not a function
+            (leanote-delete-file-and-buffer)
             (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
             (leanote-log (format "local file %s was deleted." name))
             ))
         ))))
+
+(defun leanote-delete-file-and-buffer ()
+  "delete current buffer and its file"
+  (let ((filename (buffer-file-name)))
+    (when filename
+      (delete-file filename)
+      (kill-buffer)
+      (when (listp recentf-list)
+        (delete filename recentf-list)))))
 
 (defun leanote-delete-local-notebook-note (notebook-id noteid)
   "delete local cache notebook note"
