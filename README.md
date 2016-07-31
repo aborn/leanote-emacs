@@ -32,7 +32,8 @@ What's more, when a leanote note is modified but without push to remote, the mod
 ## Leanote log
 All logs are recorded in \*Leanote-Log* buffer.
 
-English version readme ends here. Chinese language readme provided as follows.
+English version readme ends here. Chinese readme provided as follows.
+
 --------------------------------------------------------------------------------
 
 # leanote-mode
