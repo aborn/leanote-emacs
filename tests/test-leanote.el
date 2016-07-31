@@ -23,3 +23,22 @@
                       :to-be t)
               (expect (leanote-notebook-has-note-p notes "ddd")
                       :to-be nil)))
+
+(describe "test leanote-extra-abstract"
+          (it "test"
+              (let* ((s1 " # 工作备忘\n主要一些当前正在进行的一些工作\n\n## 进行中\n* 重新加入队列(再次取的时候是通过unionid来处理，这里要考虑)\n* 队列数据监控\n* 对活跃消费者线程数进行监控\n* retryCounter重试次数数据保存到哪里？\n\n## 问题\n1. 每个appid是否需要一个独立的工作队列和消费队列？保证不相互影响！\n2. tomcat初始化的时候，是否要对每个队列激活消费者？暂时保持不需要\n\n")
+                     (s2 "# 工作备忘\n主要一些当前正在进行的一些工作\n\n## 进行中\n* 重新加入队列(再次取的时候是通过unionid来处理，这里要考虑)\n* 队列数据监控\n* 对活跃消费者线程数进行监控\n* retryCounter重试次数数据保存到哪里？\n\n## 问题\n1. 每个appid是否需要一个独立的工作队列和消费队列？保证不相互影响！\n2. tomcat初始化的时候，是否要对每个队列激活消费者？暂时保持不需要\n\n")
+                     (s3 "#工作备忘\n")
+                     (s4 "#工作备忘\n#")
+                     (s5 "#工作备忘\n##ff")
+                     )
+                (expect (leanote-extra-abstract s3)
+                        :to-equal "工作备忘")
+                (expect (leanote-extra-abstract s4)
+                        :to-equal "工作备忘")
+                (expect (leanote-extra-abstract s5)
+                        :to-equal "工作备忘")
+                (expect (leanote-extra-abstract s1)
+                        :to-equal "主要一些当前正在进行的一些工作")
+                (expect (leanote-extra-abstract s2)
+                        :to-equal "主要一些当前正在进行的一些工作"))))

@@ -46,6 +46,7 @@
 (require 'request)
 (require 'let-alist)
 (require 'pcache)    ;; for persistent
+(require 's)
 
 ;;;;  Variables
 
@@ -517,6 +518,30 @@
                        (when (equal note-title (assoc-default 'Title elt))
                          (setq note-id (assoc-default 'NoteId elt))))
               note-id)))))))
+
+(defun leanote-extra-abstract (str)
+  "test regular expressions in elisp"
+  (let* ((s-indx (string-match "#" str))
+         (s-end (string-match "#" str (+ 1 s-indx)))
+         (result nil))
+    (cond
+     ((and s-indx (not s-end))
+      (setq result (substring str (+ 1 s-indx))))
+     ((and s-indx s-end (> s-end s-indx))
+      (let* ((pure-txt (s-trim (substring str (+ 1 s-indx) s-end)))
+             (lf-indx (string-match "\n" pure-txt))
+             (title (if lf-indx
+                        (substring pure-txt 0 lf-indx)
+                      pure-txt
+                      ))
+             (abstruct (if lf-indx
+                           (substring pure-txt (+ 1 lf-indx))
+                         pure-txt
+                         )))
+        (if (> (length abstruct) 0)
+            (setq result abstruct)
+          (set result title)))))
+    (s-trim result)))
 
 (defun leanote-status ()
   "current leanote status"
