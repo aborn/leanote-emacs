@@ -26,7 +26,7 @@ Add following code to your init(.emacs or init.el anyway) file.
 ## mode line status
 A markdown file is leanote, the mode line show it status as following:
 ![](images/status.png "mode line status")
-What's more, when a leanote note is modified but without push to remote, the mode line show **leanote\***
+What's more, when a leanote note is modified but without push to remote, the mode line show **leanote***
 ![](images/statusm.png "mode line status modified")
 
 ## Leanote log
@@ -58,6 +58,12 @@ M-x package-install RET leanote-mode RET
 * **C-c u** 更新或者添加当前笔记到服务器
 * **C-c d** 删除当前笔记
 * **C-c r** 修改当前笔记名
+
+## mode line 状态显示
+当一个markdown文件为leanote时，其mode line会显示出来，如下：
+![](images/status.png "mode line status")
+当一个leanote文件只是在本地修改了，没有同步到远端的时，状态显示为**leanote***，如下：
+![](images/statusm.png "mode line status modified")
 
 ## 操作日志
 所有的操作日志被记录在\*Leanote-Log* 这个buffer里。
