@@ -535,9 +535,9 @@
          (result nil))
     (cond
      ((and s-indx (not s-end))
-      (setq result (substring str (+ 1 s-indx))))
+      (setq result (substring content (+ 1 s-indx))))
      ((and s-indx s-end (> s-end s-indx))
-      (let* ((pure-txt (s-trim (substring str (+ 1 s-indx) s-end)))
+      (let* ((pure-txt (s-trim (substring content (+ 1 s-indx) s-end)))
              (lf-indx (string-match "\n" pure-txt))
              (title (if lf-indx
                         (substring pure-txt 0 lf-indx)
