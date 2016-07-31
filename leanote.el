@@ -804,7 +804,16 @@
                            (setq leanote-user-password password) ;; update password
                            (leanote-log "login success!")))))))
 
-;;; log 
+
+(defun leanote-get-all-note-name ()
+  "get all note"
+  (let* ((result '()))
+    (maphash (lambda (key value)
+               (add-to-list 'result (assoc-default 'Title value)))
+             leanote--cache-noteid-info)
+    result))
+
+;;; log
 
 (defun leanote-log2msg (level &rest args)
   "only warning or error message to *Message* buffer."
