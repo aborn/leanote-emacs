@@ -22,6 +22,7 @@ Add following code to your init(.emacs or init.el anyway) file.
 * **C-c u** update or add new note content to remote.
 * **C-c d** delete current leanote.
 * **C-c r** rename current leanote.
+* **C-c f** find note by note-name.
 
 ## Leanote status
 The mode line show it status when markdown file is leanote, 
@@ -60,6 +61,7 @@ M-x package-install RET leanote-mode RET
 * **C-c u** 更新或者添加当前笔记到服务器
 * **C-c d** 删除当前笔记
 * **C-c r** 修改当前笔记名
+* **C-c f** 按笔记名查找笔记
 
 ## leanote状态显示
 当一个markdown文件为leanote时，其mode line会显示出来，如下：

@@ -19,9 +19,11 @@
 ***** TODO update user name & password
 ***** TODO get current user info.
 *** v0.2
-1. plan release time: <2016-08-14 Sun>
+1. plan release time: <2016-07-31 Sun>
 2. features:
-**** ONGOING all tasks [75%]
+**** DONE all tasks [100%]
+- State "DONE"       from "ONGOING"    [2016-07-31 Sun 18:44]
+- State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 18:44]
 - State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 15:29]
 - State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 09:27]
 - State "ONGOING"    from "ONGOING"    [2016-07-31 Sun 00:12]
@@ -30,7 +32,8 @@
 ***** DONE CLOSED rename the note title and sync to remote
 CLOSED: [2016-07-31 Sun 00:12]
 - CLOSING NOTE [2016-07-24 Sun 16:52]
-***** TODO search all note by name.
+***** DONE search all note by name.
+CLOSED: [2016-07-31 Sun 18:44]
 ***** DONE status-bar show.  <2016-07-30 Sat>--<2016-07-31 Sun>
 CLOSED: [2016-07-31 Sun 00:11]
 ***** DONE each markdown note should has an abstract.<2016-07-31 Sun>

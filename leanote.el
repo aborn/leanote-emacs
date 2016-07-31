@@ -837,7 +837,7 @@
                            (assoc-default 'Title elt)
                            (assoc-default 'NoteId elt))))
                   (leanote-get-all-notes-from-cache)))
-    (ivy-read "search note by title:"
+    (ivy-read "search note by title: "
               collection
               :action (lambda (x)
                         (let* ((path (leanote-get-notebook-path-from-cache (car x)))
