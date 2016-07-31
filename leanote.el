@@ -846,8 +846,9 @@
                               (progn
                                 (setq file-name
                                       (concat (expand-file-name (car (cdr x)) path) ".md"))
-                                (setq ab/debug file-name)
-                                (find-file file-name))
+                                (if (file-exists-p file-name)
+                                    (find-file file-name)
+                                  (message "not find note %s." file-name)))
                             (message "not find notebook."))))
               )))
 
