@@ -519,10 +519,10 @@
                          (setq note-id (assoc-default 'NoteId elt))))
               note-id)))))))
 
-(defun leanote-extra-abstract (str)
-  "test regular expressions in elisp"
-  (let* ((s-indx (string-match "#" str))
-         (s-end (string-match "#" str (+ 1 s-indx)))
+(defun leanote-extra-abstract (content)
+  "get abstract from leanote `content'"
+  (let* ((s-indx (string-match "#" content))
+         (s-end (string-match "#" content (+ 1 s-indx)))
          (result nil))
     (cond
      ((and s-indx (not s-end))
@@ -627,7 +627,8 @@
          (note-id (assoc-default 'NoteId note-info))
          (notebook-id (assoc-default 'NotebookId note-info))
          (note-title (assoc-default 'Title note-info))
-         (request-params nil))
+         (request-params nil)
+         (note-abstract nil))
     (setq request-params `(("token" . ,leanote-token)
                            ("NoteId" . ,note-id)
                            ("Usn" . ,new-usn-str)
@@ -636,8 +637,9 @@
     (if note-content
         (progn
           (leanote-log "update content")
+          (setq note-abstract (leanote-extra-abstract note-content))
           (cl-pushnew '("IsMarkdown" . "true") request-params)
-          (cl-pushnew `("Abstract" . ,note-content) request-params)
+          (cl-pushnew `("Abstract" . ,note-abstract) request-params)
           (cl-pushnew `("Content" . ,note-content) request-params))
       (leanote-log "only update info."))
     (request (concat leanote-api-root api)
