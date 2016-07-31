@@ -805,12 +805,21 @@
                            (leanote-log "login success!")))))))
 
 
-(defun leanote-get-all-note-name ()
-  "get all note"
+(defun leanote-get-all-notes-from-cache ()
+  "get all note-info from local cache"
   (let* ((result '()))
     (maphash (lambda (key value)
-               (add-to-list 'result (assoc-default 'Title value)))
+               (add-to-list 'result value))
              leanote--cache-noteid-info)
+    result))
+
+(defun leanote-get-notebook-path-from-cache (notebook-id)
+  "obtain `notebook-id' notebook path based on local cache"
+  (let (result)
+    (maphash (lambda (key value)
+               (when (string= value notebook-id)
+                 (setq result key)))
+             leanote--cache-notebook-path-id)
     result))
 
 ;;; log
