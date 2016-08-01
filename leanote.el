@@ -163,9 +163,12 @@
     "show the leanote status"
     (when leanote-mode
       (powerline-raw
-       (s-trim (leanote-status)))))
-  (unless (assq '(leanote-status :when active) spaceline-left)
-    (add-to-list 'spaceline-left '(leanote-status :when active) t))
+       (s-trim (leanote-status))))
+    :when active)
+  ;; (unless (assq '(leanote-status :when active) spaceline-left)  ;; spaceline-left only in 1.x version
+  ;;   (add-to-list 'spaceline-left '(leanote-status :when active) t))
+  (spaceline-spacemacs-theme 'leanote-status) ;; install leanote-status to spaceline--mode-lines
+  (spaceline-compile)
   (when (= 0 (hash-table-count leanote--cache-noteid-info))
     (setq leanote--cache-noteid-info
           (leanote-persistent-get 'leanote--cache-noteid-info)))
