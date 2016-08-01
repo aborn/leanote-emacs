@@ -819,11 +819,13 @@
                       (noteid (assoc-default 'NoteId value))
                       (notebookpath (leanote-get-notebook-path-from-cache notebookid))
                       (fullpath nil))
-                 (when (and notebookid notebookpath)
+                 (when (and notebookid
+                            notebookpath)
                    (setq fullpath (expand-file-name (concat notetitle ".md") notebookpath))
-                   (add-to-list 'result
-                                (cons fullpath
-                                      (list notebookpath notetitle notebookid noteid))))))
+                   (when (file-exists-p fullpath)
+                     (add-to-list 'result
+                                  (cons fullpath
+                                        (list notebookpath notetitle notebookid noteid)))))))
              leanote--cache-noteid-info)
     result))
 
