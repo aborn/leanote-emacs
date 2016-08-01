@@ -69,6 +69,7 @@ CLOSED: [2016-07-31 Sun 19:08]
 ** advanced
 *** different color for log.
 *** update local data when published.
+*** TODO PR add leanote-status to spaceline
 
 ** others
 *** unit test
