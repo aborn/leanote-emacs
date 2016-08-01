@@ -814,7 +814,19 @@
   "get all note-info from local cache"
   (let* ((result '()))
     (maphash (lambda (key value)
-               (add-to-list 'result value))
+               (let* ((notebookid (assoc-default 'NotebookId value))
+                      (notetitle (assoc-default 'Title value))
+                      (noteid (assoc-default 'NoteId value))
+                      (notebookpath nil))
+                 (setq ab/debug2 value)
+                 (when notebookid
+                   (setq notebookpath (leanote-get-notebook-path-from-cache notebookid))
+                   (when notebookpath
+                     (let (fullpath)
+                       (setq fullpath (expand-file-name (concat notetitle ".md") notebookpath))
+                       (add-to-list 'result
+                                    (cons fullpath
+                                          (list notebookpath notetitle notebookid noteid))))))))
              leanote--cache-noteid-info)
     result))
 
@@ -831,28 +843,15 @@
   "find note by title with ivy-mode"
   (interactive)
   (let (collection)
-    (setq collection
-          (mapcar (lambda (elt)
-                    ;; re-shape list for the ivy-read
-                    (cons
-                     (assoc-default 'Title elt)
-                     (list (assoc-default 'NotebookId elt)
-                           (assoc-default 'Title elt)
-                           (assoc-default 'NoteId elt))))
-                  (leanote-get-all-notes-from-cache)))
+    (setq collection (leanote-get-all-notes-from-cache))
+    (setq ab/debug collection)
     (ivy-read "search note by title: "
               collection
               :action (lambda (x)
-                        (let* ((path (leanote-get-notebook-path-from-cache (car x)))
-                               (file-name nil))
-                          (if path
-                              (progn
-                                (setq file-name
-                                      (concat (expand-file-name (car (cdr x)) path) ".md"))
-                                (if (file-exists-p file-name)
-                                    (find-file file-name)
-                                  (message "not find note %s." file-name)))
-                            (message "not find notebook."))))
+                        (let* ((file-name (car x)))
+                          (if (file-exists-p file-name)
+                              (find-file file-name)
+                            (message "note %s doesn't exists." file-name))))
               )))
 
 ;;; log
