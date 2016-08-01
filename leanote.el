@@ -817,16 +817,13 @@
                (let* ((notebookid (assoc-default 'NotebookId value))
                       (notetitle (assoc-default 'Title value))
                       (noteid (assoc-default 'NoteId value))
-                      (notebookpath nil))
-                 (setq ab/debug2 value)
-                 (when notebookid
-                   (setq notebookpath (leanote-get-notebook-path-from-cache notebookid))
-                   (when notebookpath
-                     (let (fullpath)
-                       (setq fullpath (expand-file-name (concat notetitle ".md") notebookpath))
-                       (add-to-list 'result
-                                    (cons fullpath
-                                          (list notebookpath notetitle notebookid noteid))))))))
+                      (notebookpath (leanote-get-notebook-path-from-cache notebookid))
+                      (fullpath nil))
+                 (when (and notebookid notebookpath)
+                   (setq fullpath (expand-file-name (concat notetitle ".md") notebookpath))
+                   (add-to-list 'result
+                                (cons fullpath
+                                      (list notebookpath notetitle notebookid noteid))))))
              leanote--cache-noteid-info)
     result))
 
@@ -844,7 +841,6 @@
   (interactive)
   (let (collection)
     (setq collection (leanote-get-all-notes-from-cache))
-    (setq ab/debug collection)
     (ivy-read "search note by title: "
               collection
               :action (lambda (x)
