@@ -838,6 +838,17 @@
              leanote--cache-notebook-path-id)
     result))
 
+(defun leanote--open-note (x &optional helm)
+  (let* ((file-name (car x)))
+    (when helm
+      (setq file-name (expand-file-name
+                       (concat (car (cdr x)) ".md")
+                       file-name)))
+    (setq ab/debug x)
+    (if (file-exists-p file-name)
+        (find-file file-name)
+      (message "note %s doesn't exists." file-name))))
+
 (defun leanote-find-note ()
   "find note by title with ivy-mode"
   (interactive)
@@ -845,12 +856,21 @@
     (setq collection (leanote-get-all-notes-from-cache))
     (ivy-read "search note by title: "
               collection
-              :action (lambda (x)
-                        (let* ((file-name (car x)))
-                          (if (file-exists-p file-name)
-                              (find-file file-name)
-                            (message "note %s doesn't exists." file-name))))
+              :action 'leanote--open-note
               )))
+
+(defun leanote-helm-find-note ()
+  "helm find note"
+  (interactive)
+  (let (collection)
+    (setq collection (leanote-get-all-notes-from-cache))
+    (helm :sources (helm-build-sync-source "test"
+                     :candidates collection
+                     :fuzzy-match t
+                     :action (lambda (x)
+                               (leanote--open-note x t)))
+          :buffer "*helm test*"
+          )))
 
 ;;; log
 
