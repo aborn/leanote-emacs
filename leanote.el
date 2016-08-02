@@ -558,6 +558,22 @@
           (set result title)))))
     (s-trim result)))
 
+(defun leanote-current-note-is-need-update ()
+  "is need update for current note"
+  (let* ((note-id (leanote-get-current-note-id))
+         (note-and-content nil)
+         (remote-usn nil)
+         (local-usn nil))
+    (when note-id
+      (setq note-and-content (leanote-get-note-and-content note-id))
+      (setq ab/debug note-and-content)
+      (setq remote-usn (assoc-default 'Usn note-and-content))
+      (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
+      (when (and remote-usn local-usn)
+        (if (> remote-usn local-usn)
+            t
+          nil)))))
+
 (defun leanote-status ()
   "current leanote status"
   (let* ((note-id (leanote-get-current-note-id))
@@ -810,6 +826,7 @@
                            (setq leanote-user-password password) ;; update password
                            (leanote-log "login success!")))))))
 
+;;; find & search
 
 (defun leanote-get-all-notes-from-cache ()
   "get all note-info from local cache"
