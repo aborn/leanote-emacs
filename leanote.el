@@ -585,7 +585,9 @@
         (let ((is-modified (assoc-default 'IsModified note-info)))
           (if is-modified
               (setq result "leanote*")
-            (setq result "leanote")))))
+            (if (leanote-current-note-is-need-update)
+                (setq result "leanote⇡")
+              (setq result "leanote"))))))
     result))
 
 (defun leanote-push-current-file-to-remote ()
