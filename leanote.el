@@ -532,6 +532,7 @@
                        collect
                        (when (equal note-title (assoc-default 'Title elt))
                          (setq note-id (assoc-default 'NoteId elt))))
+              (leanote-log (format "note-id=%s" note-id))
               note-id)))))))
 
 (defun leanote-extra-abstract (content)
