@@ -568,12 +568,15 @@
       (leanote-make-sure-login)
       (setq is-modified (assoc-default 'IsModified noteinfo))
       ;; yes-or-no-p depends on is-modified
-      (let* ((notecontent-obj (leanote-ajax-get-note-content noteid))
+      ;; (leanote-get-note-and-content "57899c39c3b1f40b51000005")
+      (let* ((notecontent-obj (leanote-get-note-and-content noteid))
              (notecontent (assoc-default 'Content notecontent-obj)))
         (when notecontent
           (erase-buffer)
           (insert notecontent)
-          (save-buffer)))
+          (save-buffer)
+          (puthash noteid notecontent-obj leanote--cache-noteid-info)
+          ))
       )))
 
 (defun leanote-current-note-is-need-update ()
