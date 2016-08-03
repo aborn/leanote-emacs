@@ -605,9 +605,12 @@
                    (when (and remote-usn local-usn)
                      (if (> remote-usn local-usn)
                          (progn
+                           (leanote-log (format "this note is need update %s" note-id))
                            (setq status t)
                            (setq result t))
-                       (setq status :json-false))
+                       (progn
+                         (leanote-log (format "this note isnot need update %s" note-id))
+                         (setq status :json-false)))
                      (leanote-log "update status IsNeedUpdate")
                      (cl-pushnew `(IsNeedUpdate . ,status) note-info)
                      (puthash note-id note-info leanote--cache-noteid-info)
