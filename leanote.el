@@ -558,6 +558,24 @@
           (set result title)))))
     (s-trim result)))
 
+(defun leanote-force-update ()
+  "force update current note"  
+  (interactive)
+  (let* ((noteid (leanote-get-current-note-id))
+         (noteinfo (gethash noteid leanote--cache-noteid-info))
+         (is-modified nil))
+    (when (and noteid noteinfo)
+      (leanote-make-sure-login)
+      (setq is-modified (assoc-default 'IsModified noteinfo))
+      ;; yes-or-no-p depends on is-modified
+      (let* ((notecontent-obj (leanote-ajax-get-note-content noteid))
+             (notecontent (assoc-default 'Content notecontent-obj)))
+        (when notecontent
+          (erase-buffer)
+          (insert notecontent)
+          (save-buffer)))
+      )))
+
 (defun leanote-current-note-is-need-update ()
   "is need update for current note"
   (let* ((note-id (leanote-get-current-note-id))
