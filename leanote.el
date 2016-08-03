@@ -563,17 +563,36 @@
   (let* ((note-id (leanote-get-current-note-id))
          (note-and-content nil)
          (remote-usn nil)
-         (local-usn nil))
+         (local-usn nil)
+         (result nil)
+         (note-info nil))
     (when (and note-id leanote-token)
-      (setq note-and-content (leanote-get-note-and-content note-id))
-      (setq ab/debug note-and-content)
-      (setq remote-usn (assoc-default 'Usn note-and-content))
-      (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
-      (leanote-log "update ajax")
-      (when (and remote-usn local-usn)
-        (if (> remote-usn local-usn)
-            t
-          nil)))))
+      (setq note-info (gethash note-id leanote--cache-noteid-info))
+      (when note-info
+        (let* ((is-need-update (assoc-default 'IsNeedUpdate note-info))
+               (status nil))
+          (if is-need-update
+              (progn
+                (when (eq t is-need-update)
+                  (setq result t)))
+            (progn (setq note-and-content (leanote-get-note-and-content note-id))
+                   (setq ab/debug note-and-content)
+                   (setq remote-usn (assoc-default 'Usn note-and-content))
+                   (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
+                   (leanote-log "update ajax")
+                   (when (and remote-usn local-usn)
+                     (if (> remote-usn local-usn)
+                         (progn
+                           (setq status t)
+                           (setq result t))
+                       (setq status :json-false))
+                     (leanote-log "update status IsNeedUpdate")
+                     (cl-pushnew `(IsNeedUpdate . ,status) note-info)
+                     (puthash note-id note-info leanote--cache-noteid-info)
+                     (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
+                     ))))))
+    result
+    ))
 
 (defun leanote--login-status ()
   (if leanote-token
