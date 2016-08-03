@@ -564,15 +564,21 @@
          (note-and-content nil)
          (remote-usn nil)
          (local-usn nil))
-    (when note-id
+    (when (and note-id leanote-token)
       (setq note-and-content (leanote-get-note-and-content note-id))
       (setq ab/debug note-and-content)
       (setq remote-usn (assoc-default 'Usn note-and-content))
       (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
+      (leanote-log "update ajax")
       (when (and remote-usn local-usn)
         (if (> remote-usn local-usn)
             t
           nil)))))
+
+(defun leanote--login-status ()
+  (if leanote-token
+      "⦾"
+    "✭"))
 
 (defun leanote-status ()
   "current leanote status"
@@ -584,10 +590,10 @@
       (when note-info
         (let ((is-modified (assoc-default 'IsModified note-info)))
           (if is-modified
-              (setq result "leanote*")
+              (setq result (concat "leanote*" (leanote--login-status)))
             (if (leanote-current-note-is-need-update)
-                (setq result "leanote⇡")
-              (setq result "leanote"))))))
+                (setq result (concat "leanote⇡" (leanote--login-status)))
+              (setq result (concat "leanote" (leanote--login-status))))))))
     result))
 
 (defun leanote-push-current-file-to-remote ()
