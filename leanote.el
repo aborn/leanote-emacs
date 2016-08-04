@@ -74,6 +74,8 @@
 (defvar leanote--cache-noteid-info (make-hash-table :test 'equal))
 ;; local-path -> notebook-id map
 (defvar leanote--cache-notebook-path-id (make-hash-table :test 'equal))
+;; record is need update
+(defvar leanote--cache-is-need-update (make-hash-table :test 'equal))
 ;; pcache persistent repo name
 (defconst leanote-persistent-repo "*leanote*")
 
@@ -635,7 +637,7 @@
         (let ((is-modified (assoc-default 'IsModified note-info)))
           (if is-modified
               (setq result (concat "leanote*" (leanote--login-status)))
-            (if (leanote-current-note-is-need-update)
+            (if (gethash note-id leanote--cache-is-need-update)
                 (setq result (concat "leanote⇡" (leanote--login-status)))
               (setq result (concat "leanote" (leanote--login-status))))))))
     result))
