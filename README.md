@@ -29,6 +29,12 @@ The mode line show it status when markdown file is leanote,
 ![](images/status.png "mode line status")
 What's more, when leanote note is modified local (without push to remote), the mode line show **leanote***
 ![](images/statusm.png "mode line status modified")
+Not login status
+![](images/status-unlogin.png "not login status")
+Already login status
+![](images/status-login.png "already login status")
+Need sync with remote
+![](images/status-update.png "already login status")
 
 ## Leanote log
 All logs are recorded in \*Leanote-Log* buffer.
@@ -68,6 +74,12 @@ M-x package-install RET leanote-mode RET
 ![](images/status.png "mode line status")
 当一个leanote文件只是在本地修改了，没有同步到远端的时，状态显示为**leanote***，如下：
 ![](images/statusm.png "mode line status modified")
+没有登录时的状态
+![](images/status-unlogin.png "not login status")
+已经登录时的状态
+![](images/status-login.png "already login status")
+本地笔记过，需要同步远程笔记的状态
+![](images/status-update.png "already login status")
 
 ## 操作日志
 所有的操作日志被记录在\*Leanote-Log* 这个buffer里。
