@@ -8,4 +8,5 @@
   (depends-on "let-alist")
   (depends-on "pcache")
   (depends-on "s")
-  (depends-on "swiper"))
+  (depends-on "swiper")
+  (depends-on "helm"))

@@ -42,3 +42,11 @@
                         :to-equal "主要一些当前正在进行的一些工作")
                 (expect (leanote-extra-abstract s2)
                         :to-equal "主要一些当前正在进行的一些工作"))))
+
+(describe "test leanote-status-is-timeout"
+          (it "test"
+              (let* ((status1 '("578e2182ab644133ed01800b" t
+                                (22437 21873 142076 0))))
+                (expect (leanote-status-is-timeout status1)
+                        :to-be t)
+                )))

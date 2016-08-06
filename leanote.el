@@ -78,7 +78,7 @@
 ;; local-path -> notebook-id map
 (defvar leanote--cache-notebook-path-id (make-hash-table :test 'equal))
 ;; record is need update
-(defvar leanote--cache-is-need-update (make-hash-table :test 'equal))
+(defvar leanote--cache-note-update-status (make-hash-table :test 'equal))
 ;; pcache persistent repo name
 (defconst leanote-persistent-repo "*leanote*")
 
@@ -129,6 +129,11 @@
 
 (defcustom leanote-idle-interval 1
   "idle timer to execute check update"
+  :group 'leanote
+  :type 'number)
+
+(defcustom leanote-check-interval (* 60 2)
+  "check note is need update interval, default 2 minutes"
   :group 'leanote
   :type 'number)
 
@@ -590,7 +595,7 @@
           ))
       )))
 
-(defun leanote-current-note-is-need-update ()
+(defun leanote-current-note-need-update-status ()
   "current note is need update. "
   (interactive)
   (let* ((note-id (leanote-get-current-note-id))
@@ -598,32 +603,55 @@
          (remote-usn nil)
          (local-usn nil)
          (result nil)
-         (note-info nil))
-    (leanote-log "execute leanote-current-note-is-need-update ...")
+         (status :false))
+    ;; (leanote-log "execute leanote-current-note-need-update-status ...")
     (when (and note-id leanote-token)
-      (setq note-info (gethash note-id leanote--cache-noteid-info))
-      (when note-info
-        (setq note-and-content (leanote-get-note-and-content note-id))
-        (setq ab/debug note-and-content)
-        (setq remote-usn (assoc-default 'Usn note-and-content))
-        (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
-        (when (and remote-usn local-usn)
-          (when (> remote-usn local-usn)
-            (leanote-log (format "this note is need update %s, local-usn=%d, remote-usn=%d"
-                                 note-id local-usn remote-usn))
-            (setq result `(,note-id t ,(current-time)))
-            (setq ab/debug result))
+      (let* ((cache-status (gethash note-id leanote--cache-note-update-status))
+             (note-info (gethash note-id leanote--cache-noteid-info))
+             (is-need-force-update t))
+        (when cache-status
+          ;; (leanote-log "cache exists.....")
+          (setq is-need-force-update (leanote-status-is-timeout cache-status))
+          (unless is-need-force-update
+            (setq result cache-status)
+            (setq ab/debug cache-status)
+            (leanote-log (format "note status not need update, last update: %s"
+                                 (format-time-string "%Y-%m-%d %H:%M:%S"
+                                                     (car (last cache-status)))))))
+        (when (and note-info is-need-force-update)
+          (setq note-and-content (leanote-get-note-and-content note-id))
+          (setq remote-usn (assoc-default 'Usn note-and-content))
+          (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
+          (when (and remote-usn local-usn)
+            (when (> remote-usn local-usn)
+              (setq status t))
+            (if (eq t status)
+                (leanote-log (format "note need update %s, local-usn=%d, remote-usn=%d"
+                                     note-id local-usn remote-usn))
+              (leanote-log (format "note not need update %s, local-usn=%d, remote-usn=%d"
+                                   note-id local-usn remote-usn)))
+            (setq result `(,note-id ,status ,(current-time))))
           )))
     result
     ))
 
+(defun leanote-status-is-timeout (status)
+  "check status is timeout"
+  (let ((result t)
+        (last-time (car (last status)))
+        (diff nil))
+    (when (and status last-time)
+      (setq diff (time-to-seconds (time-subtract (current-time) last-time)))
+      (setq result (> diff leanote-check-interval)))
+    result))
+
 (defun leanote-check-note-update-task ()
-  "update task"
-  (let* ((cnote (leanote-current-note-is-need-update))
-         (note-id (car cnote))
-         (is-need-update (car (cdr cnote))))
+  "update check task"
+  (let* ((note-status (leanote-current-note-need-update-status))
+         (note-id (car note-status))
+         (is-need-update (car (cdr note-status))))
     (when (and note-id is-need-update)
-      (puthash note-id is-need-update leanote--cache-is-need-update)
+      (puthash note-id note-status leanote--cache-note-update-status)
       (force-mode-line-update))
     ))
 
@@ -648,10 +676,11 @@
     (when note-id
       (setq note-info (gethash note-id leanote--cache-noteid-info))
       (when note-info
-        (let ((is-modified (assoc-default 'IsModified note-info)))
+        (let ((is-modified (assoc-default 'IsModified note-info))
+              (is-need-update (eq t (car (cdr (gethash note-id leanote--cache-note-update-status))))))
           (if is-modified
               (setq result (concat "leanote*" (leanote--login-status)))
-            (if (gethash note-id leanote--cache-is-need-update)
+            (if is-need-update
                 (setq result (concat "leanote⇡" (leanote--login-status)))
               (setq result (concat "leanote" (leanote--login-status))))))))
     result))
@@ -972,8 +1001,7 @@
   (let* ((buf (get-buffer-create leanote-log-buffer-name))
          (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
     (with-current-buffer buf
-      ;;(end-of-buffer)
-      (end-of-buffer)
+      (goto-char (point-max))
       (insert (format "[%s] " level))
       (insert (concat local-current-time (string-join args " ")))
       (insert "\n"))))
