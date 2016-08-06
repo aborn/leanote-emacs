@@ -20,9 +20,9 @@ Add following code to your init(.emacs or init.el anyway) file.
 
 ## Actions
 * M-x leanote-login ------ login to server.
-* M-x leanote-sync  ------ sync all notes from server to local.
-* M-x leanote-push  ------ push current note to remote server (include create new).
-* M-x leanote-pull  ------ pull and force update current note from server.
+* M-x leanote-sync ------- sync all notes from server to local.
+* M-x leanote-push ------- push current note to remote server (include create new).
+* M-x leanote-pull ------- pull and force update current note from server.
 * M-x leanote-find find -- all notes in current account(default use swiper).
 * M-x leanote-helm-find -- find all notes in current account(helm).
 * M-x leanote-delete ----- delete current note.
@@ -75,9 +75,9 @@ M-x package-install RET leanote-mode RET
 
 ## 常用功能
 * M-x leanote-login ------ 登录服务器
-* M-x leanote-sync  ------ 同步所有远端笔记到本地
-* M-x leanote-push  ------ 将当前本地笔记上传到远端(如果远端没有就创建之)
-* M-x leanote-pull  ------ 强制同步当前笔记为远端的内容
+* M-x leanote-sync ------- 同步所有远端笔记到本地
+* M-x leanote-push ------- 将当前本地笔记上传到远端(如果远端没有就创建之)
+* M-x leanote-pull ------- 强制同步当前笔记为远端的内容
 * M-x leanote-find find -- 查找当前账号下所有本地笔记(用swiper方式)
 * M-x leanote-helm-find -- 查找当前账号下所有本地笔记(用helm方式)
 * M-x leanote-delete ----- 删除当前笔记
