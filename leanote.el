@@ -615,7 +615,7 @@
           (unless is-need-force-update
             (setq result cache-status)
             (setq ab/debug cache-status)
-            (leanote-log (format "note status not need update, last update: %s %s"
+            (leanote-log (format "status not need update, last update: %s %s"
                                  (format-time-string "%Y-%m-%d %H:%M:%S"
                                                      (car (last cache-status)))
                                  note-id))))
@@ -629,10 +629,10 @@
               (when (> remote-usn local-usn)
                 (setq status t))
               (if (eq t status)
-                  (leanote-log (format "note need update %s, local-usn=%d, remote-usn=%d %s"
-                                       note-id local-usn remote-usn note-id))
-                (leanote-log (format "note not need update %s, local-usn=%d, remote-usn=%d %s"
-                                     note-id local-usn remote-usn note-id)))
+                  (leanote-log (format "note need update, local-usn=%d, remote-usn=%d %s"
+                                       local-usn remote-usn note-id))
+                (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
+                                     local-usn remote-usn note-id)))
               (setq result `(,note-id ,status ,(current-time)))))
           (setq leanote-task-lock-p nil))))
     result
