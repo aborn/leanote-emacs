@@ -926,7 +926,8 @@
                            (setq leanote-user (assoc-default 'Username data))
                            (setq leanote-user-email (assoc-default 'Email data))
                            (setq leanote-user-id (assoc-default 'UserId data))
-                           (setq leanote-user-password password) ;; update password
+                           (setq leanote-user-password password)
+                           (message "login success!")
                            (leanote-log "login success!")))))))
 
 ;;; find & search
