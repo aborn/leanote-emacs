@@ -65,8 +65,9 @@
 (defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
 
-;; timer task
+;; timer task & locker
 (defvar leanote-idle-timer nil)
+(defvar leanote-task-lock-p nil)
 
 ;;; local cache 
 ;; notebook-id -> notes-list(without content) map
@@ -618,20 +619,22 @@
                                  (format-time-string "%Y-%m-%d %H:%M:%S"
                                                      (car (last cache-status)))
                                  note-id))))
-        (when (and note-info is-need-force-update)
-          (setq note-and-content (leanote-get-note-and-content note-id))
-          (setq remote-usn (assoc-default 'Usn note-and-content))
-          (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
-          (when (and remote-usn local-usn)
-            (when (> remote-usn local-usn)
-              (setq status t))
-            (if (eq t status)
-                (leanote-log (format "note need update %s, local-usn=%d, remote-usn=%d %s"
-                                     note-id local-usn remote-usn note-id))
-              (leanote-log (format "note not need update %s, local-usn=%d, remote-usn=%d %s"
-                                   note-id local-usn remote-usn note-id)))
-            (setq result `(,note-id ,status ,(current-time))))
-          )))
+        (unless leanote-task-lock-p
+          (setq leanote-task-lock-p t)
+          (when (and note-info is-need-force-update)
+            (setq note-and-content (leanote-get-note-and-content note-id))
+            (setq remote-usn (assoc-default 'Usn note-and-content))
+            (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
+            (when (and remote-usn local-usn)
+              (when (> remote-usn local-usn)
+                (setq status t))
+              (if (eq t status)
+                  (leanote-log (format "note need update %s, local-usn=%d, remote-usn=%d %s"
+                                       note-id local-usn remote-usn note-id))
+                (leanote-log (format "note not need update %s, local-usn=%d, remote-usn=%d %s"
+                                     note-id local-usn remote-usn note-id)))
+              (setq result `(,note-id ,status ,(current-time)))))
+          (setq leanote-task-lock-p nil))))
     result
     ))
 
