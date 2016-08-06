@@ -3,9 +3,9 @@ Writing markdown note in emacs with elegant way [leanote](https://leanote.com/[l
 and its [open source platform](http://leanote.org/).
 
 ## Install
-Install it from elpa package source (i.e. [melpa](https://melpa.org/) or [popkit elpa](https://elpa.popkit.org/)).  
+Install it from elpa source package (i.e. [melpa](https://melpa.org/) or [popkit elpa](https://elpa.popkit.org/)).  
 ```elisp
-M-x package-install RET leanote-mode RET
+M-x package-install RET leanote RET
 ```
 
 ## Usage
@@ -44,7 +44,7 @@ Not login status
 Already login status
 ![](images/status-login.png "already login status")
 Need sync with remote
-![](images/status-update.png "already login status")
+![](images/status-update.png "need update current note")
 
 ## Leanote log
 All logs are recorded in \*Leanote-Log* buffer.
@@ -60,15 +60,15 @@ leanote-mode是emacs下的一个**minor-mode**，使得你能在emacs下优雅�
 ## 安装
 从elpa的源中进行安装（如[melpa](https://melpa.org/) 或者 [popkit elpa](https://elpa.popkit.org/).）  
 ```elisp
-M-x package-install RET leanote-mode RET
+M-x package-install RET leanote RET
 ```
 
 ## 使用
-将下面代码添加到你emacs的启动文件(.emacs 或者 init.el)
+将下面代码添加到你emacs的启动文件(.emacs 或者 init.el 或者 .spacemacs)
 ```elisp
 (add-hook 'markdown-mode-hook 'leanote)
 ```
-如果你是自己部署了leanote的服务，配置自己服务的api
+如果你是自己部署leanote的服务，配置自己服务的api
 ```elisp
 (setq leanote-api-root "https://your-domain/api")
 ```
@@ -83,7 +83,7 @@ M-x package-install RET leanote-mode RET
 * M-x leanote-delete ----- 删除当前笔记
 * M-x leanote-rename ----- 重命令当前笔记
 
-## 常功能绑定的热键
+## 常功能绑定的快捷键
 * **C-c u** leanote-push
 * **C-c r** leanote-rename
 * **C-c f** leanote-find
@@ -98,8 +98,8 @@ M-x package-install RET leanote-mode RET
 ![](images/status-unlogin.png "not login status")
 已经登录时的状态
 ![](images/status-login.png "already login status")
-本地笔记过，需要同步远程笔记的状态
-![](images/status-update.png "already login status")
+本地笔记没有远程笔记新时，需要同步远程笔记时的状态
+![](images/status-update.png "need update current note")
 
 ## 操作日志
 所有的操作日志被记录在\*Leanote-Log* 这个buffer里。
