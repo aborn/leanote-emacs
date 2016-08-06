@@ -132,8 +132,8 @@
   :group 'leanote
   :type 'number)
 
-(defcustom leanote-check-interval (* 60 2)
-  "check note is need update interval, default 2 minutes"
+(defcustom leanote-check-interval (* 60 5)
+  "note status check interval, default 5 minutes"
   :group 'leanote
   :type 'number)
 
@@ -610,14 +610,14 @@
              (note-info (gethash note-id leanote--cache-noteid-info))
              (is-need-force-update t))
         (when cache-status
-          ;; (leanote-log "cache exists.....")
           (setq is-need-force-update (leanote-status-is-timeout cache-status))
           (unless is-need-force-update
             (setq result cache-status)
             (setq ab/debug cache-status)
-            (leanote-log (format "note status not need update, last update: %s"
+            (leanote-log (format "note status not need update, last update: %s %s"
                                  (format-time-string "%Y-%m-%d %H:%M:%S"
-                                                     (car (last cache-status)))))))
+                                                     (car (last cache-status)))
+                                 note-id))))
         (when (and note-info is-need-force-update)
           (setq note-and-content (leanote-get-note-and-content note-id))
           (setq remote-usn (assoc-default 'Usn note-and-content))
@@ -626,10 +626,10 @@
             (when (> remote-usn local-usn)
               (setq status t))
             (if (eq t status)
-                (leanote-log (format "note need update %s, local-usn=%d, remote-usn=%d"
-                                     note-id local-usn remote-usn))
-              (leanote-log (format "note not need update %s, local-usn=%d, remote-usn=%d"
-                                   note-id local-usn remote-usn)))
+                (leanote-log (format "note need update %s, local-usn=%d, remote-usn=%d %s"
+                                     note-id local-usn remote-usn note-id))
+              (leanote-log (format "note not need update %s, local-usn=%d, remote-usn=%d %s"
+                                   note-id local-usn remote-usn note-id)))
             (setq result `(,note-id ,status ,(current-time))))
           )))
     result
@@ -657,6 +657,8 @@
 
 (defun leanote-check-note-update ()
   "check current note is need update"
+  ;; first force check, after execute task.
+  (leanote-check-note-update-task)
   (unless leanote-idle-timer
     (leanote-log "leanote-idle-timer execute....")
     (setq leanote-idle-timer
