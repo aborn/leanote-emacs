@@ -32,12 +32,18 @@
 ;; office provide note server, android & ios apps.
 ;;
 ;; The emacs leanote package provides follwoing features:
-;; M-x leanote-login    login remote server.
-;; M-x leanote-sync     sync remote notes to local.
-;; C-c u                update/create note to remote server.
-;; C-c d                delete note
-;; C-c r                rename note
-;; C-c f                leanote-find-note
+;; * M-x leanote-login ------ login to server.
+;; * M-x leanote-sync  ------ sync all notes from server to local.
+;; * M-x leanote-push  ------ push current note to remote server (include create new).
+;; * M-x leanote-pull  ------ pull(update) current note from server.
+;; * M-x leanote-find find -- all notes in current account(default use swiper).
+;; * M-x leanote-helm-find -- find all notes in current account(helm).
+;; * M-x leanote-delete ----- delete current note
+;;
+;; Here is hot-keys
+;; C-c u --- update/create note to remote server.
+;; C-c r --- rename note
+;; C-c f --- leanote-find
 
 ;;; Code:
 
@@ -160,10 +166,10 @@
   "leanote mini mode"
   :init-value nil
   :keymap (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "C-c u") 'leanote-push-current-file-to-remote)
-            (define-key map (kbd "C-c d") 'leanote-delete-current-note)
+            (define-key map (kbd "C-c u") 'leanote-push)
             (define-key map (kbd "C-c r") 'leanote-rename)
-            (define-key map (kbd "C-c f") 'leanote-find-note)
+            (define-key map (kbd "C-c f") 'leanote-find)
+            (define-key map (kbd "C-c o") 'leanote-pull)
             map)
   :group 'leanote
   (leanote-init)
@@ -355,7 +361,8 @@
       (cl-pushnew '(Usn . 0) note-info))
     note-info))
 
-(defun leanote-delete-current-note ()
+;;;###autoload
+(defun leanote-delete ()
   "delete current note."
   (interactive)
   (leanote-make-sure-login)
@@ -575,7 +582,8 @@
           (set result title)))))
     (s-trim result)))
 
-(defun leanote-force-update ()
+;;;###autoload
+(defun leanote-pull ()
   "force update current note"  
   (interactive)
   (let* ((noteid (leanote-get-current-note-id))
@@ -593,10 +601,9 @@
           (when notecontent
             (erase-buffer)
             (insert notecontent)
-            (save-buffer)    ;; save buffer must before, or IsModified is kept.
+            (save-buffer)  ;; save buffer must before
             (puthash noteid notecontent-obj leanote--cache-noteid-info)
-            (puthash noteid `(,noteid :false ,(current-time))
-                     leanote--cache-note-update-status)
+            (setq ab/debug2 (gethash noteid leanote--cache-noteid-info))
             )))
       )))
 
@@ -696,7 +703,8 @@
               (setq result (concat "leanote" (leanote--login-status))))))))
     result))
 
-(defun leanote-push-current-file-to-remote ()
+;;;###autoload
+(defun leanote-push ()
   "push current content or add new note to remote server."
   (interactive)
   (leanote-make-sure-login)
@@ -975,7 +983,8 @@
         (find-file file-name)
       (message "note %s doesn't exists." file-name))))
 
-(defun leanote-find-note ()
+;;;###autoload
+(defun leanote-find ()
   "find note by title with ivy-mode"
   (interactive)
   (let (collection)
@@ -985,7 +994,8 @@
               :action 'leanote--open-note
               )))
 
-(defun leanote-helm-find-note ()
+;;;###autoload
+(defun leanote-helm-find ()
   "helm find note"
   (interactive)
   (let (collection)

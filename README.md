@@ -15,14 +15,24 @@ Add following code to your init(.emacs or init.el anyway) file.
 ```
 **Note:** Config your own server api if you use youself host(vps) as following  
 ```elisp
-(setq leanote-api-root "youryomain/api")
+(setq leanote-api-root "https://your-domain/api")
 ```
 
-## Hotkey
-* **C-c u** update or add new note content to remote.
-* **C-c d** delete current leanote.
-* **C-c r** rename current leanote.
-* **C-c f** find note by note-name.
+## Actions
+* M-x leanote-login ------ login to server.
+* M-x leanote-sync  ------ sync all notes from server to local.
+* M-x leanote-push  ------ push current note to remote server (include create new).
+* M-x leanote-pull  ------ pull and force update current note from server.
+* M-x leanote-find find -- all notes in current account(default use swiper).
+* M-x leanote-helm-find -- find all notes in current account(helm).
+* M-x leanote-delete ----- delete current note.
+* M-x leanote-rename ----- rename current note.
+
+## Hotkey for action
+* **C-c u** leanote-push
+* **C-c r** leanote-rename
+* **C-c f** leanote-find
+* **C-c o** leanote-pull
 
 ## Leanote status
 The mode line show it status when markdown file is leanote, 
@@ -60,14 +70,24 @@ M-x package-install RET leanote-mode RET
 ```
 如果你是自己部署了leanote的服务，配置自己服务的api
 ```elisp
-(setq leanote-api-root "youryomain/api")
+(setq leanote-api-root "https://your-domain/api")
 ```
 
-## 快捷键
-* **C-c u** 更新或者添加当前笔记到服务器
-* **C-c d** 删除当前笔记
-* **C-c r** 修改当前笔记名
-* **C-c f** 按笔记名查找笔记
+## 常用功能
+* M-x leanote-login ------ 登录服务器
+* M-x leanote-sync  ------ 同步所有远端笔记到本地
+* M-x leanote-push  ------ 将当前本地笔记上传到远端(如果远端没有就创建之)
+* M-x leanote-pull  ------ 强制同步当前笔记为远端的内容
+* M-x leanote-find find -- 查找当前账号下所有本地笔记(用swiper方式)
+* M-x leanote-helm-find -- 查找当前账号下所有本地笔记(用helm方式)
+* M-x leanote-delete ----- 删除当前笔记
+* M-x leanote-rename ----- 重命令当前笔记
+
+## 常功能绑定的热键
+* **C-c u** leanote-push
+* **C-c r** leanote-rename
+* **C-c f** leanote-find
+* **C-c o** leanote-pull
 
 ## leanote状态显示
 当一个markdown文件为leanote时，其mode line会显示出来，如下：
