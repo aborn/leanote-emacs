@@ -192,6 +192,7 @@
   (when (= 0 (hash-table-count leanote--cache-notebookid-notes))
     (setq leanote--cache-notebookid-notes
           (leanote-persistent-get 'leanote--cache-notebookid-notes)))
+  (leanote-check-note-update)
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
 (defun leanote-after-save-action ()
@@ -591,7 +592,7 @@
       )))
 
 (defun leanote-current-note-is-need-update ()
-  "is need update for current note"
+  "current note is need update. "
   (interactive)
   (let* ((note-id (leanote-get-current-note-id))
          (note-and-content nil)
@@ -609,16 +610,23 @@
         (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
         (when (and remote-usn local-usn)
           (when (> remote-usn local-usn)
-            (leanote-log (format "this note is need update %s" note-id))
+            (leanote-log (format "this note is need update %s, local-usn=%d, remote-usn=%d"
+                                 note-id local-usn remote-usn))
             (setq result `(,note-id t))
-            (setq ab/debug result)
-            (leanote-log (format "note %s IsNeedUpdate" note-id)))
+            (setq ab/debug result))
           )))
     result
     ))
 
 (defun leanote-check-note-update-task ()
-  )
+  "update task"
+  (let* ((cnote (leanote-current-note-is-need-update))
+         (note-id (car cnote))
+         (is-need-update (car (cdr cnote))))
+    (when (and note-id is-need-update)
+      (puthash note-id is-need-update leanote--cache-is-need-update)
+      (force-mode-line-update))
+    ))
 
 (defun leanote-check-note-update ()
   "check current note is need update"
