@@ -620,8 +620,8 @@
                                                      (car (last cache-status)))
                                  note-id))))
         (unless leanote-task-lock-p
-          (setq leanote-task-lock-p t)
           (when (and note-info is-need-force-update)
+            (setq leanote-task-lock-p t)
             (setq note-and-content (leanote-get-note-and-content note-id))
             (setq remote-usn (assoc-default 'Usn note-and-content))
             (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
@@ -633,8 +633,9 @@
                                        local-usn remote-usn note-id))
                 (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
                                      local-usn remote-usn note-id)))
-              (setq result `(,note-id ,status ,(current-time)))))
-          (setq leanote-task-lock-p nil))))
+              (setq result `(,note-id ,status ,(current-time))))
+            (setq leanote-task-lock-p nil))
+          )))
     result
     ))
 
