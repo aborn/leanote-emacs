@@ -65,6 +65,9 @@
 (defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
 
+;; timer task
+(defvar leanote-idle-timer nil)
+
 ;;; local cache 
 ;; notebook-id -> notes-list(without content) map
 (defvar leanote--cache-notebookid-notes (make-hash-table :test 'equal))
@@ -121,6 +124,11 @@
 
 (defcustom leanote-request-timeout 10
   "Timeout control for http request, in seconds."
+  :group 'leanote
+  :type 'number)
+
+(defcustom leanote-idle-interval 1
+  "idle timer to execute check update"
   :group 'leanote
   :type 'number)
 
@@ -584,42 +592,41 @@
 
 (defun leanote-current-note-is-need-update ()
   "is need update for current note"
+  (interactive)
   (let* ((note-id (leanote-get-current-note-id))
          (note-and-content nil)
          (remote-usn nil)
          (local-usn nil)
          (result nil)
          (note-info nil))
+    (leanote-log "execute leanote-current-note-is-need-update ...")
     (when (and note-id leanote-token)
       (setq note-info (gethash note-id leanote--cache-noteid-info))
       (when note-info
-        (let* ((is-need-update (assoc-default 'IsNeedUpdate note-info))
-               (status nil))
-          (if is-need-update
-              (progn
-                (when (eq t is-need-update)
-                  (setq result t)))
-            (progn (setq note-and-content (leanote-get-note-and-content note-id))
-                   (setq ab/debug note-and-content)
-                   (setq remote-usn (assoc-default 'Usn note-and-content))
-                   (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
-                   (leanote-log "update ajax")
-                   (when (and remote-usn local-usn)
-                     (if (> remote-usn local-usn)
-                         (progn
-                           (leanote-log (format "this note is need update %s" note-id))
-                           (setq status t)
-                           (setq result t))
-                       (progn
-                         (leanote-log (format "this note isnot need update %s" note-id))
-                         (setq status :json-false)))
-                     (leanote-log "update status IsNeedUpdate")
-                     (cl-pushnew `(IsNeedUpdate . ,status) note-info)
-                     (puthash note-id note-info leanote--cache-noteid-info)
-                     (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
-                     ))))))
+        (setq note-and-content (leanote-get-note-and-content note-id))
+        (setq ab/debug note-and-content)
+        (setq remote-usn (assoc-default 'Usn note-and-content))
+        (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
+        (when (and remote-usn local-usn)
+          (when (> remote-usn local-usn)
+            (leanote-log (format "this note is need update %s" note-id))
+            (setq result `(,note-id t))
+            (setq ab/debug result)
+            (leanote-log (format "note %s IsNeedUpdate" note-id)))
+          )))
     result
     ))
+
+(defun leanote-check-note-update-task ()
+  )
+
+(defun leanote-check-note-update ()
+  "check current note is need update"
+  (unless leanote-idle-timer
+    (leanote-log "leanote-idle-timer execute....")
+    (setq leanote-idle-timer
+          (run-with-idle-timer leanote-idle-interval t
+                               'leanote-check-note-update-task))))
 
 (defun leanote--login-status ()
   (if leanote-token
@@ -959,6 +966,7 @@
          (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
     (with-current-buffer buf
       ;;(end-of-buffer)
+      (end-of-buffer)
       (insert (format "[%s] " level))
       (insert (concat local-current-time (string-join args " ")))
       (insert "\n"))))
