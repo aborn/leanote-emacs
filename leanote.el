@@ -543,7 +543,6 @@
                        collect
                        (when (equal note-title (assoc-default 'Title elt))
                          (setq note-id (assoc-default 'NoteId elt))))
-              (leanote-log (format "note-id=%s" note-id))
               note-id)))))))
 
 (defun leanote-extra-abstract (content)
@@ -612,7 +611,7 @@
           (when (> remote-usn local-usn)
             (leanote-log (format "this note is need update %s, local-usn=%d, remote-usn=%d"
                                  note-id local-usn remote-usn))
-            (setq result `(,note-id t))
+            (setq result `(,note-id t ,(current-time)))
             (setq ab/debug result))
           )))
     result
