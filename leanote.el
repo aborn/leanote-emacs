@@ -580,20 +580,24 @@
   (interactive)
   (let* ((noteid (leanote-get-current-note-id))
          (noteinfo (gethash noteid leanote--cache-noteid-info))
-         (is-modified nil))
+         (is-modified nil)
+         (query-msg "Do you want to replace local with remote content?"))
     (when (and noteid noteinfo)
       (leanote-make-sure-login)
       (setq is-modified (assoc-default 'IsModified noteinfo))
-      ;; yes-or-no-p depends on is-modified
-      ;; (leanote-get-note-and-content "57899c39c3b1f40b51000005")
-      (let* ((notecontent-obj (leanote-get-note-and-content noteid))
-             (notecontent (assoc-default 'Content notecontent-obj)))
-        (when notecontent
-          (erase-buffer)
-          (insert notecontent)
-          (save-buffer)
-          (puthash noteid notecontent-obj leanote--cache-noteid-info)
-          ))
+      (when is-modified
+        (setq query-msg (concat "Local file is modified!" query-msg)))
+      (when (yes-or-no-p query-msg)
+        (let* ((notecontent-obj (leanote-get-note-and-content noteid))
+               (notecontent (assoc-default 'Content notecontent-obj)))
+          (when notecontent
+            (erase-buffer)
+            (insert notecontent)
+            (save-buffer)    ;; save buffer must before, or IsModified is kept.
+            (puthash noteid notecontent-obj leanote--cache-noteid-info)
+            (puthash noteid `(,noteid :false ,(current-time))
+                     leanote--cache-note-update-status)
+            )))
       )))
 
 (defun leanote-current-note-need-update-status ()
@@ -614,7 +618,6 @@
           (setq is-need-force-update (leanote-status-is-timeout cache-status))
           (unless is-need-force-update
             (setq result cache-status)
-            (setq ab/debug cache-status)
             (leanote-log (format "status not need update, last update: %s %s"
                                  (format-time-string "%Y-%m-%d %H:%M:%S"
                                                      (car (last cache-status)))
@@ -685,7 +688,9 @@
         (let ((is-modified (assoc-default 'IsModified note-info))
               (is-need-update (eq t (car (cdr (gethash note-id leanote--cache-note-update-status))))))
           (if is-modified
-              (setq result (concat "leanote*" (leanote--login-status)))
+              (if is-need-update
+                  (setq result (concat "leanote*⇡" (leanote--login-status)))
+                (setq result (concat "leanote*" (leanote--login-status))))
             (if is-need-update
                 (setq result (concat "leanote⇡" (leanote--login-status)))
               (setq result (concat "leanote" (leanote--login-status))))))))
@@ -966,7 +971,6 @@
       (setq file-name (expand-file-name
                        (concat (car (cdr x)) ".md")
                        file-name)))
-    (setq ab/debug x)
     (if (file-exists-p file-name)
         (find-file file-name)
       (message "note %s doesn't exists." file-name))))
