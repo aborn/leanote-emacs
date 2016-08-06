@@ -603,7 +603,8 @@
             (insert notecontent)
             (save-buffer)  ;; save buffer must before
             (puthash noteid notecontent-obj leanote--cache-noteid-info)
-            (setq ab/debug2 (gethash noteid leanote--cache-noteid-info))
+            (puthash noteid `(,noteid :false ,(current-time))
+                     leanote--cache-note-update-status)
             )))
       )))
 
