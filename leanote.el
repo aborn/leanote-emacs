@@ -620,7 +620,8 @@
         ,(async-inject-variables "\\`leanote-token\\'")
         ;;(require 'package)
         (package-initialize)
-        (add-to-list 'load-path "~/github/leanote-mode")
+        ;; TODO need remove when release
+        (add-to-list 'load-path "~/github/leanote-mode") 
         (require 'leanote)
         (let* (result)
           (setq result (leanote-get-note-and-content note-id))
