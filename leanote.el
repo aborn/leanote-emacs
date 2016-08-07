@@ -55,6 +55,7 @@
 (require 's)
 (require 'ivy)
 (require 'helm)
+(require 'subr-x)
 
 ;;;;  Variables
 
@@ -633,7 +634,9 @@
         (unless leanote-task-lock-p
           (when (and note-info is-need-force-update)
             (setq leanote-task-lock-p t)
+            (message "click before.")  ;; TODO delete it
             (setq note-and-content (leanote-get-note-and-content note-id))
+            (message "click after.")   ;; TODO delete it
             (setq remote-usn (assoc-default 'Usn note-and-content))
             (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
             (when (and remote-usn local-usn)
