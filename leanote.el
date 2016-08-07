@@ -609,11 +609,8 @@
             )))
       )))
 
-(defun leanote-test-callback (result)
-  (setq ab/debug0 result))
-
-(defun leanote-async-current-note-status (note-id)
-  "578e2182ab644133ed01800b"
+(defun leanote-async-current-note-status (note-id callback)
+  "async get note status"
   (interactive)
   (let* ((token leanote-token))
     (async-start
@@ -628,9 +625,7 @@
         (let* (result)
           (setq result (leanote-get-note-and-content note-id))
           result))
-     (lambda (result)
-       (setq ab/debug result)
-       (message "finished.")))))
+     callback)))
 
 (defun leanote-current-note-need-update-status ()
   "current note is need update. "
@@ -660,7 +655,7 @@
             ;;(setq leanote-task-lock-p nil)
             (message "click before. noteid=%s" note-id)  ;; TODO delete it
             ;; (setq note-and-content (leanote-get-note-and-content note-id))
-            (leanote-async-note-status
+            (leanote-async-current-note-status
              note-id
              (lambda (result)
                (setq ab/debug result)  ;; TODO delete it
