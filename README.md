@@ -3,7 +3,8 @@ Writing markdown note in emacs with elegant way [leanote](https://leanote.com/[l
 and its [open source platform](http://leanote.org/).
 
 ## Install
-Install it from elpa source package (i.e. [melpa](https://melpa.org/) or [popkit elpa](https://elpa.popkit.org/)).  
+Install it from elpa source package (i.e. [melpa](https://melpa.org/) or [popkit elpa](https://elpa.popkit.org/) [![POPKIT ELPA](https://elpa.popkit.org/packages/leanote-badge.svg)](https://elpa.popkit.org/#/leanote)
+).  
 ```elisp
 M-x package-install RET leanote RET
 ```
@@ -58,7 +59,8 @@ leanote-mode是emacs下的一个**minor-mode**，使得你能在emacs下优雅�
 可采用[leanote](https://leanote.com/)提供的服务保存markdown格式的笔记内容。
 
 ## 安装
-从elpa的源中进行安装（如[melpa](https://melpa.org/) 或者 [popkit elpa](https://elpa.popkit.org/).）  
+从elpa的源中进行安装（如[melpa](https://melpa.org/) 或者 [popkit elpa](https://elpa.popkit.org/) [![POPKIT ELPA](https://elpa.popkit.org/packages/leanote-badge.svg)](https://elpa.popkit.org/#/leanote)
+.）  
 ```elisp
 M-x package-install RET leanote RET
 ```
