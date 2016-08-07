@@ -74,7 +74,7 @@
 
 ;; timer task & locker
 (defvar leanote-idle-timer nil)
-(defvar leanote-task-lock-p nil)
+(defvar leanote-task-locker nil)
 
 ;;; local cache 
 ;; notebook-id -> notes-list(without content) map
@@ -649,10 +649,10 @@
                                  (format-time-string "%Y-%m-%d %H:%M:%S"
                                                      (car (last cache-status)))
                                  note-id))))
-        (unless leanote-task-lock-p
+        (when (or (not leanote-task-locker)
+                  (leanote-status-is-timeout leanote-task-locker 30))
           (when (and note-info is-need-force-update)
-            ;;(setq leanote-task-lock-p t)
-            ;;(setq leanote-task-lock-p nil)
+            (setq leanote-task-locker `(,note-id :false ,(current-time)))
             (message "check note status for note:%s" note-id)
             (leanote-async-current-note-status
              note-id
@@ -676,14 +676,16 @@
     result
     ))
 
-(defun leanote-status-is-timeout (status)
+(defun leanote-status-is-timeout (status &optional timeout)
   "check status is timeout"
+  (when (null timeout)
+    (setq timeout leanote-check-interval))
   (let ((result t)
         (last-time (car (last status)))
         (diff nil))
     (when (and status last-time)
       (setq diff (time-to-seconds (time-subtract (current-time) last-time)))
-      (setq result (> diff leanote-check-interval)))
+      (setq result (> diff timeout)))
     result))
 
 (defun leanote-check-note-update ()
