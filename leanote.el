@@ -627,7 +627,7 @@
           result))
      callback)))
 
-(defun leanote-current-note-need-update-status ()
+(defun leanote-check-note-update-task ()
   "current note is need update. "
   (interactive)
   (let* ((note-id (leanote-get-current-note-id))
@@ -653,14 +653,11 @@
           (when (and note-info is-need-force-update)
             ;;(setq leanote-task-lock-p t)
             ;;(setq leanote-task-lock-p nil)
-            (message "click before. noteid=%s" note-id)  ;; TODO delete it
-            ;; (setq note-and-content (leanote-get-note-and-content note-id))
+            (message "check note status for note:%s" note-id)
             (leanote-async-current-note-status
              note-id
-             (lambda (result)
-               (setq ab/debug result)  ;; TODO delete it
-               (message "dddddd")
-               ;; (setq note-and-content (leanote-get-note-and-content note-id))
+             (lambda (asyncresult)
+               (setq note-and-content asyncresult)
                (setq remote-usn (assoc-default 'Usn note-and-content))
                (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
                (when (and remote-usn local-usn)
@@ -671,7 +668,9 @@
                                           local-usn remote-usn note-id))
                    (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
                                         local-usn remote-usn note-id)))
-                 (setq result `(,note-id ,status ,(current-time))))
+                 (setq result `(,note-id ,status ,(current-time)))
+                 (puthash note-id result leanote--cache-note-update-status)
+                 (force-mode-line-update))
                )))
           )))
     result
@@ -686,16 +685,6 @@
       (setq diff (time-to-seconds (time-subtract (current-time) last-time)))
       (setq result (> diff leanote-check-interval)))
     result))
-
-(defun leanote-check-note-update-task ()
-  "update check task"
-  (let* ((note-status (leanote-current-note-need-update-status))
-         (note-id (car note-status))
-         (is-need-update (car (cdr note-status))))
-    (when (and note-id is-need-update)
-      (puthash note-id note-status leanote--cache-note-update-status)
-      (force-mode-line-update))
-    ))
 
 (defun leanote-check-note-update ()
   "check current note is need update"
