@@ -654,6 +654,7 @@
           (when (and note-info is-need-force-update)
             (setq leanote-task-locker `(,note-id :false ,(current-time)))
             (message "check note status for note:%s" note-id)
+            (leanote-log (format "check note status for note:%s" note-id))
             (leanote-async-current-note-status
              note-id
              (lambda (asyncresult)
@@ -670,7 +671,8 @@
                                         local-usn remote-usn note-id)))
                  (setq result `(,note-id ,status ,(current-time)))
                  (puthash note-id result leanote--cache-note-update-status)
-                 (force-mode-line-update))
+                 (force-mode-line-update)
+                 (leanote-log (format "finished check note status for note:%s" note-id)))
                )))
           )))
     result
