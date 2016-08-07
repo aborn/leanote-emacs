@@ -1,4 +1,4 @@
-;;; leanote.el --- A minor mode writing markdown leanote.  -*- lexical-binding: t; -*-
+;;; leanote.el --- A minor mode writing markdown leanote  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Aborn Jiang
 
@@ -140,8 +140,8 @@
   :group 'leanote
   :type 'number)
 
-(defcustom leanote-check-interval (* 60 5)
-  "note status check interval, default 5 minutes"
+(defcustom leanote-check-interval (* 60 3)
+  "note status check interval, default 3 minutes"
   :group 'leanote
   :type 'number)
 
@@ -609,6 +609,29 @@
             )))
       )))
 
+(defun leanote-test-callback (result)
+  (setq ab/debug0 result))
+
+(defun leanote-async-current-note-status (note-id)
+  "578e2182ab644133ed01800b"
+  (interactive)
+  (let* ((token leanote-token))
+    (async-start
+     `(lambda ()
+        (set 'note-id ,note-id)
+        ,(async-inject-variables "\\`note-id\\'")
+        ,(async-inject-variables "\\`leanote-token\\'")
+        ;;(require 'package)
+        (package-initialize)
+        (add-to-list 'load-path "~/github/leanote-mode")
+        (require 'leanote)
+        (let* (result)
+          (setq result (leanote-get-note-and-content note-id))
+          result))
+     (lambda (result)
+       (setq ab/debug result)
+       (message "finished.")))))
+
 (defun leanote-current-note-need-update-status ()
   "current note is need update. "
   (interactive)
@@ -633,22 +656,28 @@
                                  note-id))))
         (unless leanote-task-lock-p
           (when (and note-info is-need-force-update)
-            (setq leanote-task-lock-p t)
-            (message "click before.")  ;; TODO delete it
-            (setq note-and-content (leanote-get-note-and-content note-id))
-            (message "click after.")   ;; TODO delete it
-            (setq remote-usn (assoc-default 'Usn note-and-content))
-            (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
-            (when (and remote-usn local-usn)
-              (when (> remote-usn local-usn)
-                (setq status t))
-              (if (eq t status)
-                  (leanote-log (format "note need update, local-usn=%d, remote-usn=%d %s"
-                                       local-usn remote-usn note-id))
-                (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
-                                     local-usn remote-usn note-id)))
-              (setq result `(,note-id ,status ,(current-time))))
-            (setq leanote-task-lock-p nil))
+            ;;(setq leanote-task-lock-p t)
+            ;;(setq leanote-task-lock-p nil)
+            (message "click before. noteid=%s" note-id)  ;; TODO delete it
+            ;; (setq note-and-content (leanote-get-note-and-content note-id))
+            (leanote-async-note-status
+             note-id
+             (lambda (result)
+               (setq ab/debug result)  ;; TODO delete it
+               (message "dddddd")
+               ;; (setq note-and-content (leanote-get-note-and-content note-id))
+               (setq remote-usn (assoc-default 'Usn note-and-content))
+               (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
+               (when (and remote-usn local-usn)
+                 (when (> remote-usn local-usn)
+                   (setq status t))
+                 (if (eq t status)
+                     (leanote-log (format "note need update, local-usn=%d, remote-usn=%d %s"
+                                          local-usn remote-usn note-id))
+                   (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
+                                        local-usn remote-usn note-id)))
+                 (setq result `(,note-id ,status ,(current-time))))
+               )))
           )))
     result
     ))
