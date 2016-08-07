@@ -6,8 +6,8 @@
 ;; Version: 0.3.0
 ;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0") (swiper "0.8.0") (helm "1.9.9"))
 ;; Keywords: leanote, note, markdown
-;; Homepage: https://github.com/aborn/leanote-mode
-;; URL: https://github.com/aborn/leanote-mode
+;; Homepage: https://github.com/aborn/leanote-emacs
+;; URL: https://github.com/aborn/leanote-emacs
 
 ;; This file is NOT part of GNU Emacs.
 
