@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016 Aborn Jiang
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
-;; Version: 0.3.0
+;; Version: 0.4.0
 ;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0") (swiper "0.8.0") (helm "1.9.9"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-emacs
@@ -41,9 +41,10 @@
 ;; * M-x leanote-delete ----- delete current note
 ;;
 ;; Here is hot-keys
-;; C-c u --- update/create note to remote server.
+;; C-c u --- push/create note to remote server.
 ;; C-c r --- rename note
 ;; C-c f --- leanote-find
+;; C-c o --- leanote pull, force update from remote
 
 ;;; Code:
 
@@ -619,6 +620,8 @@
         ,(async-inject-variables "\\`note-id\\'")
         ,(async-inject-variables "\\`leanote-token\\'")
         ;;(require 'package)
+        ;; TODO need remove when release
+        (add-to-list 'load-path "~/github/leanote-mode") 
         (package-initialize)
         (require 'leanote)
         (let* (result)
