@@ -1,5 +1,5 @@
 # leanote-mode
-A minor mode Writing note in emacs with elegant way [leanote](https://leanote.com/[leanote])
+A minor mode writing notes in emacs with elegant way [leanote](https://leanote.com/[leanote])
 and its [open source platform](http://leanote.org/).
 
 ## Install
