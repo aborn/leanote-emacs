@@ -12,7 +12,7 @@ M-x package-install RET leanote RET
 ```
 
 ## Usage
-Add following code to your init(.emacs or init.el anyway) file.
+After install, add following code to your init(.emacs or init.el anyway) file.
 ```elisp
 (add-hook 'markdown-mode-hook 'leanote)
 ```
