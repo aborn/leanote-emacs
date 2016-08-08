@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016 Aborn Jiang
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
-;; Version: 0.4.0
+;; Version: 0.3.5
 ;; Package-Requires: ((cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0") (swiper "0.8.0") (helm "1.9.9") (spaceline "2.0.1"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-emacs
@@ -629,8 +629,6 @@
         ,(async-inject-variables "\\`note-id\\'")
         ,(async-inject-variables "\\`leanote-token\\'")
         ;;(require 'package)
-        ;; TODO need remove when release
-        (add-to-list 'load-path "~/github/leanote-mode") 
         (package-initialize)
         (require 'leanote)
         (let* (result)
