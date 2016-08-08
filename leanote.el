@@ -31,7 +31,7 @@
 ;; is an open-source platform https://github.com/leanote/leanote. The leanote
 ;; office provide note server, android & ios apps.
 ;;
-;; The emacs leanote package provides follwoing features:
+;; The leanote package provides follwoing features:
 ;; * M-x leanote-login ------ login to server.
 ;; * M-x leanote-sync  ------ sync all notes from server to local.
 ;; * M-x leanote-push  ------ push current note to remote server (include create new).
@@ -85,7 +85,7 @@
 (defvar leanote-idle-timer nil)
 (defvar leanote-task-locker nil)
 
-;;; local cache 
+;;; local cache
 ;; notebook-id -> notes-list(without content) map
 (defvar leanote--cache-notebookid-notes (make-hash-table :test 'equal))
 ;; notebook-id -> notebook-info map
@@ -110,32 +110,32 @@
 
 ;; api
 (defcustom leanote-api-login "/auth/login"
-  "login api"
+  "Login api."
   :group 'leanote
   :type 'string)
 
 (defcustom leanote-api-getnotebooks "/notebook/getNotebooks"
-  "get note books api"
+  "Get note books api."
   :group 'leanote
   :type 'string)
 
 (defcustom leanote-api-getnotecontent "/note/getNoteContent"
-  "get conte content api"
+  "Get conte content api."
   :group 'leanote
   :type 'string)
 
 (defcustom leanote-api-getnoteandcontent "/note/getNoteAndContent"
-  "get note and content api"
+  "Get note and content api."
   :group 'leanote
   :type 'string)
 
 (defcustom leanote-api-getnotes "/note/getNotes"
-  "get notes api"
+  "Get notes api."
   :group 'leanote
   :type 'string)
 
 (defcustom leanote-api-root "https://leanote.com/api"
-  "api root"
+  "Api root."
   :group 'leanote
   :type 'string)
 
@@ -145,28 +145,27 @@
   :type 'number)
 
 (defcustom leanote-idle-interval 1
-  "idle timer to execute check update"
+  "Idle timer to execute check update."
   :group 'leanote
   :type 'number)
 
 (defcustom leanote-check-interval (* 60 3)
-  "note status check interval, default 3 minutes"
+  "Note status check interval, default 3 minutes."
   :group 'leanote
   :type 'number)
 
 (defcustom leanote-local-root-path "~/leanote/note"
-  "local leanote path"
+  "Local leanote path."
   :group 'leanote
   :type 'string)
 
 (defcustom leanote-log-level "info"
-  "which level log should be printed,
-   can be `info', `warning', `error'"
+  "Which level log should be printed, can be `info', `warning', `error'."
   :group 'leanote
   :type 'string)
 
 (defcustom leanote-mode nil
-  "toggle leanote-mode."
+  "Toggle `leanote-mode'."
   :require 'leanote
   :type 'boolean
   :group 'leanote)
@@ -187,7 +186,7 @@
 
 ;;;###autoload
 (defun leanote-init ()
-  "do some init work when leanote minor-mode turn on"
+  "Do some init work when leanote minor-mode turn on."
   (unless leanote-mode
     (setq leanote-mode t))
   (unless (assq 'leanote-mode minor-mode-alist)
@@ -218,7 +217,7 @@
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
 (defun leanote-after-save-action ()
-  "do some action when markdown file are saved."
+  "Do some action when markdown file are saved."
   (let* ((full-file-name (buffer-file-name))
          (note-info nil)
          (is-modified nil)
@@ -247,12 +246,12 @@
       )))
 
 (defun leanote-persistent-put (key value)
-  "save key value to persistent cache."
+  "Save KEY VALUE to persistent cache."
   (let ((repo (pcache-repository leanote-persistent-repo)))
     (pcache-put repo key value)))
 
 (defun leanote-persistent-get (key)
-  "get value from persistent cache."
+  "Get KEY value from persistent cache."
   (let ((repo (pcache-repository leanote-persistent-repo))
         (result nil))
     (setq result (pcache-get repo key))
@@ -262,7 +261,7 @@
 
 ;;;###autoload
 (defun leanote-sync ()
-  "sync notebooks and notes from remote server."
+  "Sync notebooks and notes from remote server."
   (interactive)
   (leanote-log (format "--------start to sync leanote data:%s-------"
                        (leanote--get-current-time-stamp)))
@@ -299,11 +298,11 @@
   (message (format "finished sync leanote data:%s" (leanote--get-current-time-stamp))))
 
 (defun leanote--get-current-time-stamp ()
-  "get current time stamp"
+  "Get current time stamp."
   (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
 
 (defun leanote-create-notes-files (notebookname notes notebookid)
-  "create/update all notes in `notebookname'"
+  "Create or update all NOTEBOOKNAME NOTES in NOTEBOOKID."
   (let* ((notebookroot (expand-file-name
                         (leanote-get-notebook-parent-path notebookid)
                         leanote-local-root-path)))
@@ -347,7 +346,7 @@
                          )))))))))
 
 (defun leanote-get-note-info-base-note-full-name (ffn)
-  "get note info base note full file name `ffn'"
+  "Get note info base note full file name `FFN'."
   (unless (string-suffix-p ".md" ffn)
     (error (format "file %s is not markdown file." ffn)))
   (let* ((note-info nil)   ;; fefault return
@@ -374,7 +373,7 @@
 
 ;;;###autoload
 (defun leanote-delete ()
-  "delete current note."
+  "Delete current note."
   (interactive)
   (leanote-make-sure-login)
   (let* ((result-data nil)
@@ -385,16 +384,16 @@
          (note-title (assoc-default 'Title note-info))
          (usn (assoc-default 'Usn note-info)))
     (unless note-id
-      (error "cannot found current note for id %s" note-id))
+      (error "Cannot found current note for id %s" note-id))
     (when (yes-or-no-p (format "Do you really want to delete %s?" note-title))
       (setq result-data (leanote-ajax-delete-note note-id usn))
       (if (and (listp result-data)
                (equal :json-false (assoc-default 'Ok result-data)))
-          (error "delete note error, msg:%s." (assoc-default 'Msg result-data))
+          (error "Delete note error, msg:%s" (assoc-default 'Msg result-data))
         (progn
           (unless result-data
             (leanote-log "error" "error in delete note. reason: server error!")
-            (error "error in delete note. reason: server error!"))
+            (error "Error in delete note. reason: server error!"))
           (leanote-log (format "delete remote note %s success." note-title))
           (remhash note-id leanote--cache-noteid-info)   ;; remove from local cache
           (let ((name (buffer-file-name))
@@ -409,7 +408,7 @@
         ))))
 
 (defun leanote-delete-file-and-buffer ()
-  "delete current buffer and its file"
+  "Delete current buffer and its file."
   (let ((filename (buffer-file-name)))
     (when filename
       (delete-file filename)
@@ -418,7 +417,7 @@
         (delete filename recentf-list)))))
 
 (defun leanote-delete-local-notebook-note (notebook-id noteid)
-  "delete local cache notebook note"
+  "Delete NOTEBOOK-ID local cache for NOTEID."
   (let* ((notebook-notes (gethash notebook-id leanote--cache-notebookid-notes))
          (index (leanote-get-note-index notebook-notes noteid))
          (result notebook-notes))
@@ -428,7 +427,7 @@
     result))
 
 (defun leanote-ajax-delete-note (note-id usn)
-  "delete note"
+  "Delete NOTE-ID note with USN arguments."
   (leanote-log (format "note-id=%s, usn=%d will be delete." note-id usn))
   (let* ((result nil)
          (usn-str (number-to-string (+ 0 usn))))
@@ -449,7 +448,7 @@
     result))
 
 (defun leanote-notebook-has-note-p (notebook-notes note-name)
-  "notebook has note with name `note-name'"
+  "Notebook all notes NOTEBOOK-NOTES has note with name NOTE-NAME."
   (let* ((result nil))
     (when (string-suffix-p ".md" note-name)
       (setq note-name (substring note-name 0
@@ -462,7 +461,7 @@
     result))
 
 (defun leanote-get-note-index (notebook-notes note-id)
-  "get the note index in `notebook-notes'"
+  "Get the index in NOTEBOOK-NOTES for NOTE-ID."
   (let* ((index -1)
          (count 0))
     (cl-loop for elt in (append notebook-notes nil)
@@ -475,7 +474,7 @@
     index))
 
 (defun leanote-notebook-replace (notebook-notes new-note note-id)
-  "replace `note-name' with `new-note'"
+  "In NOTEBOOK-NOTES, replacs with NEW-NOTE for NOTE-ID."
   (let* ((index (leanote-get-note-index notebook-notes note-id)))
     (when (and (>= index 0)
                (arrayp notebook-notes))
@@ -502,7 +501,7 @@
 
 ;;;###autoload
 (defun leanote-rename ()
-  "rename current note"
+  "Rename current note."
   (interactive)
   (leanote-make-sure-login)
   (let* ((buf-name (buffer-file-name))
@@ -533,10 +532,10 @@
         (setq result-data (leanote-ajax-update-note note-info nil))
         (if (and (listp result-data)
                  (equal :json-false (assoc-default 'Ok result-data)))
-            (error "rename note error, msg:%s." (assoc-default 'Msg result-data))
+            (error "Rename note error, msg:%s" (assoc-default 'Msg result-data))
           (progn
             (unless result-data
-              (error "error in rename. reason: server error!"))
+              (error "Error in rename. reason: server error!"))
             (leanote-notebook-replace notebook-notes result-data note-id)
             (puthash notebook-id notebook-notes leanote--cache-notebookid-notes)
             (puthash note-id result-data leanote--cache-noteid-info)
@@ -548,7 +547,7 @@
     ))
 
 (defun leanote-get-current-note-id ()
-  "get current buffer leanote note-id"
+  "Get current buffer leanote note-id."
   (interactive)
   (let ((file-name (buffer-file-name)))
     (when file-name
@@ -570,7 +569,7 @@
               note-id)))))))
 
 (defun leanote-extra-abstract (content)
-  "get abstract from leanote `content'"
+  "Get abstract from leanote CONTENT."
   (let* ((s-indx (string-match "#" content))
          (s-end (string-match "#" content (+ 1 s-indx)))
          (result nil))
@@ -595,7 +594,7 @@
 
 ;;;###autoload
 (defun leanote-pull ()
-  "force update current note"  
+  "Force update current note."
   (interactive)
   (let* ((noteid (leanote-get-current-note-id))
          (noteinfo (gethash noteid leanote--cache-noteid-info))
@@ -620,7 +619,7 @@
       )))
 
 (defun leanote-async-current-note-status (note-id callback)
-  "async get note status"
+  "Async get NOTE-ID status. Argument  CALLBACK for async callback fun."
   (interactive)
   (let* ((token leanote-token))
     (async-start
@@ -638,7 +637,7 @@
      callback)))
 
 (defun leanote-check-note-update-task ()
-  "current note is need update. "
+  "Current note is need update."
   (interactive)
   (let* ((note-id (leanote-get-current-note-id))
          (note-and-content nil)
@@ -689,7 +688,7 @@
     ))
 
 (defun leanote-status-is-timeout (status &optional timeout)
-  "check status is timeout"
+  "Check STATUS is TIMEOUT."
   (when (null timeout)
     (setq timeout leanote-check-interval))
   (let ((result t)
@@ -701,7 +700,7 @@
     result))
 
 (defun leanote-check-note-update ()
-  "check current note is need update"
+  "Check current note is need update."
   ;; first force check, after execute task.
   (leanote-check-note-update-task)
   (unless leanote-idle-timer
@@ -711,13 +710,14 @@
                                'leanote-check-note-update-task))))
 
 (defun leanote--login-status ()
+  "Current leanote login status."
   (if leanote-token
       "⦾"
     "✭"))
 
 ;;;###autoload
 (defun leanote-status ()
-  "current leanote status"
+  "Current leanote status."
   (let* ((note-id (leanote-get-current-note-id))
          (result "")
          (note-info nil))
@@ -737,7 +737,7 @@
 
 ;;;###autoload
 (defun leanote-push ()
-  "push current content or add new note to remote server."
+  "Push current content or add new note to remote server."
   (interactive)
   (leanote-make-sure-login)
   (let* ((note-info (leanote-get-note-info-base-note-full-name
@@ -756,14 +756,14 @@
         (progn     ;; modify exists note.
           (setq note-info (gethash note-id leanote--cache-noteid-info)) ;; force update
           (unless note-info
-            (error "cannot find current note info for id %s in local cache." note-id))
+            (error "Cannot find current note info for id %s in local cache" note-id))
           (setq result-data (leanote-ajax-update-note note-info (buffer-string)))
           (if (and (listp result-data)
                    (equal :json-false (assoc-default 'Ok result-data)))
-              (error "push to remote error, msg:%s." (assoc-default 'Msg result-data))
+              (error "Push to remote error, msg:%s" (assoc-default 'Msg result-data))
             (progn
               (unless result-data
-                (error "error in push(update note) to server. reason: server error!"))
+                (error "Error in push(update note) to server. reason: server error!"))
               (leanote-log (format "file %s update to remote success." note-title))
               (message (format "file %s update to remote success." note-title))
               (leanote-notebook-replace notebook-notes result-data note-id)
@@ -771,7 +771,7 @@
             ))
       (progn       ;; add new note
         (unless notebook-id
-          (error "cannot find any notebook for this file."))
+          (error "Cannot find any notebook for this file"))
         (when (yes-or-no-p (format "The note was not found in notebook `%s'. Do you want to add it?"
                                    notebook-title))
           (cl-pushnew '(NoteId . "0") note-info)
@@ -779,23 +779,23 @@
           (setq result-data (leanote-ajax-update-note note-info (buffer-string) "/note/addNote"))
           (if (and (listp result-data)
                    (equal :json-false (assoc-default 'Ok result-data)))
-              (error "add new note to remote error, msg:%s." (assoc-default 'Msg result-data))
+              (error "Add new note to remote error, msg:%s" (assoc-default 'Msg result-data))
             (progn
               (unless result-data
-                (error "add new note to server error. reason: server error!"))
+                (error "Add new note to server error. reason: server error!"))
               (leanote-log (format "add new file %s to remote success." note-title))
               (message (format "add new file %s to remote success." note-title))
               (let* ((notebook-notes-new (vconcat notebook-notes (vector result-data))))
                 (setq note-id (assoc-default 'NoteId result-data))
                 (unless note-id
-                  (error "error in local data operate!"))
+                  (error "Error in local data operate!"))
                 (puthash notebook-id notebook-notes-new leanote--cache-notebookid-notes)
                 (puthash note-id result-data leanote--cache-noteid-info)))
             )))
       )))
 
 (defun leanote-ajax-update-note (note-info &optional note-content api)
-  "update note content and abstract."
+  "Update note content with NOTE-INFO and NOTE-CONTENT using API."
   (when (null api)
     (setq api "/note/updateNote"))
   (leanote-log (format "leanote-ajax-update-note api=%s" api))
@@ -837,11 +837,11 @@
     result))
 
 (defun leanote-parser ()
-  "parser"
+  "Parser."
   (json-read-from-string (decode-coding-string (buffer-string) 'utf-8)))
 
 (defun leanote-ajax-get-note-books ()
-  "get note books"
+  "Get note books."
   (interactive)
   (leanote-log (format "leanote-ajax-get-note-books api: %s" leanote-api-getnotebooks))
   (let ((note-books (leanote-common-api-action leanote-api-getnotebooks)))
@@ -856,24 +856,24 @@
     ))
 
 (defun leanote-ajax-get-note-content (noteid)
-  "get note content, return type.Note"
+  "Get note NOTEID content."
   (interactive)
   (leanote-common-api-action leanote-api-getnotecontent "noteId" noteid))
 
 (defun leanote-ajax-get-notes (notebookid)
-  "get all notes-info in notebook"
+  "Get all notes-info in notebook NOTEBOOKID."
   (interactive)
   (leanote-common-api-action leanote-api-getnotes "notebookId" notebookid))
 
 (defun leanote-get-note-and-content (noteid)
-  "get note and content, return  type.Note"
+  "Get note and content fo NOTEID."
   (interactive)
   (leanote-common-api-action leanote-api-getnoteandcontent "noteId" noteid))
 
 (defun leanote-common-api-action (api &optional param-key &optional param-value)
-  "common api only one parameter"
+  "Common API with PARAM-KEY and PARAM-VALUE."
   (unless api
-    (error "leanote-common-api-action parameter api is %s!" api))
+    (error "Leanote-common-api-action parameter api is %s!" api))
   (leanote-log (format "do ajax, api=%s" api))
   (let ((result nil))
     (request (concat leanote-api-root api)
@@ -897,7 +897,7 @@
     result))
 
 (defun leanote-get-notebook-parent-path (parentid)
-  "get notebook parent path"
+  "Get notebook parent path for PARENTID."
   (if (not parentid)
       ""
     (progn (let* ((cparent (gethash parentid leanote--cache-notebookid-info))
@@ -910,7 +910,7 @@
              ))))
 
 (defun leanote-mkdir-notebooks-directory-structure (&optional all-notebooks)
-  "make note-books hierarchy"
+  "Make note-books hierarchy for ALL-NOTEBOOKS."
   (interactive)
   (unless (file-exists-p leanote-local-root-path)
     (leanote-log (format "make root dir %s" leanote-local-root-path))
@@ -938,7 +938,7 @@
            ))
 
 (defun leanote-make-sure-login (&optional force)
-  "make sure login first"
+  "Make sure login first. Relogin if FORCE not nil."
   (when (null force)
     (if leanote-token
         (setq force nil)
@@ -947,11 +947,11 @@
     (leanote-login))
   (unless leanote-token
     (leanote-log "error" "login failed!")
-    (error "login failed!")))
+    (error "Login failed!")))
 
 ;;;###autoload
 (defun leanote-login (&optional user password)
-  "login in leanote"
+  "Login in leanote with USER and PASSWORD."
   (interactive)
   (when (null user)
     (setq user (read-string "Email: " nil nil leanote-user-email)))
@@ -978,7 +978,7 @@
 ;;; find & search
 
 (defun leanote-get-all-notes-from-cache ()
-  "get all note-info from local cache"
+  "Get all note-info from local cache."
   (let* ((result '()))
     (maphash (lambda (key value)
                (let* ((notebookid (assoc-default 'NotebookId value))
@@ -997,7 +997,7 @@
     result))
 
 (defun leanote-get-notebook-path-from-cache (notebook-id)
-  "obtain `notebook-id' notebook path based on local cache"
+  "Obtain NOTEBOOK-ID notebook path based on local cache."
   (let (result)
     (maphash (lambda (key value)
                (when (string= value notebook-id)
@@ -1006,6 +1006,7 @@
     result))
 
 (defun leanote--open-note (x &optional helm)
+  "Open note X with swiper. Use helm when HELM not nil."
   (let* ((file-name (car x)))
     (when helm
       (setq file-name (expand-file-name
@@ -1017,7 +1018,7 @@
 
 ;;;###autoload
 (defun leanote-find ()
-  "find note by title with ivy-mode"
+  "Find note by title with swiper method."
   (interactive)
   (let (collection)
     (setq collection (leanote-get-all-notes-from-cache))
@@ -1028,7 +1029,7 @@
 
 ;;;###autoload
 (defun leanote-helm-find ()
-  "helm find note"
+  "Helm find note."
   (interactive)
   (let (collection)
     (setq collection (leanote-get-all-notes-from-cache))
@@ -1043,14 +1044,14 @@
 ;;; log
 
 (defun leanote-log2msg (level &rest args)
-  "only warning or error message to *Message* buffer."
+  "Only warning or error message to *Message* buffer. Argument LEVEL as log level. ARGS for other content."
   (when (or (equal "warning" level) (equal "error" level))
     (let* ((local-current-time (format-time-string "[leanote][%Y-%m-%d %H:%M:%S] " (current-time))))
       (message (concat local-current-time (string-join args " ")))
       )))
 
 (defun leanote-log2buf (level &rest args)
-  "log message in buffer `leanote-log-buffer-name'"
+  "Log LEVEL message in buffer with ARGS."
   (let* ((buf (get-buffer-create leanote-log-buffer-name))
          (local-current-time (format-time-string "[%Y-%m-%d %H:%M:%S] " (current-time))))
     (with-current-buffer buf
@@ -1060,7 +1061,7 @@
       (insert "\n"))))
 
 (defun leanote-log4j (level msg)
-  "log4j: log message with corresponding level."
+  "Log4j, log LEVEL MSG."
   (leanote-log2msg level msg)
   (cond ((equal "info" leanote-log-level)
          (progn
@@ -1077,7 +1078,7 @@
            ))))
 
 (defun leanote-log (&rest args)
-  "log message!"
+  "Log message. Optional argument ARGS for other content."
   (let* ((size (length args))
          (level (if (= 1 size)
                     "info"
