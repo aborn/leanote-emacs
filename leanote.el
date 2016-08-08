@@ -45,6 +45,10 @@
 ;; C-c r --- rename note
 ;; C-c f --- leanote-find
 ;; C-c o --- leanote pull, force update from remote
+;;
+;; Add hook to markdown file
+;; (add-hook 'markdown-mode-hook 'leanote)
+;;
 
 ;;; Code:
 
