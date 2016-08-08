@@ -10,6 +10,11 @@ Install it from elpa source package (i.e. [melpa](https://melpa.org/) or [popkit
 ```elisp
 M-x package-install RET leanote RET
 ```
+Manually install, download leanote.el file to folder */path/to/leanote/*  
+```elisp
+(add-to-list 'load-path "/path/to/leanote/")
+(require 'leanote)
+```
 
 ## Usage
 After install, add following code to your init(.emacs or init.el anyway) file.
@@ -65,6 +70,11 @@ leanote-mode是emacs下的一个**minor-mode**，使得你能在emacs下优雅�
 ```elisp
 M-x package-install RET leanote RET
 ```
+手工安装，下载leanote.el文件到文件夹*/path/to/leanote/*
+```elisp
+(add-to-list 'load-path "/path/to/leanote/")
+(require 'leanote)
+
 
 ## 使用
 将下面代码添加到你emacs的启动文件(.emacs 或者 init.el 或者 .spacemacs)
