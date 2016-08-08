@@ -295,7 +295,8 @@
   (leanote-persistent-put 'leanote--cache-notebook-path-id leanote--cache-notebook-path-id)
   (leanote-persistent-put 'leanote--cache-notebookid-info leanote--cache-notebookid-info)
   (leanote-persistent-put 'leanote--cache-notebookid-notes leanote--cache-notebookid-notes)
-  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp))))
+  (leanote-log (format "--------finished sync leanote data:%s-------" (leanote--get-current-time-stamp)))
+  (message (format "finished sync leanote data:%s" (leanote--get-current-time-stamp))))
 
 (defun leanote--get-current-time-stamp ()
   "get current time stamp"
