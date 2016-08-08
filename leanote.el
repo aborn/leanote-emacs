@@ -711,6 +711,7 @@
       "⦾"
     "✭"))
 
+;;;###autoload
 (defun leanote-status ()
   "current leanote status"
   (let* ((note-id (leanote-get-current-note-id))
