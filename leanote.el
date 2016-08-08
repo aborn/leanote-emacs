@@ -167,9 +167,9 @@
   :type 'boolean
   :group 'leanote)
 
-;; minor mode
+;;;###autoload
 (define-minor-mode leanote
-  "leanote mini mode"
+  "leanote minor mode"
   :init-value nil
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-c u") 'leanote-push)
