@@ -77,6 +77,9 @@
 (defvar leanote-current-all-note-books nil)
 (defvar leanote-current-note-book nil)
 
+;; minor status seg
+(defvar leanote-status-seg nil)
+
 ;; timer task & locker
 (defvar leanote-idle-timer nil)
 (defvar leanote-task-locker nil)
