@@ -9,4 +9,5 @@
   (depends-on "pcache")
   (depends-on "s")
   (depends-on "swiper")
-  (depends-on "helm"))
+  (depends-on "helm")
+  (depends-on "spaceline"))
