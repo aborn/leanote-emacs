@@ -41,10 +41,10 @@
 ;; * M-x leanote-delete ----- delete current note
 ;;
 ;; Here is hot-keys
-;; C-c u --- push/create note to remote server.
-;; C-c r --- rename note
-;; C-c f --- leanote-find
-;; C-c o --- leanote pull, force update from remote
+;; C-x C-l u --- push/create note to remote server.
+;; C-x C-l r --- rename note
+;; C-x C-l f --- leanote-find
+;; C-x C-l o --- leanote pull, force update from remote
 ;;
 ;; Add hook to markdown file
 ;; (add-hook 'markdown-mode-hook 'leanote)
@@ -175,10 +175,10 @@
   "leanote minor mode"
   :init-value nil
   :keymap (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "C-c u") 'leanote-push)
-            (define-key map (kbd "C-c r") 'leanote-rename)
-            (define-key map (kbd "C-c f") 'leanote-find)
-            (define-key map (kbd "C-c o") 'leanote-pull)
+            (define-key map (kbd "C-x C-l u") 'leanote-push)
+            (define-key map (kbd "C-x C-l r") 'leanote-rename)
+            (define-key map (kbd "C-x C-l f") 'leanote-find)
+            (define-key map (kbd "C-x C-l o") 'leanote-pull)
             map)
   :group 'leanote
   (leanote-init)
