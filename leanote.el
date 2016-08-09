@@ -870,11 +870,11 @@
   (interactive)
   (leanote-common-api-action leanote-api-getnoteandcontent "noteId" noteid))
 
-(defun leanote-common-api-action (api &optional param-key &optional param-value)
+(defun leanote-common-api-action (api &optional param-key param-value)
   "Common API with PARAM-KEY and PARAM-VALUE."
   (unless api
     (error "Leanote-common-api-action parameter api is %s!" api))
-  (leanote-log (format "do ajax, api=%s" api))
+  (leanote-log (format "do ajax, api=%s, key=%s, value=%s" api param-key param-value))
   (let ((result nil))
     (request (concat leanote-api-root api)
              :params `(("token" . ,leanote-token) (,param-key . ,param-value))
