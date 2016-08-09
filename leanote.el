@@ -85,7 +85,7 @@
 (defvar leanote-idle-timer nil)
 (defvar leanote-task-locker nil)
 
-;;; local cache
+;; local cache
 ;; notebook-id -> notes-list(without content) map
 (defvar leanote--cache-notebookid-notes (make-hash-table :test 'equal))
 ;; notebook-id -> notebook-info map
@@ -217,7 +217,7 @@
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
 (defun leanote-after-save-action ()
-  "Do some action when markdown file are saved."
+  "Callback action after file saved."
   (let* ((full-file-name (buffer-file-name))
          (note-info nil)
          (is-modified nil)
@@ -837,7 +837,7 @@
     result))
 
 (defun leanote-parser ()
-  "Parser."
+  "Ajax result parser."
   (json-read-from-string (decode-coding-string (buffer-string) 'utf-8)))
 
 (defun leanote-ajax-get-note-books ()
@@ -856,22 +856,22 @@
     ))
 
 (defun leanote-ajax-get-note-content (noteid)
-  "Get note NOTEID content."
+  "Get note deatil content of NOTEID."
   (interactive)
   (leanote-common-api-action leanote-api-getnotecontent "noteId" noteid))
 
 (defun leanote-ajax-get-notes (notebookid)
-  "Get all notes-info in notebook NOTEBOOKID."
+  "Get all notes' info in notebook NOTEBOOKID."
   (interactive)
   (leanote-common-api-action leanote-api-getnotes "notebookId" notebookid))
 
 (defun leanote-get-note-and-content (noteid)
-  "Get note and content fo NOTEID."
+  "Get note and content of NOTEID."
   (interactive)
   (leanote-common-api-action leanote-api-getnoteandcontent "noteId" noteid))
 
 (defun leanote-common-api-action (api &optional param-key param-value)
-  "Common API with PARAM-KEY and PARAM-VALUE."
+  "Do ajax request for API with pair arguments PARAM-KEY PARAM-VALUE."
   (unless api
     (error "Leanote-common-api-action parameter api is %s!" api))
   (leanote-log (format "do ajax, api=%s, key=%s, value=%s" api param-key param-value))
