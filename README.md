@@ -37,10 +37,10 @@ After install, add following code to your init(.emacs or init.el anyway) file.
 * M-x leanote-rename ----- rename current note.
 
 ## Hotkey for action
-* **C-c u** leanote-push
-* **C-c r** leanote-rename
-* **C-c f** leanote-find
-* **C-c o** leanote-pull
+* **C-x C-l u** leanote-push
+* **C-x C-l r** leanote-rename
+* **C-x C-l f** leanote-find
+* **C-x C-l o** leanote-pull
 
 ## Leanote status
 The mode line show it status when markdown file is leanote, 
@@ -97,10 +97,10 @@ M-x package-install RET leanote RET
 * M-x leanote-rename ----- 重命名当前笔记
 
 ## 常功能绑定的快捷键
-* **C-c u** leanote-push
-* **C-c r** leanote-rename
-* **C-c f** leanote-find
-* **C-c o** leanote-pull
+* **C-x C-l u** leanote-push
+* **C-x C-l r** leanote-rename
+* **C-x C-l f** leanote-find
+* **C-x C-l o** leanote-pull
 
 ## leanote状态显示
 当一个markdown文件为leanote时，其mode line会显示出来，如下：
