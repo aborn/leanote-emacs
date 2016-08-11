@@ -14,6 +14,11 @@ Manually install, download leanote.el file to folder */path/to/leanote/*
 ```elisp
 (add-to-list 'load-path "/path/to/leanote/")
 (require 'leanote)
+(add-hook 'markdown-mode-hook
+          (lambda ()
+            (leanote)
+            (leanote-spaceline-status)  ;; optional, use it if necessary
+            ))
 ```
 
 ## Usage
@@ -82,7 +87,12 @@ M-x package-install RET leanote RET
 ```elisp
 (add-to-list 'load-path "/path/to/leanote/")
 (require 'leanote)
-
+(add-hook 'markdown-mode-hook
+          (lambda ()
+            (leanote)
+            (leanote-spaceline-status)  ;; optional, use it if necessary
+            ))
+```
 
 ## 使用
 将下面代码添加到你emacs的启动文件(.emacs 或者 init.el 或者 .spacemacs)
