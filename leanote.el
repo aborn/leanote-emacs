@@ -104,7 +104,7 @@
 (defgroup leanote nil
   "leanote mini group"
   :prefix "leanote-"
-  :group 'external)
+  :group 'markdown)
 
 ;; api
 (defcustom leanote-api-login "/auth/login"
