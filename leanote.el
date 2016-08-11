@@ -4,7 +4,7 @@
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
 ;; Version: 0.3.5
-;; Package-Requires: ((emacs "24.4") (cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0") (swiper "0.8.0") (spaceline "2.0.1"))
+;; Package-Requires: ((emacs "24.4") (cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-emacs
 ;; URL: https://github.com/aborn/leanote-emacs
@@ -60,7 +60,6 @@
 (require 's)
 (require 'ivy)
 (require 'subr-x)
-(require 'spaceline)
 
 ;;;;  Variables
 
