@@ -43,7 +43,7 @@ After install, add following code to your init(.emacs or init.el anyway) file.
 * **C-x C-l o** leanote-pull
 
 ## Leanote status
-First of all, install spaceline (need 2.x version), install leanote status
+First of all, install spaceline (need 2.x version), install leanote status by *M-x leanote-spaceline-status* or add following code to your init file.
 ```elisp
 (leanote-spaceline-status)
 ```
@@ -107,6 +107,11 @@ M-x package-install RET leanote RET
 * **C-x C-l o** leanote-pull
 
 ## leanote状态显示
+leanote状态需要安装2.x及以上版本的spaceline，然后通过*M-x leanote-spaceline-status*
+或者将下列代码加入到你emacs初始配置文件里(这样不用每次打开emacs执行上面命令)。
+```elisp
+(leanote-spaceline-status)
+```
 当一个markdown文件为leanote时，其mode line会显示出来，如下：
 ![](images/status.png "mode line status")
 当一个leanote文件只是在本地修改了，没有同步到远端的时，状态显示为**leanote***，如下：
