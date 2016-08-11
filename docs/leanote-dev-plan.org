@@ -19,10 +19,21 @@
 ***** TODO update user name & password
 ***** TODO get current user info.
 *** 0.3.5
-features:
-**** TODO elpa install autoload bug
-**** TODO fix purcell advice
-**** TODO let status check time interval customize.
+1. plan release time: <2016-08-11 Thu>
+2. features
+**** DONE all tasks [100%]:
+***** DONE elpa install autoload bug
+CLOSED: [2016-08-11 Thu 23:30]
+- State "DONE"       from "ONGOING"    [2016-08-11 Thu 23:30]
+- State "ONGOING"    from "TODO"       [2016-08-11 Thu 23:30]
+***** DONE fix purcell advice
+CLOSED: [2016-08-11 Thu 23:30]
+- State "DONE"       from "ONGOING"    [2016-08-11 Thu 23:30]
+- State "ONGOING"    from "TODO"       [2016-08-11 Thu 23:30]
+***** DONE let status check time interval customize.
+CLOSED: [2016-08-11 Thu 23:35]
+- State "DONE"       from "ONGOING"    [2016-08-11 Thu 23:35]
+- State "ONGOING"    from "TODO"       [2016-08-11 Thu 23:33]
 *** 0.3.0
 1. plan release time: <2016-08-07 Sun>
 2. features
