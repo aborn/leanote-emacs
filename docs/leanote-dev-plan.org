@@ -30,7 +30,7 @@ CLOSED: [2016-08-11 Thu 23:30]
 CLOSED: [2016-08-11 Thu 23:30]
 - State "DONE"       from "ONGOING"    [2016-08-11 Thu 23:30]
 - State "ONGOING"    from "TODO"       [2016-08-11 Thu 23:30]
-***** DONE let status check time interval customize.
+***** DONE let status check time interval customizable.
 CLOSED: [2016-08-11 Thu 23:35]
 - State "DONE"       from "ONGOING"    [2016-08-11 Thu 23:35]
 - State "ONGOING"    from "TODO"       [2016-08-11 Thu 23:33]
