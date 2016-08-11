@@ -4,7 +4,7 @@
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
 ;; Version: 0.3.5
-;; Package-Requires: ((emacs "24.4") (cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0"))
+;; Package-Requires: ((emacs "24.4") (cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0") (async "1.9"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-emacs
 ;; URL: https://github.com/aborn/leanote-emacs
@@ -58,8 +58,8 @@
 (require 'let-alist)
 (require 'pcache)    ;; for persistent
 (require 's)
-(require 'ivy)
 (require 'subr-x)
+(require 'async)
 
 ;;;;  Variables
 
@@ -189,16 +189,6 @@
     (setq leanote-mode t))
   (unless (assq 'leanote-mode minor-mode-alist)
     (add-to-list 'minor-mode-alist '(leanote-mode " Ⓛ") t))
-  (spaceline-define-segment leanote-status-seg
-    "show the leanote status"
-    (when leanote-mode
-      (powerline-raw
-       (s-trim (leanote-status))))
-    :when active)
-  ;; (unless (assq '(leanote-status :when active) spaceline-left)  ;; spaceline-left only in 1.x version
-  ;;   (add-to-list 'spaceline-left '(leanote-status :when active) t))
-  (spaceline-spacemacs-theme 'leanote-status-seg) ;; install leanote-status to spaceline--mode-lines
-  (spaceline-compile)
   (when (= 0 (hash-table-count leanote--cache-noteid-info))
     (setq leanote--cache-noteid-info
           (leanote-persistent-get 'leanote--cache-noteid-info)))
@@ -213,6 +203,18 @@
           (leanote-persistent-get 'leanote--cache-notebookid-notes)))
   (leanote-check-note-update)
   (add-hook 'after-save-hook 'leanote-after-save-action))
+
+(defun leanote-spaceline-status ()
+  "Install spaceline status, need spaceline 2.x version."
+  (interactive)
+  (spaceline-define-segment leanote-status-seg
+    "show the leanote status"
+    (when leanote-mode
+      (powerline-raw
+       (s-trim (leanote-status))))
+    :when active)
+  (spaceline-spacemacs-theme 'leanote-status-seg)
+  (spaceline-compile))
 
 (defun leanote-after-save-action ()
   "Callback action after file saved."

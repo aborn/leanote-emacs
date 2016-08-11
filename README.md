@@ -43,6 +43,10 @@ After install, add following code to your init(.emacs or init.el anyway) file.
 * **C-x C-l o** leanote-pull
 
 ## Leanote status
+First of all, install spaceline (need 2.x version), install leanote status
+```elisp
+(leanote-spaceline-status)
+```
 The mode line show it status when markdown file is leanote, 
 ![](images/status.png "mode line status")
 What's more, when leanote note is modified local (without push to remote), the mode line show **leanote***
