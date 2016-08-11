@@ -118,7 +118,7 @@
   :type 'string)
 
 (defcustom leanote-api-getnotecontent "/note/getNoteContent"
-  "Get conte content api."
+  "Get note content api."
   :group 'leanote
   :type 'string)
 
@@ -408,7 +408,7 @@
         ))))
 
 (defun leanote-delete-file-and-buffer ()
-  "Delete current buffer and its file."
+  "Delete current buffer and its visiting file."
   (let ((filename (buffer-file-name)))
     (when filename
       (delete-file filename)
