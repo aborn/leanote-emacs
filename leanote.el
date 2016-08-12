@@ -162,6 +162,11 @@
   :group 'leanote
   :type 'string)
 
+(defcustom leanote-spaceline-status-p t
+  "Whether or not show spaceline status"
+  :group 'leanote
+  :type 'boolean)
+
 (defcustom leanote-mode nil
   "Toggle `leanote-mode'."
   :require 'leanote
@@ -212,7 +217,7 @@
     (when leanote-mode
       (powerline-raw
        (s-trim (leanote-status))))
-    :when active)
+    :when leanote-spaceline-status-p)
   (spaceline-spacemacs-theme 'leanote-status-seg)
   (spaceline-compile))
 
