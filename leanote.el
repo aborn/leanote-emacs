@@ -214,7 +214,7 @@
   (interactive)
   (require 'spaceline)
   (eval-when-compile
-    (spaceline-define-segment leanote-status-seg
+    (spaceline-define-segment ,leanote-status-seg
       "show the leanote status"
       (when leanote-mode
         (powerline-raw
