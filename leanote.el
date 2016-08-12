@@ -219,7 +219,7 @@
       (when leanote-mode
         (powerline-raw
          (s-trim (leanote-status))))
-      :when leanote-spaceline-status-p))
+      :when ,leanote-spaceline-status-p))
   (spaceline-spacemacs-theme 'leanote-status-seg)
   (spaceline-compile))
 
