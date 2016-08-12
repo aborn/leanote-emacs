@@ -209,6 +209,7 @@
   (leanote-check-note-update)
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
+;;;###autoload
 (defun leanote-spaceline-status ()
   "Install spaceline status, need spaceline 2.x version."
   (interactive)
