@@ -209,17 +209,18 @@
   (leanote-check-note-update)
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
+(eval-when-compile
+  (spaceline-define-segment leanote-status-seg
+    "show the leanote status"
+    (when leanote-mode
+      (powerline-raw
+       (s-trim (leanote-status))))
+    :when leanote-spaceline-status-p))
+
 (defun leanote-spaceline-status ()
   "Install spaceline status, need spaceline 2.x version."
   (interactive)
   (require 'spaceline)
-  (eval-when-compile
-    (spaceline-define-segment ,leanote-status-seg
-      "show the leanote status"
-      (when leanote-mode
-        (powerline-raw
-         (s-trim (leanote-status))))
-      :when ,leanote-spaceline-status-p))
   (spaceline-spacemacs-theme 'leanote-status-seg)
   (spaceline-compile))
 
