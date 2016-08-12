@@ -214,7 +214,7 @@
   "Install spaceline status, need spaceline 2.x version."
   (interactive)
   (require 'spaceline)
-  (eval-when-compile
+  (funcall
     (spaceline-define-segment leanote-status-seg
       "show the leanote status"
       (when leanote-mode
