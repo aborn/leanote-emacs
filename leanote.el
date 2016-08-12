@@ -77,7 +77,6 @@
 (defvar leanote-current-note-book nil)
 
 ;; minor status seg
-(defvar leanote-status nil)
 
 ;; timer task & locker
 (defvar leanote-idle-timer nil)
@@ -216,12 +215,12 @@
   (interactive)
   (require 'spaceline)
   (eval-when-compile
-    (spaceline-define-segment leanote-status
+    (spaceline-define-segment 'leanote-status-seg
       "show the leanote status"
       (when leanote-mode
         (powerline-raw
          (s-trim (leanote-status))))))
-  (spaceline-spacemacs-theme 'leanote-status)
+  (spaceline-spacemacs-theme 'leanote-status-seg)
   (spaceline-compile))
 
 (defun leanote-after-save-action ()
