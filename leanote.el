@@ -77,6 +77,7 @@
 (defvar leanote-current-note-book nil)
 
 ;; minor status seg
+(defvar leanote-status-seg nil)
 
 ;; timer task & locker
 (defvar leanote-idle-timer nil)
@@ -208,18 +209,15 @@
   (leanote-check-note-update)
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
-
-
 (defun leanote-spaceline-status ()
   "Install spaceline status, need spaceline 2.x version."
   (interactive)
   (require 'spaceline)
-  (funcall
-    (spaceline-define-segment leanote-status-seg
-      "show the leanote status"
-      (when leanote-mode
-        (powerline-raw
-         (s-trim (leanote-status))))))
+  (spaceline-define-segment leanote-status-seg
+    "show the leanote status"
+    (when leanote-mode
+      (powerline-raw
+       (s-trim (leanote-status)))))
   (spaceline-spacemacs-theme 'leanote-status-seg)
   (spaceline-compile))
 

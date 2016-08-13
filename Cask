@@ -9,6 +9,5 @@
   (depends-on "pcache")
   (depends-on "s")
   (depends-on "async")
-  (depends-on "swiper")
-  (depends-on "helm")
-  (depends-on "spaceline"))
+  (depends-on "spaceline")
+  )
