@@ -630,20 +630,19 @@
 (defun leanote-async-current-note-status (note-id callback)
   "Async get NOTE-ID status. Argument  CALLBACK for async callback fun."
   (interactive)
-  (let* ((token leanote-token))
-    (async-start
-     `(lambda ()
-        (set 'note-id ,note-id)
-        ,(async-inject-variables "\\`note-id\\'")
-        ,(async-inject-variables "\\`leanote-token\\'")
-        (require 'package)
-        (package-initialize)
-        (load-file (locate-library "leanote"))
-        (require 'leanote)
-        (let* (result)
-          (setq result (leanote-get-note-and-content note-id))
-          result))
-     callback)))
+  (async-start
+   `(lambda ()
+      (set 'note-id ,note-id)
+      ,(async-inject-variables "\\`load-path\\'") ;; add main process load-path
+      ,(async-inject-variables "\\`leanote-token\\'")
+      (require 'package)
+      (package-initialize)
+      (load-file (locate-library "leanote"))
+      (require 'leanote)
+      (let* (result)
+        (setq result (leanote-get-note-and-content note-id))
+        result))
+   callback))
 
 (defun leanote-check-note-update-task ()
   "Current note is need update."
@@ -671,8 +670,9 @@
                   (leanote-status-is-timeout leanote-task-locker 30))
           (when (and note-info is-need-force-update)
             (setq leanote-task-locker `(,note-id :false ,(current-time)))
-            (message "check note status for note:%s" note-id)
-            (leanote-log (format "check note status for note:%s" note-id))
+            (let ((fname (file-name-nondirectory (buffer-file-name))))
+              (message "check note status :%s(%s)" fname note-id)
+              (leanote-log (format "check note status :%s" note-id)))
             (leanote-async-current-note-status
              note-id
              (lambda (asyncresult)
