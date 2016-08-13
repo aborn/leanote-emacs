@@ -1,5 +1,6 @@
 # leanote-mode
 [![Build Status](https://travis-ci.org/aborn/leanote-emacs.svg?branch=master)](https://travis-ci.org/aborn/leanote-emacs)
+[![MELPA Stable](https://stable.melpa.org/packages/leanote-badge.svg)](https://stable.melpa.org/#/leanote)
 [![POPKIT ELPA](https://elpa.popkit.org/packages/leanote-badge.svg)](https://elpa.popkit.org/#/leanote)  
 
 A minor mode writing notes in emacs with elegant way [leanote](https://leanote.com/[leanote])
