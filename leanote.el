@@ -36,8 +36,7 @@
 ;; * M-x leanote-sync  ------ sync all notes from server to local.
 ;; * M-x leanote-push  ------ push current note to remote server (include create new).
 ;; * M-x leanote-pull  ------ pull(update) current note from server.
-;; * M-x leanote-find find -- all notes in current account(default use swiper).
-;; * M-x leanote-helm-find -- find all notes in current account(helm).
+;; * M-x leanote-find  ------ find all notes for current account.
 ;; * M-x leanote-delete ----- delete current note
 ;;
 ;; Here is hot-keys
@@ -49,6 +48,11 @@
 ;; Add hook to markdown file
 ;; (add-hook 'markdown-mode-hook 'leanote)
 ;;
+;; Optional
+;; 
+;; Install leanote status in mode line if you have installed spaceline
+;; M-x leanote-spaceline-status
+;; 
 
 ;;; Code:
 
