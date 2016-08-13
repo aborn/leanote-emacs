@@ -1021,7 +1021,6 @@
         (find-file file-name)
       (message "note %s doesn't exists." file-name))))
 
-;;;###autoload
 (defun leanote-find ()
   "Find note by title with swiper method."
   (interactive)
