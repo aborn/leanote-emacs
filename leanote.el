@@ -1010,39 +1010,22 @@
              leanote--cache-notebook-path-id)
     result))
 
-(defun leanote--open-note (x &optional helm)
-  "Open note X with swiper. Use helm when HELM not nil."
-  (let* ((file-name (car x)))
-    (when helm
-      (setq file-name (expand-file-name
-                       (concat (car (cdr x)) ".md")
-                       file-name)))
-    (if (file-exists-p file-name)
-        (find-file file-name)
-      (message "note %s doesn't exists." file-name))))
+(defun leanote--open-note (note-file)
+  "Open note NOTE-FILE."
+  (if (file-exists-p note-file)
+      (find-file note-file)
+    (message "note %s doesn't exists." note-file)))
 
+;;;###autoload
 (defun leanote-find ()
-  "Find note by title with swiper method."
+  "Find note by title with completing-read"
   (interactive)
-  (let (collection)
+  (let ((collection nil)
+        (sel nil))
     (setq collection (leanote-get-all-notes-from-cache))
-    (ivy-read "search note by title: "
-              collection
-              :action 'leanote--open-note
-              )))
-
-(defun leanote-helm-find ()
-  "Helm find note."
-  (interactive)
-  (let (collection)
-    (setq collection (leanote-get-all-notes-from-cache))
-    (helm :sources (helm-build-sync-source "test"
-                     :candidates collection
-                     :fuzzy-match t
-                     :action (lambda (x)
-                               (leanote--open-note x t)))
-          :buffer "*helm test*"
-          )))
+    (setq sel (completing-read "search note by title: "
+                               collection))
+    (leanote--open-note sel)))
 
 ;; log-releated functions
 (defun leanote-log2msg (level &rest args)
