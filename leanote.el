@@ -1014,22 +1014,15 @@
              leanote--cache-notebook-path-id)
     result))
 
-(defun leanote--open-note (note-file)
-  "Open note NOTE-FILE."
-  (if (file-exists-p note-file)
-      (find-file note-file)
-    (message "note %s doesn't exists." note-file)))
-
 ;;;###autoload
-(defun leanote-find ()
-  "Find note by title with completing-read"
-  (interactive)
-  (let ((collection nil)
-        (sel nil))
-    (setq collection (leanote-get-all-notes-from-cache))
-    (setq sel (completing-read "search note by title: "
-                               collection))
-    (leanote--open-note sel)))
+(defun leanote-find (note)
+  "Find note by title with completing-read."
+  (interactive
+   (list (completing-read "search note by title: "
+                          (leanote-get-all-notes-from-cache))))
+  (unless (file-exists-p note)
+    (error "No such file"))
+  (find-file note))
 
 ;; log-releated functions
 (defun leanote-log2msg (level &rest args)
