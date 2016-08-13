@@ -18,6 +18,14 @@
 ***** TODO deal with minor-mode variable and minor-mode command and map.
 ***** TODO update user name & password
 ***** TODO get current user info.
+*** 0.3.6
+1. release time: <2016-08-13 Sat>
+2. features
+***** DONE remove swiper and helm, use completing-read as default.
+CLOSED: [2016-08-13 Sat 19:10]
+- State "DONE"       from "ONGOING"    [2016-08-13 Sat 19:10]
+- State "ONGOING"    from "TODO"       [2016-08-13 Sat 19:10]
+- State "TODO"       from              [2016-08-13 Sat 19:10]
 *** 0.3.5
 1. plan release time: <2016-08-11 Thu>
 2. features

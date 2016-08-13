@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016 Aborn Jiang
 
 ;; Author: Aborn Jiang <aborn.jiang@gmail.com>
-;; Version: 0.3.5
+;; Version: 0.3.6
 ;; Package-Requires: ((emacs "24.4") (cl-lib "0.5") (request "0.2") (let-alist "1.0.3") (pcache "0.4.0") (s "1.10.0") (async "1.9"))
 ;; Keywords: leanote, note, markdown
 ;; Homepage: https://github.com/aborn/leanote-emacs
