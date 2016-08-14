@@ -101,7 +101,11 @@ CLOSED: [2016-07-31 Sun 19:08]
 - State "DONE"       from "ONGOING"    [2016-07-31 Sun 19:08]
 - State "ONGOING"    from "TODO"       [2016-07-31 Sun 19:08]
 *** local data lose if emacs crash accidentally. do a timer task for save it!
-*** Blocking call to accept-process-output with quit inhibited!!
+*** DONE Blocking call to accept-process-output with quit inhibited!!
+CLOSED: [2016-08-14 Sun 22:30]
+- State "DONE"       from "ONGOING"    [2016-08-14 Sun 22:30]
+- State "ONGOING"    from "TODO"       [2016-08-14 Sun 22:30]
+- State "TODO"       from              [2016-08-14 Sun 22:30]
 *** delte note conflict. 
 *** when buffer exists bug?
 
@@ -112,4 +116,5 @@ CLOSED: [2016-07-31 Sun 19:08]
 
 ** others
 *** unit test
+*** add spaceline pr for leanote-status segment
 
