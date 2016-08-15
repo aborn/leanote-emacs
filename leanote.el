@@ -803,14 +803,26 @@
             )))
       )))
 
+;; TODO
 (defun leanote-notebook-create ()
   "Create new notebook NAME."
   (interactive)
-  (let* ((nbookname nil))
+  (let* ((nbookname nil)
+         (note-id (leanote-get-current-note-id)))
     (setq nbookname (read-string "Enter notebook name:" nil nil nil))
     (when nbookname
       (message "nbookname=%s" nbookname))
     ))
+
+;; TODO
+(defun leanote-notebook-rename ()
+  "Reanme current note book."
+  (interactive))
+
+;; TODO
+(defun leanote-notebook-delete ()
+  "Delete current note book."
+  (interactive))
 
 (defun leanote-ajax-update-note (note-info &optional note-content api)
   "Update note content with NOTE-INFO and NOTE-CONTENT using API."
