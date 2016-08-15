@@ -803,6 +803,15 @@
             )))
       )))
 
+(defun leanote-notebook-create ()
+  "Create new notebook NAME."
+  (interactive)
+  (let* ((nbookname nil))
+    (setq nbookname (read-string "Enter notebook name:" nil nil nil))
+    (when nbookname
+      (message "nbookname=%s" nbookname))
+    ))
+
 (defun leanote-ajax-update-note (note-info &optional note-content api)
   "Update note content with NOTE-INFO and NOTE-CONTENT using API."
   (when (null api)
