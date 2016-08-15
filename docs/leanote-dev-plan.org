@@ -11,6 +11,11 @@
 -----
 
 ** each version develop plan.
+*** 0.4.5
+1. plan release time:
+2. features
+**** all tasks []
+***** TODO show all notebook and notes info in table.
 *** 0.4.0
 1. plan release time: <2016-08-28 Sun>
 2. features
