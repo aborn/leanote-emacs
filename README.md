@@ -144,3 +144,7 @@ leanote状态需要安装2.x及以上版本的spaceline，然后通过*M-x leano
 
 ## 操作日志
 所有的操作日志被记录在\*Leanote-Log* 这个buffer里。
+
+## FAQ
+* 出现Could not create connection to leanote.com:443?  
+答：windows下emacs 24.5及以下版本是不支持TLS，要手动安装一个TLS库，见这个[博客](http://www.lonecpluspluscoder.com/2015/08/01/adding-tls-support-to-emacs-24-5-on-windows/)。
