@@ -1,0 +1,13 @@
+#+TITLE:     Bug list
+#+AUTHOR:    Aborn Jiang
+#+EMAIL:     (concat "aborn.jiang" at-sign "gmail.com")
+#+DATE:      2016-07-24
+#+LANGUAGE:  en
+#+OPTIONS:   H:4 num:nil toc:2
+#+TIME:      2016-07-24 ~ 
+
+#+SETUPFILE: ~/github/org-html-themes/setup/theme-readtheorg.setup
+
+-----
+
+* TODO cache are deleted when reopen if previous not open note.
