@@ -671,7 +671,7 @@
           (when (and note-info is-need-force-update)
             (setq leanote-task-locker `(,note-id :false ,(current-time)))
             (let ((fname (file-name-nondirectory (buffer-file-name))))
-              (message "check note status :%s(%s)" fname note-id)
+              (message "check note %s(%s) status." fname note-id)
               (leanote-log (format "check note status :%s" note-id)))
             (leanote-async-current-note-status
              note-id
