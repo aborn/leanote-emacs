@@ -219,6 +219,20 @@
   (leanote-check-note-update)
   (add-hook 'after-save-hook 'leanote-after-save-action))
 
+(defun leanote-spaceline-compile ()
+  "Initialize commpile the spaceline status."
+  (interactive)
+  (unless (locate-library "spaceline")
+    (error "please install spaceline."))
+  (let* ((leanote-lib
+          (locate-library "leanote"))
+         (leanote-lib-src-file leanote-lib))
+    (unless leanote-lib
+      (error "cannot find leanote package, please install."))
+    (when (string-suffix-p ".elc" leanote-lib)
+      (setq leanote-lib-src-file (substring leanote-lib 0 (- (length leanote-lib) 1))))
+    (byte-compile-file leanote-lib-src-file)))
+
 (defun leanote-spaceline-status ()
   "Install spaceline status, need spaceline 2.x version."
   (interactive)
