@@ -171,6 +171,11 @@
   :group 'leanote
   :type 'boolean)
 
+(defcustom leanote-mode-hook '()
+  "Called upon entry into leanote mode."
+  :type 'hook
+  :group 'leanote)
+
 (defcustom leanote-mode nil
   "Toggle `leanote-mode'."
   :require 'leanote
@@ -189,7 +194,8 @@
             map)
   :group 'leanote
   (leanote-init)
-  (leanote-log "leanote minor mode initial!"))
+  (leanote-log "leanote minor mode inited, now run hooks!")
+  (run-hooks 'leanote-mode-hook))
 
 ;;;###autoload
 (defun leanote-init ()
