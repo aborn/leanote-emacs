@@ -2,3 +2,5 @@
 .cask
 *.elc
 upload.sh
+docs/*.pdf
+docs/*.tex
