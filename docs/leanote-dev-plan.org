@@ -16,6 +16,7 @@
 2. features
 **** all tasks []
 ***** TODO show all notebook and notes info in table.
+***** TODO auto overwritten content when local need update.
 *** 0.4.0
 1. plan release time: <2016-08-28 Sun>
 2. features
