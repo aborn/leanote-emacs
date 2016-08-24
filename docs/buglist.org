@@ -11,3 +11,6 @@
 -----
 
 * TODO cache are deleted when reopen if previous not open note.
+
+* TODO leanote-extra-abstract bug when not start #
+leanote-ajax-update-note: Wrong type argument: number-or-marker-p, nil
