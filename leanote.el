@@ -266,8 +266,7 @@
         (setq is-modified (assoc-default 'IsModified note-info))
         (setq noteid (assoc-default 'NoteId note-info))
         (when (and note-info
-                   (not is-modified)
-                   (buffer-modified-p))
+                   (not is-modified))
           (cl-pushnew '(IsModified . t) note-info)
           (puthash noteid note-info leanote--cache-noteid-info)
           (leanote-persistent-put 'leanote--cache-noteid-info leanote--cache-noteid-info)
