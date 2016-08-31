@@ -576,6 +576,18 @@
             (leanote-log "rename note success.")))))
     ))
 
+(defun leanote-get-current-notebook-id ()
+  "Get current buffer notebookid"
+  (interactive)
+  (let* ((filename (buffer-file-name))
+         (is-markdown-file (string-suffix-p ".md" filename)))
+    (when (and filename is-markdown-file)
+      (message "good")
+      (gethash
+       (substring default-directory
+                  0 (- (length default-directory) 1))
+       leanote--cache-notebook-path-id))))
+
 (defun leanote-get-current-note-id ()
   "Get current buffer leanote note-id."
   (interactive)
