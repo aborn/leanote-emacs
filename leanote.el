@@ -578,11 +578,9 @@
 
 (defun leanote-get-current-notebook-id ()
   "Get current buffer notebookid"
-  (interactive)
   (let* ((filename (buffer-file-name))
          (is-markdown-file (string-suffix-p ".md" filename)))
     (when (and filename is-markdown-file)
-      (message "good")
       (gethash
        (substring default-directory
                   0 (- (length default-directory) 1))
@@ -761,8 +759,12 @@
 (defun leanote-status ()
   "Current leanote status."
   (let* ((note-id (leanote-get-current-note-id))
+         (notebook-id (leanote-get-current-notebook-id))
          (result "")
          (note-info nil))
+    (when (and (not note-id) notebook-id)
+      (message "New note need to push to remote M-x leanote-push.")
+      (setq result (concat "leanote≛" (leanote--login-status))))
     (when note-id
       (setq note-info (gethash note-id leanote--cache-noteid-info))
       (when note-info
