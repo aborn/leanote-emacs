@@ -644,13 +644,17 @@
   (let* ((noteid (leanote-get-current-note-id))
          (noteinfo (gethash noteid leanote--cache-noteid-info))
          (is-modified nil)
+         (auto nil)
          (query-msg "Do you want to replace local with remote content?"))
     (when (and noteid noteinfo)
       (leanote-make-sure-login)
       (setq is-modified (assoc-default 'IsModified noteinfo))
       (when is-modified
         (setq query-msg (concat "Local file is modified!" query-msg)))
-      (when (yes-or-no-p query-msg)
+      (setq auto (and (not is-modified) leanote-auto-overwrite-p))
+      (when (or auto
+                (yes-or-no-p query-msg))
+        (message "begin to update")
         (let* ((notecontent-obj (leanote-get-note-and-content noteid))
                (notecontent (assoc-default 'Content notecontent-obj)))
           (when notecontent
@@ -688,6 +692,8 @@
          (remote-usn nil)
          (local-usn nil)
          (result nil)
+         (note-info (gethash note-id leanote--cache-noteid-info))
+         (is-modified (assoc-default 'IsModified note-info))
          (status :false))
     ;; (leanote-log "execute leanote-current-note-need-update-status ...")
     (when (and note-id leanote-token)
@@ -724,8 +730,12 @@
                    (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
                                         local-usn remote-usn note-id)))
                  (setq result `(,note-id ,status ,(current-time)))
-                 (puthash note-id result leanote--cache-note-update-status)
-                 (force-mode-line-update)
+                 (if (and leanote-auto-overwrite-p (not is-modified))
+                     (progn
+                       (leanote-pull))
+                   (progn
+                     (puthash note-id result leanote--cache-note-update-status)
+                     (force-mode-line-update)))
                  (leanote-log (format "finished check note status for note:%s" note-id)))
                )))
           )))
