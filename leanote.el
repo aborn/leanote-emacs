@@ -763,7 +763,7 @@
          (result "")
          (note-info nil))
     (when (and (not note-id) notebook-id)
-      (message "New note need to push to remote M-x leanote-push.")
+      ;; (message "New note need to push to remote M-x leanote-push.")
       (setq result (concat "leanote≛" (leanote--login-status))))
     (when note-id
       (setq note-info (gethash note-id leanote--cache-noteid-info))
