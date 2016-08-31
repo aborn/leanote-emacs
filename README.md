@@ -68,6 +68,8 @@ Already login status
 ![](images/status-login.png "already login status")
 Need sync with remote
 ![](images/status-update.png "need update current note")
+New note status, which need to push to remote
+![](images/statusnewnote.png "new note need to push to remote")
 
 ## Leanote log
 All logs are recorded in \*Leanote-Log* buffer.
@@ -141,6 +143,8 @@ leanote状态需要安装2.x及以上版本的spaceline，然后通过*M-x leano
 ![](images/status-login.png "already login status")
 本地笔记没有远程笔记新时，需要同步远程笔记时的状态
 ![](images/status-update.png "need update current note")
+还没有push到远端的新笔记状态
+![](images/statusnewnote.png "new note need to push to remote")
 
 ## 操作日志
 所有的操作日志被记录在\*Leanote-Log* 这个buffer里。
