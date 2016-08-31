@@ -171,6 +171,11 @@
   :group 'leanote
   :type 'boolean)
 
+(defcustom leanote-auto-overwrite-p t
+  "Whether auto overwrite the local content when need update."
+  :group 'leanote
+  :type 'boolean)
+
 (defcustom leanote-mode-hook '()
   "Called upon entry into leanote mode."
   :type 'hook
