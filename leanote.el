@@ -694,7 +694,8 @@
          (result nil)
          (note-info (gethash note-id leanote--cache-noteid-info))
          (is-modified (assoc-default 'IsModified note-info))
-         (status :false))
+         (status :false)
+         (fname (buffer-file-name)))
     ;; (leanote-log "execute leanote-current-note-need-update-status ...")
     (when (and note-id leanote-token)
       (let* ((cache-status (gethash note-id leanote--cache-note-update-status))
@@ -729,11 +730,13 @@
                                           local-usn remote-usn note-id))
                    (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
                                         local-usn remote-usn note-id)))
-                 (setq result `(,note-id ,status ,(current-time)))
                  (if (and leanote-auto-overwrite-p (not is-modified))
                      (progn
-                       (leanote-pull))
+                       (message "async pull begin, filename=%s, noteid=%s, status=%s" fname note-id status)
+                       ;;(leanote-pull note-id)
+                       )
                    (progn
+                     (setq result `(,note-id ,status ,(current-time)))
                      (puthash note-id result leanote--cache-note-update-status)
                      (force-mode-line-update)))
                  (leanote-log (format "finished check note status for note:%s" note-id)))
@@ -778,6 +781,7 @@
          (result "")
          (note-info nil))
     (when (and (not note-id) notebook-id)
+      ;; TODO is markdown file ?
       ;; (message "New note need to push to remote M-x leanote-push.")
       (setq result (concat "leanote≛" (leanote--login-status))))
     (when note-id
