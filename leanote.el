@@ -719,6 +719,7 @@
             (leanote-async-current-note-status
              note-id
              (lambda (asyncresult)
+               ;; (setq ab/debug asyncresult)
                (setq note-and-content asyncresult)
                (setq remote-usn (assoc-default 'Usn note-and-content))
                (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
@@ -733,8 +734,12 @@
                  (if (and leanote-auto-overwrite-p (not is-modified))
                      (progn
                        (message "async pull begin, filename=%s, noteid=%s, status=%s" fname note-id status)
-                       ;;(leanote-pull note-id)
-                       )
+                       (let ((content (assoc-default 'Content asyncresult)))
+                         (with-current-buffer (get-buffer-create fname)
+                           (erase-buffer)
+                           (insert content)
+                           (write-file fname)))
+                       (message "note %s auto update." fname))
                    (progn
                      (setq result `(,note-id ,status ,(current-time)))
                      (puthash note-id result leanote--cache-note-update-status)
