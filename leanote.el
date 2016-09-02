@@ -738,7 +738,11 @@
                          (with-current-buffer (get-buffer-create fname)
                            (erase-buffer)
                            (insert content)
-                           (write-file fname)))
+                           (write-file fname))
+                         (puthash note-id asyncresult leanote--cache-noteid-info)
+                         (puthash note-id `(,note-id :false ,(current-time))
+                                  leanote--cache-note-update-status)
+                         )
                        (message "note %s auto update." fname))
                    (progn
                      (setq result `(,note-id ,status ,(current-time)))
