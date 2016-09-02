@@ -734,16 +734,16 @@
                  (if (and leanote-auto-overwrite-p (not is-modified))
                      (progn
                        (message "async pull begin, filename=%s, noteid=%s, status=%s" fname note-id status)
+                       (leanote-log (format "async pull begin, filename=%s, noteid=%s, status=%s" fname note-id status))
                        (let ((content (assoc-default 'Content asyncresult)))
-                         (with-current-buffer (get-buffer-create fname)
-                           (erase-buffer)
+                         (with-temp-buffer
                            (insert content)
-                           (write-file fname))
+                           ;; (write-file fname)
+                           (write-region (point-min) (point-max) fname))
                          (puthash note-id asyncresult leanote--cache-noteid-info)
                          (puthash note-id `(,note-id :false ,(current-time))
-                                  leanote--cache-note-update-status)
-                         )
-                       (message "note %s auto update." fname))
+                                  leanote--cache-note-update-status))
+                       (leanote-log (format "note %s auto update." fname)))
                    (progn
                      (setq result `(,note-id ,status ,(current-time)))
                      (puthash note-id result leanote--cache-note-update-status)
