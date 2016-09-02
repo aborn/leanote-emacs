@@ -363,19 +363,17 @@
                                  (leanote-log "error" (format "local file %s has modified, sync error for this file."
                                                               file-full-name))
                                (progn
-                                 (find-file file-full-name)
-                                 (setq buffer-read-only nil)
-                                 (erase-buffer)
-                                 (insert notecontent)  ;; if notecontent is nil ?
-                                 (save-buffer)
+                                 (with-temp-buffer  ;; save content
+                                   (insert notecontent)
+                                   (write-region (point-min) (point-max) file-full-name))
                                  (puthash noteid note leanote--cache-noteid-info)
                                  (leanote-log (format "ok, local file %s updated!" file-full-name))
                                  ))))
                        (progn
                          (leanote-log (format "file %s not exists in local." file-full-name))
-                         (find-file file-full-name)
-                         (insert notecontent)
-                         (save-buffer)
+                         (with-temp-buffer
+                           (insert notecontent)
+                           (write-region (point-min) (point-max) file-full-name))
                          (puthash noteid note leanote--cache-noteid-info)
                          (leanote-log (format "ok, local file %s created!" file-full-name))
                          )))))))))
