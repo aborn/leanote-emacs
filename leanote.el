@@ -686,10 +686,7 @@
   "Current note is need update."
   (interactive)
   (let* ((note-id (leanote-get-current-note-id))
-         (note-and-content nil)
-         (remote-usn nil)
-         (local-usn nil)
-         (result nil)
+         (note-and-content) (remote-usn) (local-usn) (result)
          (note-info (gethash note-id leanote--cache-noteid-info))
          (is-modified (assoc-default 'IsModified note-info))
          (status :false)
@@ -717,7 +714,6 @@
             (leanote-async-current-note-status
              note-id
              (lambda (asyncresult)
-               ;; (setq ab/debug asyncresult)
                (setq note-and-content asyncresult)
                (setq remote-usn (assoc-default 'Usn note-and-content))
                (setq local-usn (assoc-default 'Usn (gethash note-id leanote--cache-noteid-info)))
@@ -729,7 +725,9 @@
                                           local-usn remote-usn note-id))
                    (leanote-log (format "note not need update, local-usn=%d, remote-usn=%d %s"
                                         local-usn remote-usn note-id)))
-                 (if (and leanote-auto-overwrite-p (not is-modified))
+                 (if (and leanote-auto-overwrite-p
+                          (not is-modified)
+                          (eq status t))
                      (progn
                        (message "async pull begin, filename=%s, noteid=%s, status=%s" fname note-id status)
                        (leanote-log (format "async pull begin, filename=%s, noteid=%s, status=%s" fname note-id status))
