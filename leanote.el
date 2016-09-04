@@ -744,7 +744,7 @@
                          (puthash note-id asyncresult leanote--cache-noteid-info)
                          (puthash note-id `(,note-id :false ,(current-time))
                                   leanote--cache-note-update-status))
-                       ;; (revert-buffer :ignore-auto :noconfirm)  ;; (auto-revert-mode) ?
+                       ;; (revert-buffer :ignore-auto :noconfirm)  ;; (auto-revert-mode) ? (global-auto-revert-mode 1)
                        (leanote-log (format "note %s auto update." fname)))
                    (progn
                      (setq result `(,note-id ,status ,(current-time)))
