@@ -922,7 +922,9 @@
         (when notebook-id
           (make-directory nbook-path)    ;; or use (mkdir <path>)
           (puthash notebook-id result leanote--cache-notebookid-info)
-          (puthash nbook-path notebook-id leanote--cache-notebook-path-id))))
+          (puthash nbook-path notebook-id leanote--cache-notebook-path-id)
+          (message "Notebook %s (%s) was created!" nbookname nbook-path)
+          )))
     ))
 
 (defun leanote--path-without-slash (path)
@@ -943,7 +945,7 @@
          (usn (assoc-default 'Usn notebook-info))
          (request-params)
          (result)
-         (notebook-path ))
+         (notebook-path (leanote--path-without-slash default-directory)))
     (unless (and notebook-id
                  notebook-info)
       (error "Cannot fond current notebook."))
@@ -962,10 +964,11 @@
                    (equal :json-false (assoc-default 'Ok result))))
           (message "Delete notebook error, reason:%s" (assoc-default 'Msg result)))
       (progn
-        (delete-directory default-directory t)
+        (delete-directory notebook-path t)
         (remhash notebook-id leanote--cache-noteid-info)
-        (remhash )
+        (remhash notebook-path leanote--cache-notebook-path-id)
         (kill-buffer)
+        (message "Notebook %s (%s) was deleted!" notebook-title notebook-path)
         ))))
 
 ;; TODO
