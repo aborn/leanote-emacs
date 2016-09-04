@@ -34,20 +34,23 @@ After install, add following code to your init(.emacs or init.el anyway) file.
 ```
 
 ## Actions
-* M-x leanote-login ------ login to server.
-* M-x leanote-sync ------- sync all notes from server to local.
-* M-x leanote-push ------- push current note to remote server (include create new).
-* M-x leanote-pull ------- pull and force update current note from server.
-* M-x leanote-find find -- all notes in current account(default use swiper).
-* M-x leanote-helm-find -- find all notes in current account(helm).
-* M-x leanote-delete ----- delete current note.
-* M-x leanote-rename ----- rename current note.
+* M-x leanote-login ------------ login to server.
+* M-x leanote-sync ------------- sync all notes from server to local.
+* M-x leanote-push ------------- push current note to remote server (include create new).
+* M-x leanote-pull ------------- pull and force update current note from server.
+* M-x leanote-find find -------- all notes in current account(default use swiper).
+* M-x leanote-helm-find -------- find all notes in current account(helm).
+* M-x leanote-delete ----------- delete current note.
+* M-x leanote-rename ----------- rename current note.
+* M-x leanote-notebook-create -- create new notebook.
+* M-x leanote-notebook-delete -- delete current notebook.
 
 ## Hotkey for action
 * **C-x C-l u** leanote-push
 * **C-x C-l r** leanote-rename
 * **C-x C-l f** leanote-find
 * **C-x C-l o** leanote-pull
+* **C-x C-l n** leanote-notebook-create
 
 ## Leanote status
 First of all, install spaceline (need 2.x version), install leanote status by *M-x leanote-spaceline-status* or add following code to your init file.
@@ -109,19 +112,22 @@ M-x package-install RET leanote RET
 ```
 
 ## 常用功能
-* M-x leanote-login ------ 登录服务器
-* M-x leanote-sync ------- 同步所有远端笔记到本地
-* M-x leanote-push ------- 将当前本地笔记上传到远端(如果远端没有就创建之)
-* M-x leanote-pull ------- 强制同步当前笔记为远端内容
-* M-x leanote-find ------- 查找当前账号下所有本地笔记
-* M-x leanote-delete ----- 删除当前笔记
-* M-x leanote-rename ----- 重命名当前笔记
+* M-x leanote-login ------------ 登录服务器
+* M-x leanote-sync ------------- 同步所有远端笔记到本地
+* M-x leanote-push ------------- 将当前本地笔记上传到远端(如果远端没有就创建之)
+* M-x leanote-pull ------------- 强制同步当前笔记为远端内容
+* M-x leanote-find ------------- 查找当前账号下所有本地笔记
+* M-x leanote-delete ----------- 删除当前笔记
+* M-x leanote-rename ----------- 重命名当前笔记
+* M-x leanote-notebook-create -- 新建立笔记本
+* M-x leanote-notebook-delete -- 删除当前笔记本
 
 ## 常功能绑定的快捷键
 * **C-x C-l u** leanote-push
 * **C-x C-l r** leanote-rename
 * **C-x C-l f** leanote-find
 * **C-x C-l o** leanote-pull
+* **C-x C-l n** leanote-notebook-create
 
 ## leanote状态显示
 leanote状态需要安装2.x及以上版本的spaceline，然后通过*M-x leanote-spaceline-status*
