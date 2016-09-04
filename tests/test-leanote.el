@@ -50,3 +50,15 @@
                 (expect (leanote-status-is-timeout status1)
                         :to-be t)
                 )))
+
+(describe "test leanote--path-without-slash"
+          (it "test"
+              (let* ((path1 "/abd")
+                     (path2 "/abcd/")
+                     (path3 "中/")
+                     (path4 "/"))
+                (expect (leanote--path-without-slash path1) :to-equal path1)
+                (expect (leanote--path-without-slash path2) :to-equal "/abcd")
+                (expect (leanote--path-without-slash path3) :to-equal "中")
+                (expect (leanote--path-without-slash path4) :to-equal "")
+                )))
