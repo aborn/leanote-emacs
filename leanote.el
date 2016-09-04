@@ -909,7 +909,6 @@
     (when nbookname
       (message "nbookname=%s  note-id=%s  notebook-id=%s" nbookname note-id notebook-id))
     (setq result (leanote-request api request-params t))
-    (setq ab/debug result)
     (if (or (not result)
             (and (listp result)
                  (equal :json-false (assoc-default 'Ok result))))
@@ -927,13 +926,16 @@
     ))
 
 ;; TODO
-(defun leanote-notebook-rename ()
-  "Reanme current note book."
-  (interactive))
-
-;; TODO
 (defun leanote-notebook-delete ()
   "Delete current note book."
+  (interactive)
+  (let* ((notebook-id (leanote-get-current-notebook-id)))
+    (message "delete %s" notebook-id)
+    ))
+
+;; TODO
+(defun leanote-notebook-rename ()
+  "Reanme current note book."
   (interactive))
 
 (defun leanote-ajax-update-note (note-info &optional note-content api)
