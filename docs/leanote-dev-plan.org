@@ -21,7 +21,10 @@
 *** 0.4.0
 1. plan release time: <2016-09-11 Sun>
 2. features
-**** ONGOING all tasks [80%]
+**** ONGOING all tasks [83%]
+- State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 16:33]
+- State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 16:33]
+- State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 16:33]
 - State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 16:30]
 - State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 12:03]
 - State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 12:03]
@@ -29,6 +32,8 @@
 ***** DONE deal with minor-mode variable and minor-mode command and map.
 CLOSED: [2016-09-04 Sun 10:26]
 ***** TODO get current user info.
+***** DONE fix leanote-extra-abstract function bug when content hasn't #
+CLOSED: [2016-09-04 Sun 16:33]
 ***** DONE create new notebook
 CLOSED: [2016-09-04 Sun 12:03]
 ***** DONE delete notebook
