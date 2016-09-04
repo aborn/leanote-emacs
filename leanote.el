@@ -962,23 +962,29 @@
       (setq request-params `(("usn" . ,usn)
                              ("notebookId" . ,notebook-id)))
       (setq result (leanote-request api request-params t))
-      (if
-          (or (not result)
-              (and (listp result)
-                   (equal :json-false (assoc-default 'Ok result))))
-          (message "Delete notebook error, reason:%s" (assoc-default 'Msg result)))
-      (progn
-        (delete-directory notebook-path t)
-        (remhash notebook-id leanote--cache-noteid-info)
-        (remhash notebook-path leanote--cache-notebook-path-id)
-        (kill-buffer)
-        (message "Notebook %s (%s) was deleted!" notebook-title notebook-path)
-        ))))
+      (if (leanote-request-result-is-success result)
+          (progn
+            (delete-directory notebook-path t)
+            (remhash notebook-id leanote--cache-noteid-info)
+            (remhash notebook-path leanote--cache-notebook-path-id)
+            (kill-buffer)
+            (message "Notebook %s (%s) was deleted!" notebook-title notebook-path))
+        (message "Delete notebook error, reason:%s" (assoc-default 'Msg result))))))
 
 ;; TODO
 (defun leanote-notebook-rename ()
   "Reanme current note book."
   (interactive))
+
+(defun leanote-get-user-info ()
+  "Get current login user info."
+  (let ((api "/user/info")
+        (request-params)
+        (result))
+    (leanote-make-sure-login)
+    (setq request-params `(("userId" . ,leanote-user-id)))
+
+    ))
 
 (defun leanote-ajax-update-note (note-info &optional note-content api)
   "Update note content with NOTE-INFO and NOTE-CONTENT using API."
@@ -1009,6 +1015,13 @@
       (leanote-log "only update info."))
     (setq result (leanote-request api request-params t))
     result))
+
+(defun leanote-request-result-is-success (result)
+  "Check request result is success."
+  (and result
+       (not
+        (and (listp result)
+             (equal :json-false (assoc-default 'Ok result))))))
 
 (defun leanote-request (api params ispost)
   "Leanote common request wrap."
