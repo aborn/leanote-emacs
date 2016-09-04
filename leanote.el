@@ -862,15 +862,32 @@
             )))
       )))
 
+(defun leanote-get-parent-notebookid ()
+  "Get parent-notebookid, `false' return means illegal."
+  (let ((notebook-id (leanote-get-current-notebook-id)))
+    (if notebook-id
+        notebook-id
+      (progn
+        (if (string-prefix-p (expand-file-name leanote-local-root-path)
+                             default-directory)
+            nil
+          :false)))))
+
 ;; TODO
 (defun leanote-notebook-create ()
   "Create new notebook NAME."
   (interactive)
   (let* ((nbookname nil)
-         (note-id (leanote-get-current-note-id)))
+         (note-id (leanote-get-current-note-id))
+         (pnotebook-id (leanote-get-parent-notebookid)))
+    (unless (or (not pnotebook-id)
+                (not (eq :false pnotebook-id)))
+      (error "not in corrent directory, create notebook error!"))
     (setq nbookname (read-string "Enter notebook name:" nil nil nil))
+    (unless nbookname
+      (error "notebook name not provided!"))
     (when nbookname
-      (message "nbookname=%s" nbookname))
+      (message "nbookname=%s  note-id=%s  notebook-id=%s" nbookname note-id notebook-id))
     ))
 
 ;; TODO
@@ -923,6 +940,23 @@
                                    (leanote-log "error" "Got error")
                                    (error "Got error: %S" error-thrown)))
              )
+    result))
+
+(defun leanote-request (api params ispost)
+  "Leanote common request wrap."
+  (let (result)
+    (request (concat leanote-api-root api)
+             :params params
+             :sync t
+             :type "POST"
+             :parser 'leanote-parser
+             :success (cl-function
+                       (lambda (&key data &allow-other-keys)
+                         (setq result data)))
+             :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                                   (message "Got error: %S" error-thrown)
+                                   (leanote-log "error" "Got error")
+                                   (error "Got error: %S" error-thrown))))
     result))
 
 (defun leanote-parser ()
