@@ -614,25 +614,29 @@
 (defun leanote-extra-abstract (content)
   "Get abstract from leanote CONTENT."
   (let* ((s-indx (string-match "#" content))
-         (s-end (string-match "#" content (+ 1 s-indx)))
-         (result nil))
-    (cond
-     ((and s-indx (not s-end))
-      (setq result (substring content (+ 1 s-indx))))
-     ((and s-indx s-end (> s-end s-indx))
-      (let* ((pure-txt (s-trim (substring content (+ 1 s-indx) s-end)))
-             (lf-indx (string-match "\n" pure-txt))
-             (title (if lf-indx
-                        (substring pure-txt 0 lf-indx)
-                      pure-txt
-                      ))
-             (abstruct (if lf-indx
-                           (substring pure-txt (+ 1 lf-indx))
-                         pure-txt
-                         )))
-        (if (> (length abstruct) 0)
-            (setq result abstruct)
-          (set result title)))))
+         (s-end)
+         (result))
+    (if (not s-indx)
+        (setq result content)
+      (progn
+        (setq s-end (string-match "#" content (+ 1 s-indx)))
+        (cond
+         ((and s-indx (not s-end))
+          (setq result (substring content (+ 1 s-indx))))
+         ((and s-indx s-end (> s-end s-indx))
+          (let* ((pure-txt (s-trim (substring content (+ 1 s-indx) s-end)))
+                 (lf-indx (string-match "\n" pure-txt))
+                 (title (if lf-indx
+                            (substring pure-txt 0 lf-indx)
+                          pure-txt
+                          ))
+                 (abstruct (if lf-indx
+                               (substring pure-txt (+ 1 lf-indx))
+                             pure-txt
+                             )))
+            (if (> (length abstruct) 0)
+                (setq result abstruct)
+              (set result title)))))))
     (s-trim result)))
 
 ;;;###autoload

@@ -31,7 +31,11 @@
                      (s3 "#工作备忘\n")
                      (s4 "#工作备忘\n#")
                      (s5 "#工作备忘\n##ff")
+                     (s6 "abcd")
+                     (s7 "abcd#")   ;; TODO how to deal with it?
                      )
+                (expect (leanote-extra-abstract s6)
+                        :to-equal "abcd")
                 (expect (leanote-extra-abstract s3)
                         :to-equal "工作备忘")
                 (expect (leanote-extra-abstract s4)
