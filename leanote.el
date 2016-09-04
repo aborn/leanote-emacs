@@ -196,6 +196,7 @@
             (define-key map (kbd "C-x C-l r") 'leanote-rename)
             (define-key map (kbd "C-x C-l f") 'leanote-find)
             (define-key map (kbd "C-x C-l o") 'leanote-pull)
+            (define-key map (kbd "C-x C-l n") 'leanote-notebook-create)
             map)
   :group 'leanote
   (leanote-init)
