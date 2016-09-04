@@ -961,7 +961,6 @@
       (setq request-params `(("usn" . ,usn)
                              ("notebookId" . ,notebook-id)))
       (setq result (leanote-request api request-params t))
-      (setq ab/debug result)
       (if
           (or (not result)
               (and (listp result)
