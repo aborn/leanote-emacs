@@ -19,9 +19,10 @@
 ***** TODO rename notebook
 ***** TODO update user name & password
 *** 0.4.0
-1. plan release time: <2016-09-11 Sun>
+1. plan release time: <2016-09-04 Sun>
 2. features
-**** ONGOING all tasks [83%]
+**** DONE all tasks [100%]
+- State "DONE"       from "ONGOING"    [2016-09-04 Sun 19:39]
 - State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 19:15]
 - State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 16:33]
 - State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 16:33]
@@ -32,7 +33,8 @@
 - State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 10:27]
 ***** DONE deal with minor-mode variable and minor-mode command and map.
 CLOSED: [2016-09-04 Sun 10:26]
-***** ONGOING get current user info.
+***** DONE get current user info.
+CLOSED: [2016-09-04 Sun 19:39]
 ***** DONE fix leanote-extra-abstract function bug when content hasn't #
 CLOSED: [2016-09-04 Sun 16:33]
 ***** DONE create new notebook
