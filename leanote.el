@@ -925,13 +925,29 @@
           (puthash nbook-path notebook-id leanote--cache-notebook-path-id))))
     ))
 
-;; TODO
+;;;###autoload
 (defun leanote-notebook-delete ()
   "Delete current note book."
   (interactive)
-  (let* ((notebook-id (leanote-get-current-notebook-id)))
-    (message "delete %s" notebook-id)
-    ))
+  (let* ((notebook-id (leanote-get-current-notebook-id))
+         (notebook-info (gethash notebook-id leanote--cache-notebookid-info))
+         (notebook-title (assoc-default 'Title notebook-info))
+         (api "/notebook/deleteNotebook")
+         (usn (assoc-default 'Usn notebook-info))
+         (request-params)
+         (ajax-result))
+    (unless (and notebook-id
+                 notebook-info)
+      (error "Cannot fond current notebook."))
+    (when (yes-or-no-p
+           (format "Do you really want to delete notebook %s (in %s)? %s"
+                   notebook-title default-directory
+                   "And notes in the notebook also will be deleted!"))
+      (message "delete %s" notebook-id)
+      (setq request-params `(("usn" . ,usn)
+                             ("notebookId" . ,notebook-id)))
+      (setq ajax-result (leanote-request api request-params t))
+      )))
 
 ;; TODO
 (defun leanote-notebook-rename ()
