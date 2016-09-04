@@ -925,6 +925,13 @@
           (puthash nbook-path notebook-id leanote--cache-notebook-path-id))))
     ))
 
+(defun leanote--path-without-slash (path)
+  "Delete last / in `path'"
+  (when path
+    (if (string-suffix-p "/" path)
+        (substring path 0 (- (length path) 1))
+      path)))
+
 ;;;###autoload
 (defun leanote-notebook-delete ()
   "Delete current note book."
@@ -935,7 +942,8 @@
          (api "/notebook/deleteNotebook")
          (usn (assoc-default 'Usn notebook-info))
          (request-params)
-         (result))
+         (result)
+         (notebook-path ))
     (unless (and notebook-id
                  notebook-info)
       (error "Cannot fond current notebook."))
@@ -954,8 +962,11 @@
                    (equal :json-false (assoc-default 'Ok result))))
           (message "Delete notebook error, reason:%s" (assoc-default 'Msg result)))
       (progn
-        (delete-directory default-directory t))
-      )))
+        (delete-directory default-directory t)
+        (remhash notebook-id leanote--cache-noteid-info)
+        (remhash )
+        (kill-buffer)
+        ))))
 
 ;; TODO
 (defun leanote-notebook-rename ()
