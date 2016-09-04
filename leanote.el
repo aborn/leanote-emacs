@@ -888,7 +888,7 @@
 
 ;;;###autoload
 (defun leanote-notebook-create ()
-  "Create new notebook NAME."
+  "Create new notebook in as current notebook sub notebook."
   (interactive)
   (let* ((nbookname)
          (request-params)
@@ -914,23 +914,19 @@
     (when nbookname
       (message "nbookname=%s  note-id=%s  notebook-id=%s" nbookname note-id notebook-id))
     (setq result (leanote-request api request-params t))
-    (if (or (not result)
-            (and (listp result)
-                 (equal :json-false (assoc-default 'Ok result))))
-        (message "Add new notebook error, reason:%s"
-                 (concat (assoc-default 'Msg result)
-                         (leanote--get-extra-login-msg result)))
-      (progn
-        (setq notebook-id (assoc-default 'NotebookId result))
-        (unless notebook-id
-          (error "Create new notebook error."))
-        (when notebook-id
-          (make-directory nbook-path)    ;; or use (mkdir <path>)
-          (puthash notebook-id result leanote--cache-notebookid-info)
-          (puthash nbook-path notebook-id leanote--cache-notebook-path-id)
-          (message "Notebook %s (%s) was created!" nbookname nbook-path)
-          )))
-    ))
+    (if (leanote-request-result-is-success result)
+        (progn
+          (setq notebook-id (assoc-default 'NotebookId result))
+          (unless notebook-id
+            (error "Create new notebook error."))
+          (when notebook-id
+            (make-directory nbook-path)    ;; or use (mkdir <path>)
+            (puthash notebook-id result leanote--cache-notebookid-info)
+            (puthash nbook-path notebook-id leanote--cache-notebook-path-id)
+            (message "Notebook %s (%s) was created!" nbookname nbook-path)))
+      (message "Add new notebook error, reason:%s"
+               (concat (assoc-default 'Msg result)
+                       (leanote--get-extra-login-msg result))))))
 
 (defun leanote--path-without-slash (path)
   "Delete last / in `path'"
@@ -978,13 +974,18 @@
 
 (defun leanote-get-user-info ()
   "Get current login user info."
+  (interactive)
   (let ((api "/user/info")
         (request-params)
         (result))
     (leanote-make-sure-login)
     (setq request-params `(("userId" . ,leanote-user-id)))
-
-    ))
+    (setq result (leanote-request api request-params nil))
+    (if (leanote-request-result-is-success result)
+        (progn
+          (message "Get current user info success.")
+          (message "%s" result))
+      (message "Get current user info error."))))
 
 (defun leanote-ajax-update-note (note-info &optional note-content api)
   "Update note content with NOTE-INFO and NOTE-CONTENT using API."
