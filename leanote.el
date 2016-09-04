@@ -700,10 +700,10 @@
           (setq is-need-force-update (leanote-status-is-timeout cache-status))
           (unless is-need-force-update
             (setq result cache-status)
-            (leanote-log (format "status not need update, last update: %s %s"
+            (leanote-log (format "status not need update, last update: %s %s %s"
                                  (format-time-string "%Y-%m-%d %H:%M:%S"
                                                      (car (last cache-status)))
-                                 note-id))))
+                                 note-id fname))))
         (when (or (not leanote-task-locker)
                   (leanote-status-is-timeout leanote-task-locker 30))
           (when (and note-info is-need-force-update)
