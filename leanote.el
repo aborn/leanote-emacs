@@ -927,19 +927,7 @@
           (cl-pushnew `("Abstract" . ,note-abstract) request-params)
           (cl-pushnew `("Content" . ,note-content) request-params))
       (leanote-log "only update info."))
-    (request (concat leanote-api-root api)
-             :params request-params
-             :sync t
-             :type "POST"
-             :parser 'leanote-parser
-             :success (cl-function
-                       (lambda (&key data &allow-other-keys)
-                         (setq result data)))
-             :error (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                                   (message "Got error: %S" error-thrown)
-                                   (leanote-log "error" "Got error")
-                                   (error "Got error: %S" error-thrown)))
-             )
+    (setq result (leanote-request api request-params t))
     result))
 
 (defun leanote-request (api params ispost)
@@ -948,7 +936,7 @@
     (request (concat leanote-api-root api)
              :params params
              :sync t
-             :type "POST"
+             :type (if ispost "POST" "GET")
              :parser 'leanote-parser
              :success (cl-function
                        (lambda (&key data &allow-other-keys)
