@@ -877,17 +877,40 @@
 (defun leanote-notebook-create ()
   "Create new notebook NAME."
   (interactive)
-  (let* ((nbookname nil)
+  (let* ((nbookname)
+         (request-params)
          (note-id (leanote-get-current-note-id))
-         (pnotebook-id (leanote-get-parent-notebookid)))
+         (pnotebook-id (leanote-get-parent-notebookid))
+         (api "/notebook/addNotebook")
+         (result)
+         (nbook-path)
+         (notebook-id))
     (unless (or (not pnotebook-id)
                 (not (eq :false pnotebook-id)))
-      (error "not in corrent directory, create notebook error!"))
+      (error "not in correct directory, create notebook error!"))
     (setq nbookname (read-string "Enter notebook name:" nil nil nil))
     (unless nbookname
       (error "notebook name not provided!"))
+    (setq nbook-path (expand-file-name nbookname default-directory))
+    (when (file-directory-p nbook-path)
+      (error "Create notebook error: %s already exists in %s." nbookname default-directory))
+    (setq request-params `(("title" . ,nbookname)
+                           ("seq" . -1)
+                           ("parentNotebookId" pnotebook-id)))
     (when nbookname
       (message "nbookname=%s  note-id=%s  notebook-id=%s" nbookname note-id notebook-id))
+    ;;(setq result (leanote-request api request-params t))
+    (setq ab/debug result)
+    (if (or (not result)
+            (and (listp result)
+                 (equal :json-false (assoc-default 'Ok result))))
+        (error "Add new notebook error, msg:%s" (assoc-default 'Msg result))
+      (progn
+        (setq notebook-id (assoc-default 'NotebookId result))
+        (when notebook-id
+          (make-directory nbook-path)    ;; or use (mkdir <path>)
+          (puthash notebook-id result leanote--cache-notebookid-info)
+          (puthash nbook-path notebook-id leanote--cache-notebook-path-id))))
     ))
 
 ;; TODO

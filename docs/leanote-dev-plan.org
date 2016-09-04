@@ -21,11 +21,12 @@
 *** 0.4.0
 1. plan release time: <2016-09-11 Sun>
 2. features
-**** ONGOING all tasks [33%]
+**** ONGOING all tasks [40%]
+- State "ONGOING"    from "ONGOING"    [2016-09-04 Sun 10:27]
 ***** DONE deal with minor-mode variable and minor-mode command and map.
 CLOSED: [2016-09-04 Sun 10:26]
 ***** TODO get current user info.
-***** TODO create new notebook
+***** ONGOING create new notebook
 ***** TODO delete notebook
 ***** DONE auto overwritten content when local need update.
 CLOSED: [2016-09-04 Sun 08:03]
