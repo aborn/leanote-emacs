@@ -873,7 +873,15 @@
             nil
           :false)))))
 
-;; TODO
+(defun leanote--get-extra-login-msg (ajax-result)
+  "Maybe need relogin when session timeout."
+  (let ((extra-msg ""))
+    (when (and (s-contains? "NOTLOGIN" (assoc-default 'Msg ajax-result))
+               leanote-token)
+      (setq extra-msg " Login session is timeout, you need relogin.")
+      extra-msg)))
+
+;;;###autoload
 (defun leanote-notebook-create ()
   "Create new notebook NAME."
   (interactive)
@@ -885,6 +893,7 @@
          (result)
          (nbook-path)
          (notebook-id))
+    (leanote-make-sure-login)
     (unless (or (not pnotebook-id)
                 (not (eq :false pnotebook-id)))
       (error "not in correct directory, create notebook error!"))
@@ -896,17 +905,21 @@
       (error "Create notebook error: %s already exists in %s." nbookname default-directory))
     (setq request-params `(("title" . ,nbookname)
                            ("seq" . -1)
-                           ("parentNotebookId" pnotebook-id)))
+                           ("parentNotebookId" . ,pnotebook-id)))
     (when nbookname
       (message "nbookname=%s  note-id=%s  notebook-id=%s" nbookname note-id notebook-id))
-    ;;(setq result (leanote-request api request-params t))
+    (setq result (leanote-request api request-params t))
     (setq ab/debug result)
     (if (or (not result)
             (and (listp result)
                  (equal :json-false (assoc-default 'Ok result))))
-        (error "Add new notebook error, msg:%s" (assoc-default 'Msg result))
+        (message "Add new notebook error, reason:%s"
+                 (concat (assoc-default 'Msg result)
+                         (leanote--get-extra-login-msg result)))
       (progn
         (setq notebook-id (assoc-default 'NotebookId result))
+        (unless notebook-id
+          (error "Create new notebook error."))
         (when notebook-id
           (make-directory nbook-path)    ;; or use (mkdir <path>)
           (puthash notebook-id result leanote--cache-notebookid-info)
@@ -956,6 +969,8 @@
 (defun leanote-request (api params ispost)
   "Leanote common request wrap."
   (let (result)
+    (unless (assoc-default "token" params)
+      (cl-pushnew `("token" . ,leanote-token) params))
     (request (concat leanote-api-root api)
              :params params
              :sync t
