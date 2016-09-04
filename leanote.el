@@ -935,7 +935,7 @@
          (api "/notebook/deleteNotebook")
          (usn (assoc-default 'Usn notebook-info))
          (request-params)
-         (ajax-result))
+         (result))
     (unless (and notebook-id
                  notebook-info)
       (error "Cannot fond current notebook."))
@@ -946,7 +946,15 @@
       (message "delete %s" notebook-id)
       (setq request-params `(("usn" . ,usn)
                              ("notebookId" . ,notebook-id)))
-      (setq ajax-result (leanote-request api request-params t))
+      (setq result (leanote-request api request-params t))
+      (setq ab/debug result)
+      (if
+          (or (not result)
+              (and (listp result)
+                   (equal :json-false (assoc-default 'Ok result))))
+          (message "Delete notebook error, reason:%s" (assoc-default 'Msg result)))
+      (progn
+        (delete-directory default-directory t))
       )))
 
 ;; TODO
