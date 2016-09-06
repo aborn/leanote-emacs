@@ -839,7 +839,7 @@
               (unless result-data
                 (error "Error in push(update note) to server. reason: server error!"))
               (leanote-log (format "file %s update to remote success." note-title))
-              (message (format "file %s update to remote success." note-title))
+              (message (format "file %s.md update to remote success." note-title))
               (leanote-notebook-replace notebook-notes result-data note-id)
               (puthash note-id result-data leanote--cache-noteid-info))
             ))
@@ -858,7 +858,7 @@
               (unless result-data
                 (error "Add new note to server error. reason: server error!"))
               (leanote-log (format "add new file %s to remote success." note-title))
-              (message (format "add new file %s to remote success." note-title))
+              (message (format "add new file %s.md to remote success." note-title))
               (let* ((notebook-notes-new (vconcat notebook-notes (vector result-data))))
                 (setq note-id (assoc-default 'NoteId result-data))
                 (unless note-id
