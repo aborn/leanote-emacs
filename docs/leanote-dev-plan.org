@@ -18,6 +18,7 @@
 ***** TODO show all notebook and notes info in table.
 ***** TODO rename notebook
 ***** TODO update user name & password
+***** TODO using password in local machine
 *** 0.4.0
 1. plan release time: <2016-09-04 Sun>
 2. features
