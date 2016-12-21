@@ -116,6 +116,11 @@
   :group 'leanote
   :type 'string)
 
+(defcustom leanote-user-info-json-file (expand-file-name ".leanote" "~")
+  "User info file, content see userinfo.json"
+  :group 'leanote
+  :type 'string)
+
 (defcustom leanote-api-getnotebooks "/notebook/getNotebooks"
   "Get note books api."
   :group 'leanote
