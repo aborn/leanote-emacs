@@ -205,6 +205,7 @@
             map)
   :group 'leanote
   (leanote-init)
+  (leanote-init-user-email-and-password-from-config-file)
   (leanote-log "leanote minor mode inited, now run hooks!")
   (run-hooks 'leanote-mode-hook))
 
