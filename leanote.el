@@ -1169,9 +1169,9 @@
              (file-exists-p leanote-user-info-json-file))
     (let* ((info (json-read-file leanote-user-info-json-file))
            (email (assoc-default 'user info))
-           (pwd (assoc-default 'password info)))
+           (password (assoc-default 'password info)))
       (and email (setq leanote-user-email email))
-      (and pwd (setq leanote-user-password pwd)))))
+      (and password (setq leanote-user-password password)))))
 
 ;;;###autoload
 (defun leanote-login (&optional user password)
