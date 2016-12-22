@@ -116,7 +116,7 @@
   :group 'leanote
   :type 'string)
 
-(defcustom leanote-user-info-json-file (expand-file-name ".leanote" "~")
+(defcustom leanote-user-info-json-file (expand-file-name ".leanote/userinfo.json" "~")
   "User info file, content see userinfo.json"
   :group 'leanote
   :type 'string)
@@ -1161,6 +1161,15 @@
   (unless leanote-token
     (leanote-log "error" "login failed!")
     (error "Login failed!")))
+
+(defun leanote-init-user-email-and-password-from-config-file ()
+  "Init leanote user email and passwod from config file."
+  (when (and leanote-user-info-json-file
+             (file-exists-p leanote-user-info-json-file))
+    (let* ((info (json-read-file leanote-user-info-json-file))
+           (email (assoc-default 'user info))
+           (pwd (assoc-default 'password)))
+      )))
 
 ;;;###autoload
 (defun leanote-login (&optional user password)
