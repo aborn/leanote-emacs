@@ -1164,14 +1164,18 @@
     (error "Login failed!")))
 
 (defun leanote-init-user-email-and-password-from-config-file ()
-  "Init leanote user email and passwod from config file."
+  "Init leanote user and passwod from config file."
   (when (and leanote-user-info-json-file
              (file-exists-p leanote-user-info-json-file))
     (let* ((info (json-read-file leanote-user-info-json-file))
-           (email (assoc-default 'user info))
+           (user (assoc-default 'user info))
            (password (assoc-default 'password info)))
-      (and email (setq leanote-user-email email))
-      (and password (setq leanote-user-password password)))))
+      (and user (setq leanote-user-email user))
+      (and password (setq leanote-user-password password))
+      ;; (and user
+      ;;      password
+      ;;      (leanote-login user password))
+      )))
 
 ;;;###autoload
 (defun leanote-login (&optional user password)
