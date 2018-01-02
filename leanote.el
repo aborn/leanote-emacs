@@ -643,7 +643,7 @@
                              )))
             (if (> (length abstruct) 0)
                 (setq result abstruct)
-              (set result title)))))))
+              (setq result title)))))))
     (s-trim result)))
 
 ;;;###autoload
